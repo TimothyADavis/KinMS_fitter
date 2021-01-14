@@ -15,6 +15,8 @@ import astropy.units as u
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from kinms import KinMS
 from kinms.utils.KinMS_figures import KinMS_plotter
+from kinms_fitter.sb_profs import sb_profs
+from kinms_fitter.velocity_profs import velocity_profs      
 
 def gaussian(values,x):
     mu=values[0]
@@ -47,7 +49,9 @@ class kinms_fitter:
         self.xc_guess=np.nanmedian(self.x1)
         self.yc_guess=np.nanmedian(self.y1)
         self.vsys_guess=np.nanmedian(self.v1)
-        self.maxextent=np.max([np.max(np.abs(self.x1)),np.max(np.abs(self.y1))])
+        self.vsys_mid=np.nanmedian(self.v1)
+        
+        self.maxextent=np.max([np.max(np.abs(self.x1-self.xc_guess)),np.max(np.abs(self.y1-self.yc_guess))])*3600.
         self.nrings=np.floor(self.maxextent/self.bmaj).astype(np.int)
         self.vel_guess= np.nanstd(self.v1)
         self.cellsize=np.abs(self.hdr['CDELT1']*3600)
@@ -57,10 +61,10 @@ class kinms_fitter:
         self.silent=False
         self.show_corner= False
         self.totflux_guess=np.nansum(self.cube)
-        self.expscale_guess=np.max(np.abs(self.y1))/5.
+        self.expscale_guess=self.maxextent/5.
         self.inc_guess=45.
         self.inc_range=[1,89]
-        self.expscale_range=[0,np.max(np.abs(self.y1))]
+        self.expscale_range=[0,self.maxextent]
         self.totflux_range=[0,np.nansum(self.cube)*3.]
         self.xcent_range=[np.min(self.x1),np.max(self.x1)]
         self.ycent_range=[np.min(self.y1),np.max(self.y1)]
@@ -69,8 +73,8 @@ class kinms_fitter:
         self.vel_range=[0,(np.nanmax(self.v1)-np.nanmin(self.v1))/2.]
         self.sbRad=np.arange(0,self.maxextent*2,self.cellsize/2.)
         self.nSamps=np.int(5e5)
-
-        
+        self.sb_profile=None
+        self.vel_profile=None
         try:
             self.objname=self.hdr['OBJECT']
         except:
@@ -179,30 +183,29 @@ class kinms_fitter:
                 
          
         # xcen, ycen, vsys
-        initial_guesses=np.array([self.pa_guess,self.xc_guess,self.yc_guess,self.vsys_guess,self.inc_guess,self.expscale_guess,self.totflux_guess])
-        minimums=np.array([self.pa_range[0],self.xcent_range[0],self.ycent_range[0],self.vsys_range[0],self.inc_range[0],self.expscale_range[0],self.totflux_range[0]])
-        maximums=np.array([self.pa_range[1],self.xcent_range[1],self.ycent_range[1],self.vsys_range[1],self.inc_range[1],self.expscale_range[1],self.totflux_range[1]])
-        labels=np.array(["PA","Xc","Yc","Vsys","inc","expscale","totflux"])
-        fixed= np.array([False,False,False,False,False,False,False])
+        initial_guesses=np.array([self.pa_guess,self.xc_guess,self.yc_guess,self.vsys_guess,self.inc_guess,self.totflux_guess])
+        minimums=np.array([self.pa_range[0],self.xcent_range[0],self.ycent_range[0],self.vsys_range[0],self.inc_range[0],self.totflux_range[0]])
+        maximums=np.array([self.pa_range[1],self.xcent_range[1],self.ycent_range[1],self.vsys_range[1],self.inc_range[1],self.totflux_range[1]])
+        labels=np.array(["PA","Xc","Yc","Vsys","inc","totflux"])
+        fixed= np.array([False,False,False,False,False,False])
         priors=np.resize(None,fixed.size)
-                
+        precision=(maximums-minimums)/10.        
 
-        #V(r) 
-        initial_guesses= np.append(initial_guesses,np.resize(self.vel_guess,self.nrings)) 
-        minimums=np.append(minimums,np.resize(self.vel_range[0],self.nrings))
-        maximums=np.append(maximums,np.resize(self.vel_range[1],self.nrings))
-        fixed=np.append(fixed,np.resize(False,self.nrings))
-        priors=np.append(priors,np.resize(random_walk_prior,self.nrings))
+        #SBprof(r) and Vel(r):
+        self.n_sbvars = np.sum([i.freeparams for i in self.sb_profile])
+        self.n_velvars = np.sum([i.freeparams for i in self.vel_profile])
         
-        
-        for i in nums:
-            labels=np.append(labels,"V"+str(i))
+        for list_vars in [self.sb_profile,self.vel_profile]: 
+            initial_guesses= np.append(initial_guesses,np.concatenate([i.guess for i in list_vars])) 
+            minimums=np.append(minimums,np.concatenate([i.min for i in list_vars]))
+            maximums=np.append(maximums,np.concatenate([i.max for i in list_vars]))
+            fixed=np.append(fixed,np.concatenate([i.fixed for i in list_vars]))
+            priors=np.append(priors,np.concatenate([i.priors for i in list_vars]))
+            precision=np.append(precision,np.concatenate([i.precisions for i in list_vars]))
+            labels=np.append(labels,np.concatenate([i.labels for i in list_vars]))
+            
 
-        self.error=self.rms
-        
-        
-
-        return initial_guesses,labels,minimums,maximums,fixed, priors
+        return initial_guesses,labels,minimums,maximums,fixed, priors,precision
         
                      
     def clip_cube(self):
@@ -228,22 +231,22 @@ class kinms_fitter:
         yc=param[2]
         vsys=param[3]
         inc=param[4]
-        rscale=param[5]
-        totflux=param[6]
-        velprof=param[7:]
-        vrad=np.interp(self.sbRad,self.bincentroids,velprof)
-        sbprof=np.exp(-self.sbRad/rscale)
+        totflux=param[5]
         
+
+        sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[6:6+self.n_sbvars])
+        
+        vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[6+self.n_sbvars:])
     
         return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
                  [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,\
-                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_guess,phaseCent=[(xc-self.xc_guess)*3600.,(yc-self.yc_guess)*3600.],nSamps=self.nSamps,vSys=vsys).model_cube()
+                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,phaseCent=[(xc-self.xc_guess)*3600.,(yc-self.yc_guess)*3600.],nSamps=self.nSamps,vSys=vsys).model_cube()
                 
     
         
             
         
-    def mcmc_fit(self,initial_guesses,labels,minimums,maximums,fixed,priors):
+    def mcmc_fit(self,initial_guesses,labels,minimums,maximums,fixed,priors,precision):
         mcmc = gastimator(self.model)
         
         mcmc.labels=labels
@@ -253,23 +256,29 @@ class kinms_fitter:
         mcmc.fixed=fixed
         mcmc.prior=priors
         mcmc.silent=self.silent
-        #mcmc.lnlike_func=mylnlike
-        mcmc.precision= (mcmc.max-mcmc.min)/10.
+        mcmc.precision= precision
+        self.fixed=fixed
+        
+        if self.niters < 5000:
+            self.nprocesses=1
+        
         if self.nprocesses != None:
             mcmc.nprocesses= int(self.nprocesses)
+            
+            
         outputvalue, outputll= mcmc.run(self.cube,self.error*((2*self.cube.size)**0.25),self.niters,nchains=1,plot=False)
         bestvals=np.median(outputvalue,1)    
         besterrs=np.std(outputvalue,1)
         
-        if self.show_corner:
-            figure = corner_plot.corner_plot(outputvalue.T,like=outputll,labels=mcmc.labels,quantiles=[0.16, 0.5, 0.84],verbose=False)
-
-            if self.pdf:
-                plt.savefig(self.objname+"_cornerplots.pdf", bbox_inches = 'tight')
-            else:
-                plt.show()
+        # #if self.show_corner:
+        #     figure = corner_plot.corner_plot(outputvalue[~fixed,:].T,like=outputll,labels=mcmc.labels[~fixed],quantiles=[0.16, 0.5, 0.84],verbose=False)
+        #
+        #     if self.pdf:
+        #         plt.savefig(self.objname+"_cornerplots.pdf", bbox_inches = 'tight')
+        #     else:
+        #         plt.show()
         
-        return bestvals, besterrs    
+        return bestvals, besterrs, outputvalue, outputll    
 
             
             
@@ -278,8 +287,22 @@ class kinms_fitter:
         
     def run(self):
         self.bincentroids=np.arange(0,self.nrings)*self.bmaj
-        initial_guesses,labels,minimums,maximums,fixed, priors = self.setup_params()
-        print(initial_guesses)
+        self.error=self.rms
+        
+        if np.any(self.sb_profile) == None:
+            # default SB profile is a single exponential disc
+            self.sb_profile=[sb_profs.expdisk(guesses=[1,self.expscale_guess],minimums=[0,self.expscale_range[0]],maximums=[2,self.expscale_range[1]],fixed=[True,False])]
+            
+        if np.any(self.vel_profile) == None:
+            # default vel profile is tilted rings
+            self.vel_profile=[velocity_profs.tilted_rings(self.bincentroids,guesses=np.resize(self.vel_guess,self.nrings),minimums=np.resize(self.vel_range[0],self.nrings),maximums=np.resize(self.vel_range[1],self.nrings))]
+        
+        
+        
+        
+        
+        initial_guesses,labels,minimums,maximums,fixed, priors,precision = self.setup_params()
+
         import time
         t=time.time()
         for i in range (0,9):
@@ -288,9 +311,10 @@ class kinms_fitter:
 
         KinMS_plotter(self.cube, self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=initial_guesses[0],overcube=init_model,rms=self.error).makeplots()
         
-        bestvals, besterrs = self.mcmc_fit(initial_guesses,labels,minimums,maximums,fixed,priors)
+        bestvals, besterrs, outputvalue, outputll = self.mcmc_fit(initial_guesses,labels,minimums,maximums,fixed,priors,precision)
         best_model=self.model(bestvals)
 
         KinMS_plotter(self.cube, self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=bestvals[0],overcube=best_model,rms=self.error).makeplots()
         
+        return bestvals, besterrs, outputvalue, outputll
         

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
  
 setup(name='kinms_fitter',
-       version='0.0.1',
+       version='0.0.2',
        description='Wrapper for KinMSpy that automates most common galaxy fitting tasks',
        url='https://github.com/TimothyADavis/KinMS_fitter',
        author='Timothy A. Davis',
@@ -13,12 +13,13 @@ setup(name='kinms_fitter',
        long_description=long_description,
        long_description_content_type="text/markdown",
        license='GNU GPLv3',
-       packages=['kinms_fitter'],
+       packages=['kinms_fitter','kinms_fitter.docs'],
        install_requires=[
            'numpy',
            'gastimator',
            'astropy',
            'matplotlib',
+           'jampy',
            'kinms',
        ],
        classifiers=[

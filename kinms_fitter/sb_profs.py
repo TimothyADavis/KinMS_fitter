@@ -7,8 +7,8 @@ class sb_profs:
         pass    
     
     def eval(modellist,r,params):    
-        indices=np.append(np.array([0]),np.cumsum([i.freeparams for i in mymodel]))
-        operations=[i.operation for i in mymodel]
+        indices=np.append(np.array([0]),np.cumsum([i.freeparams for i in modellist]))
+        operations=[i.operation for i in modellist]
         out=np.zeros(r.size)
         for i,mod in enumerate(modellist):
             if operations[i]=='add':            
