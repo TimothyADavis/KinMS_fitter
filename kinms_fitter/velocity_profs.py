@@ -11,8 +11,7 @@ class velocity_profs:
         indices=np.append(np.array([0]),np.cumsum([i.freeparams for i in modellist]))
         out=np.zeros(r.size)
         for i,mod in enumerate(modellist):
-                out= np.sqrt(out**2 + mod(r,params[indices[i]:indices[i+1]])**2)
-                
+            out= np.sqrt(out**2 + mod(r,np.array(params[indices[i]:indices[i+1]], dtype='float64'))**2)
         return out
             
     
