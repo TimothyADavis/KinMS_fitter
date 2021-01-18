@@ -40,9 +40,9 @@ class kinms_fitter:
         self.pa_guess=0
         self.linefree_chans_start = linefree_chans[0]
         self.linefree_chans_end = linefree_chans[1]
+        self.chans2do=spectral_trim
         self.cube =self.read_primary_cube(filename)
         self.spatial_trim=spatial_trim
-        self.chans2do=spectral_trim
         self.clip_cube()
         
         self.wcs=wcs.WCS(self.hdr)
@@ -171,7 +171,8 @@ class kinms_fitter:
         if self.dv < 0:
             datacube = np.flip(datacube,axis=2)
             self.dv*=(-1)
-            self.v1 = np.flip(self.v1)
+            self.v1 = np.flip(self.v1, axis=0)
+            self.chans2do=[len(self.v1)-self.chans2do[1],len(self.v1)-self.chans2do[0]]
             self.flipped=True
                 
         self.rms= self.rms_estimate(datacube,self.linefree_chans_start,self.linefree_chans_end) 
