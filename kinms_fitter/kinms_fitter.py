@@ -46,12 +46,14 @@ class kinms_fitter:
         self.clip_cube()
         
         self.wcs=wcs.WCS(self.hdr)
+        self.xc_img=np.nanmedian(self.x1)
+        self.yc_img=np.nanmedian(self.y1)
         self.xc_guess=np.nanmedian(self.x1)
         self.yc_guess=np.nanmedian(self.y1)
         self.vsys_guess=np.nanmedian(self.v1)
         self.vsys_mid=np.nanmedian(self.v1)
         
-        self.maxextent=np.max([np.max(np.abs(self.x1-self.xc_guess)),np.max(np.abs(self.y1-self.yc_guess))])*3600.
+        self.maxextent=np.max([np.max(np.abs(self.x1-self.xc_img)),np.max(np.abs(self.y1-self.yc_img))])*3600.
         self.nrings=np.floor(self.maxextent/self.bmaj).astype(np.int)
         self.vel_guess= np.nanstd(self.v1)
         self.cellsize=np.abs(self.hdr['CDELT1']*3600)
@@ -120,7 +122,7 @@ class kinms_fitter:
         y1=np.median(y[0:hdr['NAXIS1'],0:hdr['NAXIS2']],1)
         spectral1=spectral[0,0:hdr['NAXIS3']]
 
-        if (hdr['CTYPE3'] =='VRAD') or (hdr['CTYPE3'] =='VELO-LSR'):
+        if (hdr['CTYPE3'] =='VRAD') or (hdr['CTYPE3'] =='VELO-LSR') or (hdr['CTYPE3'] =='VOPT'):
             v1=spectral1
             try:
                 if hdr['CUNIT3']=='m/s':
@@ -238,10 +240,10 @@ class kinms_fitter:
         sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[6:6+self.n_sbvars])
         
         vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[6+self.n_sbvars:])
-    
+
         return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
                  [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,\
-                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,phaseCent=[(xc-self.xc_guess)*3600.,(yc-self.yc_guess)*3600.],nSamps=self.nSamps,vSys=vsys).model_cube()
+                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,phaseCent=[(xc-self.xc_img)*3600.,(yc-self.yc_img)*3600.],nSamps=self.nSamps,vSys=vsys).model_cube()
                 
     
         
