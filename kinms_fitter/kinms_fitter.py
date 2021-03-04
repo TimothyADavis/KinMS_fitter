@@ -65,6 +65,8 @@ class kinms_fitter:
         self.totflux_guess=np.nansum(self.cube)
         self.expscale_guess=self.maxextent/5.
         self.inc_guess=45.
+        self.velDisp_guess=8.
+        self.velDisp_range=[0,50]
         self.inc_range=[1,89]
         self.expscale_range=[0,self.maxextent]
         self.totflux_range=[0,np.nansum(self.cube)*3.]
@@ -77,6 +79,7 @@ class kinms_fitter:
         self.nSamps=np.int(5e5)
         self.sb_profile=None
         self.vel_profile=None
+        
         try:
             self.objname=self.hdr['OBJECT']
         except:
@@ -186,11 +189,11 @@ class kinms_fitter:
                 
          
         # xcen, ycen, vsys
-        initial_guesses=np.array([self.pa_guess,self.xc_guess,self.yc_guess,self.vsys_guess,self.inc_guess,self.totflux_guess])
-        minimums=np.array([self.pa_range[0],self.xcent_range[0],self.ycent_range[0],self.vsys_range[0],self.inc_range[0],self.totflux_range[0]])
-        maximums=np.array([self.pa_range[1],self.xcent_range[1],self.ycent_range[1],self.vsys_range[1],self.inc_range[1],self.totflux_range[1]])
-        labels=np.array(["PA","Xc","Yc","Vsys","inc","totflux"])
-        fixed= np.array([False,False,False,False,False,False])
+        initial_guesses=np.array([self.pa_guess,self.xc_guess,self.yc_guess,self.vsys_guess,self.inc_guess,self.totflux_guess,self.velDisp_guess])
+        minimums=np.array([self.pa_range[0],self.xcent_range[0],self.ycent_range[0],self.vsys_range[0],self.inc_range[0],self.totflux_range[0],self.velDisp_range[0]])
+        maximums=np.array([self.pa_range[1],self.xcent_range[1],self.ycent_range[1],self.vsys_range[1],self.inc_range[1],self.totflux_range[1],self.velDisp_range[1]])
+        labels=np.array(["PA","Xc","Yc","Vsys","inc","totflux","veldisp"])
+        fixed= np.array([False,False,False,False,False,False,False])
         priors=np.resize(None,fixed.size)
         precision=(maximums-minimums)/10.        
 
@@ -235,14 +238,14 @@ class kinms_fitter:
         vsys=param[3]
         inc=param[4]
         totflux=param[5]
-        
+        veldisp=param[6]
 
-        sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[6:6+self.n_sbvars])
+        sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[7:7+self.n_sbvars])
         
-        vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[6+self.n_sbvars:])
+        vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[7+self.n_sbvars:])
 
         return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
-                 [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,\
+                 [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
                  intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,phaseCent=[(xc-self.xc_img)*3600.,(yc-self.yc_img)*3600.],nSamps=self.nSamps,vSys=vsys).model_cube()
                 
     
