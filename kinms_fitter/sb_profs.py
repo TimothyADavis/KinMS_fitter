@@ -20,8 +20,17 @@ class sb_profs:
     
     class expdisk:  
         def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
-            self.freeparams=2
-            self.labels=np.array(['PeakFlux_exp','Rscale_exp'])
+            self.guess=np.array(guesses)
+            if self.guess.size == 1:
+                self.freeparams=1
+                self.labels=['Rscale_exp']
+            else:
+                if self.guess.size == 2:
+                    self.freeparams=2
+                    self.labels=np.array(['PeakFlux_exp','Rscale_exp'])
+                else:
+                    raise('Wrong number of guesses, expected one or two [(optionally PeakFlux_exp), Rscale_exp]')
+
             self.min=np.array(minimums)
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
@@ -42,15 +51,26 @@ class sb_profs:
                 self.precisions=precisions
                 
         def __call__(self,x,args):
-            return args[0]*np.exp(-x/args[1])
+            if self.freeparams==1:
+                return np.exp(-x/args[0])
+            else:
+                return args[0]*np.exp(-x/args[1])
             
     class gaussian:  
         def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
-            self.freeparams=3
-            self.labels=np.array(['PeakFlux_gauss','Mean_gauss','sigma_gauss'])
+            self.guess=np.array(guesses)
+            if self.guess.size == 2:
+                self.freeparams=2
+                self.labels=['Mean_gauss','sigma_gauss']
+            else:
+                if self.guess.size == 3:
+                    self.freeparams=3
+                    self.labels=np.array(['PeakFlux_gauss','Mean_gauss','sigma_gauss'])
+                else:
+                    raise('Wrong number of guesses, expected two or ftree [(optionally PeakFlux_gauss), Mean_gauss, sigma_gauss]')
+                    
             self.min=np.array(minimums)
             self.max=np.array(maximums)
-            self.guess=np.array(guesses)
             self.operation='add'
         
             if np.any(fixed) == None:
@@ -69,6 +89,8 @@ class sb_profs:
                 self.precisions=precisions
                 
         def __call__(self,x,args):
+            if self.freeparams==2:
+                args=np.append(1,args)
             z = (x - args[1]) / args[2]
             return args[0]*np.exp(-z*z/2.0)
             
