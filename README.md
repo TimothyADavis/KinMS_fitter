@@ -22,7 +22,7 @@ It requires the following modules:
 
 ### Documentation
 
-A simple iPython notebook tutorial on KinMS_fitter can be found here: [KinMS_fitter tutorial](https://github.com/TimothyADavis/KinMS_fitter/blob/main/kinms_fitter/docs/KinMS_fitter%20tutorial.ipynb)
+A simple iPython notebook tutorial on KinMS_fitter can be found here: [KinMS_fitter tutorial](https://github.com/TimothyADavis/KinMS_fitter/blob/main/kinms_fitter/docs/KinMS_fitter_tutorial.ipynb)
 
 ### Commumication
 
