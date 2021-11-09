@@ -30,6 +30,7 @@ class kinms_fitter:
         self.linefree_chans_end = linefree_chans[1]
         self.chans2do=spectral_trim
         self.cube =self.read_primary_cube(filename)
+        
         self.spatial_trim=spatial_trim
         self.clip_cube()
         
@@ -113,20 +114,19 @@ class kinms_fitter:
 
         x,y,spectral = self.wcs.all_pix2world(xp,yp,zp, 0)
         
-
+        
 
         x1=np.median(x[0:hdr['NAXIS1'],0:hdr['NAXIS2']],0)
         y1=np.median(y[0:hdr['NAXIS1'],0:hdr['NAXIS2']],1)
         spectral1=spectral[0,0:hdr['NAXIS3']]
 
-        if (hdr['CTYPE3'] =='VRAD') or (hdr['CTYPE3'] =='VELO-LSR') or (hdr['CTYPE3'] =='VOPT'):
+        if (hdr['CTYPE3'] =='VRAD') or (hdr['CTYPE3'] =='VELO-LSR') or (hdr['CTYPE3'] =='VOPT') or (hdr['CTYPE3'] =='FELO-HEL'):
             v1=spectral1
             try:
                 if hdr['CUNIT3']=='m/s':
                      v1/=1e3
                      
             except:
-                 if np.max(v1) > 1e5:
                      v1/=1e3
 
 
@@ -141,6 +141,7 @@ class kinms_fitter:
 
         cd3= np.median(np.diff(v1))
         cd1= np.median(np.diff(x1))
+        
         return x1,y1,v1,np.abs(cd1*3600),cd3
            
     def rms_estimate(self,cube,chanstart,chanend):
@@ -148,7 +149,48 @@ class kinms_fitter:
         quartery=np.array(self.y1.size/4.).astype(np.int)
         return np.nanstd(cube[quarterx*1:3*quarterx,1*quartery:3*quartery,chanstart:chanend])
         
-            
+    def from_fits_history(self, hdr):
+        """
+        Stolen from radio_beam, with thanks!
+        """
+        # a line looks like
+        # HISTORY AIPS   CLEAN BMAJ=  1.7599E-03 BMIN=  1.5740E-03 BPA=   2.61
+        if 'HISTORY' not in hdr:
+            return None
+
+        aipsline = None
+        for line in hdr['HISTORY']:
+            if 'BMAJ' in line:
+                aipsline = line
+
+        # a line looks like
+        # HISTORY Sat May 10 20:53:11 2014
+        # HISTORY imager::clean() [] Fitted beam used in
+        # HISTORY > restoration: 1.34841 by 0.830715 (arcsec)
+        #        at pa 82.8827 (deg)
+
+        casaline = None
+        for line in hdr['HISTORY']:
+            if ('restoration' in line) and ('arcsec' in line):
+                casaline = line
+        #assert precedence for CASA style over AIPS
+        #        this is a dubious choice
+
+        if casaline is not None:
+            bmaj = float(casaline.split()[2]) 
+            bmin = float(casaline.split()[4]) 
+            bpa = float(casaline.split()[8]) 
+            return bmaj, bmin, bpa
+
+        elif aipsline is not None:
+            bmaj = float(aipsline.split()[3]) 
+            bmin = float(aipsline.split()[5]) 
+            bpa = float(aipsline.split()[7])
+            return bmaj, bmin, bpa
+
+        else:
+            return None,None,None
+                        
     def read_primary_cube(self,cube):
         
         ### read in cube ###
@@ -159,14 +201,22 @@ class kinms_fitter:
            self.bmin=np.median(beamtab['BMIN'])
            self.bpa=np.median(beamtab['BPA'])
         except:     
-           self.bmaj=hdr['BMAJ']*3600.
-           self.bmin=hdr['BMIN']*3600.
-           self.bpa=hdr['BPA']
+           try:
+               self.bmaj=hdr['BMAJ']*3600.
+               self.bmin=hdr['BMIN']*3600.
+               self.bpa=hdr['BPA']
+           except:
+               self.bmaj,self.bmin,self.bpa = self.from_fits_history(hdr)
+               if self.bmaj == None:
+                   raise Exception('No beam information found')
         
         self.hdr=hdr
                           
         self.x1,self.y1,self.v1,self.cellsize,self.dv = self.get_header_coord_arrays(self.hdr)
         
+        if self.chans2do == None:
+            self.chans2do=[0,self.v1.size]
+            
         if self.dv < 0:
             datacube = np.flip(datacube,axis=2)
             self.dv*=(-1)
@@ -213,8 +263,7 @@ class kinms_fitter:
                      
     def clip_cube(self):
         
-        if self.chans2do == None:
-            self.chans2do=[0,self.v1.size]
+
 
         if self.spatial_trim == None:
             self.spatial_trim = [0, self.x1.size, 0, self.y1.size]
@@ -408,9 +457,8 @@ class kinms_fitter:
         self.labels=labels
         
         t=time.time()
-        for i in range (0,5):
-            init_model=self.model(initial_guesses)
-        self.timetaken=(time.time()-t)/5.
+        init_model=self.model(initial_guesses)
+        self.timetaken=(time.time()-t)
         
         
         if not self.silent: 

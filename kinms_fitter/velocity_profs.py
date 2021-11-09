@@ -250,8 +250,8 @@ class velocity_profs:
             
     class bulge_disc:  
         def __init__(self,distance,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
+            self.guess=np.array(guesses)
             self.guesses=np.array(guesses)
-
             self.freeparams=4
             self.labels=['mtot','re_d','re_b','b_to_t']
             self.distance=distance
@@ -286,8 +286,8 @@ class velocity_profs:
 
     class nfw:  
         def __init__(self,distance,guesses,minimums,maximums,priors=None,precisions=None,fixed=None,hubbleconst=68.):
+            self.guess=np.array(guesses)
             self.guesses=np.array(guesses)
-
             self.freeparams=2
             self.hubbleparam=hubbleconst
             self.labels=['M200','c']
