@@ -18,6 +18,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from kinms import KinMS
 from kinms.utils.KinMS_figures import KinMS_plotter
 from kinms_fitter.sb_profs import sb_profs
+from kinms_fitter.transformClouds import transformClouds
 from kinms_fitter.velocity_profs import velocity_profs      
 from kinms_fitter.prior_funcs import prior_funcs
 import time
@@ -41,7 +42,7 @@ class kinms_fitter:
         self.yc_guess=np.nanmedian(self.y1)
         self.vsys_guess=np.nanmedian(self.v1)
         self.vsys_mid=np.nanmedian(self.v1)
-        
+        self.skySampClouds=np.array([])
         self.maxextent=np.max([np.max(np.abs(self.x1-self.xc_img)),np.max(np.abs(self.y1-self.yc_img))])*3600.
         self.nrings=np.floor(self.maxextent/self.bmaj).astype(np.int)
         self.vel_guess= np.nanstd(self.v1)
@@ -242,11 +243,15 @@ class kinms_fitter:
         priors=np.resize(None,fixed.size)
         precision=(maximums-minimums)/10.        
 
-
+        
+        vars2look=[]
+        if len(self.skySampClouds) == 0:
+            vars2look.append(self.sb_profile)
+        vars2look.append(self.vel_profile)
         if self.radial_motion != None:
-            vars2look=[self.sb_profile,self.vel_profile,self.radial_motion]
-        else:
-            vars2look=[self.sb_profile,self.vel_profile]
+            vars2look.append(self.radial_motion)
+
+            
             
         for list_vars in vars2look: 
             initial_guesses= np.append(initial_guesses,np.concatenate([i.guess for i in list_vars])) 
@@ -286,8 +291,8 @@ class kinms_fitter:
         inc=param[4]
         totflux=param[5]
         veldisp=param[6]
-
-        sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[7:7+self.n_sbvars])
+        phasecen=[(xc-self.xc_img)*3600.,(yc-self.yc_img)*3600.]
+        
         
         vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[7+self.n_sbvars:7+self.n_velvars+self.n_sbvars],inc=inc)
         
@@ -296,9 +301,19 @@ class kinms_fitter:
         else:
             radmotion=None
         
+        if len(self.skySampClouds) >0:
+            inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,cent = phasecen)
+            fluxclouds=self.skySampClouds[:,3]
+            sbprof=None
+        else:
+            sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[7:7+self.n_sbvars])
+            inClouds=[]
+            fluxclouds=None
+        
+        #breakpoint()
         return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
                  [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
-                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,phaseCent=[(xc-self.xc_img)*3600.,(yc-self.yc_img)*3600.],nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion).model_cube()
+                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,phaseCent=phasecen,nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,inClouds=inClouds,flux_clouds=fluxclouds).model_cube()
                 
     def model_simple(self,param):
         pa=param[0]
@@ -309,7 +324,14 @@ class kinms_fitter:
         totflux=param[5]
         veldisp=param[6]
 
-        sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[7:7+self.n_sbvars])
+        if len(self.skySampClouds) >0:
+            inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,cent = [xc,yc])
+            fluxclouds=self.skySampClouds[:,3]
+            sbprof=None
+        else:
+            sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[7:7+self.n_sbvars])
+            inClouds=None
+            fluxclouds=None
         
         vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[7+self.n_sbvars:],inc=inc)
         
@@ -317,10 +339,10 @@ class kinms_fitter:
             radmotion=self.radial_motion[0](self.sbRad,param[7+self.n_velvars+self.n_sbvars:])
         else:
             radmotion=None
-
+        
         return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
                  [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
-                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,phaseCent=[xc,yc],nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion).model_cube()
+                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,phaseCent=[xc,yc],nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,inClouds=inClouds,flux_clouds=fluxclouds).model_cube()
         
             
         
@@ -439,7 +461,11 @@ class kinms_fitter:
         if np.any(self.sb_profile) == None:
             # default SB profile is a single exponential disc
             self.sb_profile=[sb_profs.expdisk(guesses=[self.expscale_guess],minimums=[self.expscale_range[0]],maximums=[self.expscale_range[1]],fixed=[False])]
-        self.n_sbvars = np.sum([i.freeparams for i in self.sb_profile])
+        
+        if len(self.skySampClouds) >0:
+            self.n_sbvars = 0
+        else:
+            self.n_sbvars = np.sum([i.freeparams for i in self.sb_profile])
          
             
         if np.any(self.vel_profile) == None:
@@ -460,6 +486,7 @@ class kinms_fitter:
         t=time.time()
         init_model=self.model(initial_guesses)
         self.timetaken=(time.time()-t)
+        
         
         
         if not self.silent: 
