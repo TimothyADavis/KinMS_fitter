@@ -141,8 +141,9 @@ class kinms_fitter:
            v1=f1.to(u.km/u.s, equivalencies=u.doppler_radio(self.restfreq))
            v1=v1.value
 
+        breakpoint()
         cd3= np.median(np.diff(v1))
-        cd1= np.median(np.diff(x1))
+        cd1= np.median(np.diff(y1))
         
         return x1,y1,v1,np.abs(cd1*3600),cd3
            
