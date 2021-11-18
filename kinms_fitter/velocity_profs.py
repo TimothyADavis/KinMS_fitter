@@ -11,13 +11,20 @@ class velocity_profs:
     
     def eval(modellist,r,params,inc=90):    
         indices=np.append(np.array([0]),np.cumsum([i.freeparams for i in modellist]))
+        operations=[i.operation for i in modellist]
         out=np.zeros(r.size)
         if len(modellist) == 1:
             out= modellist[0](r,params,inc=inc)
         else:
             for i,mod in enumerate(modellist):
-                out= out + mod(r,np.array(params[indices[i]:indices[i+1]], dtype='float64'),inc=inc)**2
+                if operations[i]=='quad':   
+                    
+                    out= out + mod(r,np.array(params[indices[i]:indices[i+1]], dtype='float64'),inc=inc)**2
             out=np.sqrt(out)
+            for i,mod in enumerate(modellist):
+                if operations[i]=='mult':
+                    
+                    out= out * mod(r,params[indices[i]:indices[i+1]])  
         return out
             
     
@@ -25,6 +32,7 @@ class velocity_profs:
         def __init__(self,bincentroids,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
             self.freeparams=bincentroids.size
             self.bincentroids=bincentroids
+            self.operation="quad"
             self.labels=np.array([])
             for i in range(0,self.freeparams):
                 self.labels=np.append(self.labels,"V"+str(i))
@@ -58,7 +66,7 @@ class velocity_profs:
             self.freeparams=1
             self.distance=distance
             self.labels=['logCentralMass']
-
+            self.operation="quad"
             self.min=np.array(minimums)
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
@@ -85,6 +93,7 @@ class velocity_profs:
     class mge_vcirc:  
         def __init__(self,surf,sigma,qobs,distance,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
             self.guess=np.array(guesses)
+            self.operation="quad"
             if self.guess.size == 1:
                 self.freeparams=1
                 self.labels=['M/L']
@@ -99,6 +108,7 @@ class velocity_profs:
             self.surf=surf
             self.sigma=sigma
             self.qobs=qobs
+            self.mininc=np.max(np.rad2deg(np.arccos(qobs-0.05)))
             self.min=np.array(minimums)
             self.max=np.array(maximums)
             
@@ -124,12 +134,52 @@ class velocity_profs:
                 bhmass=0
             else:
                 bhmass=args[1]
-            return mge_vcirc(self.surf*args[0], self.sigma, self.qobs, kwargs['inc'], 10**bhmass, self.distance, x)               
+            return mge_vcirc(self.surf*args[0], self.sigma, self.qobs, np.clip(kwargs['inc'],self.mininc,90), 10**bhmass, self.distance, x)               
+
+    class mge_vcirc_innerml:  
+        def __init__(self,surf,sigma,qobs,distance,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
+            self.guess=np.array(guesses)
+            self.operation="quad"
+            self.freeparams=3
+            self.labels=['M/Linner','M/Louter','logMBH']
+            self.distance=distance
+            self.surf=surf
+            self.sigma=sigma
+            self.qobs=qobs
+            self.mininc=np.max(np.rad2deg(np.arccos(qobs-0.05)))
+            self.min=np.array(minimums)
+            self.max=np.array(maximums)
+            
+
+            if np.any(fixed) == None:
+                self.fixed=np.resize(False,self.freeparams)
+            else:
+                self.fixed=fixed
+            
+            if np.any(priors) == None:
+                self.priors=np.resize(None,self.freeparams)
+            else:
+                self.priors=fixed
+                        
+            if np.any(precisions) == None:
+                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+            else:
+                self.precisions=precisions
+                
+        def __call__(self,x,args,**kwargs):
+            ## return the velocity 
+            if self.freeparams==1:
+                bhmass=0
+            else:
+                bhmass=args[2]
+            return mge_vcirc(self.surf*np.append(args[0],np.resize(args[1],self.surf.size-1)), self.sigma, self.qobs, np.clip(kwargs['inc'],self.mininc,90), 10**bhmass, self.distance, x)               
+            
+
             
     class arctan:  
         def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
             self.freeparams=2
-
+            self.operation="quad"
             self.labels=['Vmax','Rturn']
 
             self.min=np.array(minimums)
@@ -158,7 +208,7 @@ class velocity_profs:
     class radial_barflow:  
         def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
             self.freeparams=4
-
+            self.operation="quad"
             self.labels=['Vt','Vr','Rbar','phibar']
 
             self.min=np.array(minimums)
@@ -193,7 +243,7 @@ class velocity_profs:
             self.guess=np.array(guesses)
             self.freeparams=3
             self.labels=['mtot','re','n']
-
+            self.operation="quad"
             self.distance=distance
             self.min=np.array(minimums)
             self.max=np.array(maximums)
@@ -257,6 +307,7 @@ class velocity_profs:
             self.distance=distance
             self.minimums=np.array(minimums)
             self.maximums=np.array(maximums)
+            self.operation="quad"
             self.max=np.array(maximums)
             self.min=np.array(minimums)
 
@@ -290,6 +341,7 @@ class velocity_profs:
             self.guesses=np.array(guesses)
             self.freeparams=2
             self.hubbleparam=hubbleconst
+            self.operation="quad"
             self.labels=['M200','c']
             self.distance=distance
             self.minimums=np.array(minimums)
@@ -326,5 +378,33 @@ class velocity_profs:
             bottom=np.log(1+c) - ((c)/(1+(c)))         
             return v200*np.sqrt((1/x)*(top/bottom))
             
+    class mlgrad_linear:  
+        def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
+            self.freeparams=3
+
+            self.labels=['MLgrad','MLinter','MLendpoint']
+            self.operation="mult"
+            self.min=np.array(minimums)
+            self.max=np.array(maximums)
+            self.guess=np.array(guesses)
+
+            if np.any(fixed) == None:
+                self.fixed=np.resize(False,self.freeparams)
+            else:
+                self.fixed=fixed
+            
+            if np.any(priors) == None:
+                self.priors=np.resize(None,self.freeparams)
+            else:
+                self.priors=fixed
+                        
+            if np.any(precisions) == None:
+                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+            else:
+                self.precisions=precisions
+                
+        def __call__(self,x,args,**kwargs):
+            ## return the velocity
+            return np.clip(x,0,args[2])*args[0] + args[1]        
                           
 

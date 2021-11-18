@@ -11,8 +11,11 @@ class sb_profs:
         operations=[i.operation for i in modellist]
         out=np.zeros(r.size)
         for i,mod in enumerate(modellist):
+            # do addative first
             if operations[i]=='add':            
                 out= out + mod(r,params[indices[i]:indices[i+1]])
+        for i,mod in enumerate(modellist): 
+            # then do multiplicative      
             if operations[i]=='mult':
                 out= out * mod(r,params[indices[i]:indices[i+1]])    
         return out

@@ -49,8 +49,9 @@ class kinms_fitter:
         self.nprocesses=None
         self.niters=3000
         self.pdf=False
+        self.pdf_rootname="KinMS_fitter"
         self.silent=False
-        self.show_corner= False
+        self.show_corner= True
         self.totflux_guess=np.nansum(self.cube)
         self.expscale_guess=self.maxextent/5.
         self.inc_guess=45.
@@ -346,7 +347,7 @@ class kinms_fitter:
         mcmc.precision= precision
         self.fixed=fixed
         
-        if self.niters < 5000:
+        if self.niters < 3000:
             self.nprocesses=1
         
         if self.nprocesses != None:
@@ -427,7 +428,7 @@ class kinms_fitter:
         return results 
 
     def plot(self,overcube=None,savepath=None,**kwargs):
-        pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=self.rms,savepath=savepath,**kwargs)
+        pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=self.rms,savepath=savepath,savename=self.pdf_rootname,**kwargs)
         pl.makeplots()
         self.mask_sum=pl.mask.sum()
         
@@ -508,7 +509,8 @@ class kinms_fitter:
                 fig=corner_plot.corner_plot(outputvalue[~fixed,:].T,like=outputll,\
                                         quantiles=[0.16, 0.5, 0.84],labels=self.labels[~fixed],verbose=False)
                 if self.pdf:
-                    plt.savefig("KinMS_fitter_MCMCcornerplot.pdf")
+                    
+                    plt.savefig(self.pdf_rootname+"_MCMCcornerplot.pdf")
                 plt.show()                        
                                         
         
