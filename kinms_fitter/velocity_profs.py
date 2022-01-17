@@ -133,11 +133,11 @@ class velocity_profs:
             if self.freeparams==1:
                 bhmass=0
             else:
-                bhmass=args[1]
+                bhmass=args[1] 
             return mge_vcirc(self.surf*args[0], self.sigma, self.qobs, np.clip(kwargs['inc'],self.mininc,90), 10**bhmass, self.distance, x)               
 
     class mge_vcirc_innerml:  
-        def __init__(self,surf,sigma,qobs,distance,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
+        def __init__(self,surf,sigma,qobs,distance,guesses,minimums,maximums,ninner=1,priors=None,precisions=None,fixed=None):
             self.guess=np.array(guesses)
             self.operation="quad"
             self.freeparams=3
@@ -145,6 +145,7 @@ class velocity_profs:
             self.distance=distance
             self.surf=surf
             self.sigma=sigma
+            self.ninner=ninner
             self.qobs=qobs
             self.mininc=np.max(np.rad2deg(np.arccos(qobs-0.05)))
             self.min=np.array(minimums)
@@ -172,7 +173,7 @@ class velocity_profs:
                 bhmass=0
             else:
                 bhmass=args[2]
-            return mge_vcirc(self.surf*np.append(args[0],np.resize(args[1],self.surf.size-1)), self.sigma, self.qobs, np.clip(kwargs['inc'],self.mininc,90), 10**bhmass, self.distance, x)               
+            return mge_vcirc(self.surf*np.append(np.resize(10**args[0],self.ninner),np.resize(args[1],self.surf.size-self.ninner)), self.sigma, self.qobs, np.clip(kwargs['inc'],self.mininc,90), 10**bhmass, self.distance, x)               
             
 
             

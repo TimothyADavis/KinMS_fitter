@@ -74,8 +74,12 @@ class kinms_fitter:
         self.timetaken=0
         self.initial_guesses=None
         self.chi2_var_correct=True
+        self.chi2_correct_fac=None
         self.mask_sum=0
         self.labels=None
+        self.pa_prior,self.xc_prior,self.yc_prior,self.vsys_prior,self.inc_prior,self.totflux_prior,self.velDisp_prior = None,None,None,None,None,None,None
+        
+        
         self.tolerance=0.1 ## tolerance for simple fit. Smaller numbers are more stringent (longer runtime)
         try:
             self.objname=self.hdr['OBJECT']
@@ -241,7 +245,7 @@ class kinms_fitter:
         maximums=np.array([self.pa_range[1],self.xcent_range[1],self.ycent_range[1],self.vsys_range[1],self.inc_range[1],self.totflux_range[1],self.velDisp_range[1]])
         labels=np.array(["PA","Xc","Yc","Vsys","inc","totflux","veldisp"])
         fixed= minimums == maximums
-        priors=np.resize(None,fixed.size)
+        priors=np.array([self.pa_prior,self.xc_prior,self.yc_prior,self.vsys_prior,self.inc_prior,self.totflux_prior,self.velDisp_prior])#np.resize(None,fixed.size)
         precision=(maximums-minimums)/10.        
 
         
@@ -284,38 +288,37 @@ class kinms_fitter:
         
             
         
-    def model(self,param):
-        pa=param[0]
-        xc=param[1]
-        yc=param[2]
-        vsys=param[3]
-        inc=param[4]
-        totflux=param[5]
-        veldisp=param[6]
-        phasecen=[(xc-self.xc_img)*3600.,(yc-self.yc_img)*3600.]
-        
-        
-        vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[7+self.n_sbvars:7+self.n_velvars+self.n_sbvars],inc=inc)
-        
-        if self.n_radmotionvars >0:
-            radmotion=self.radial_motion[0](self.sbRad,param[7+self.n_velvars+self.n_sbvars:])
-        else:
-            radmotion=None
-        
-        if len(self.skySampClouds) >0:
-            inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,cent = phasecen)
-            fluxclouds=self.skySampClouds[:,3]
-            sbprof=None
-        else:
-            sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[7:7+self.n_sbvars])
-            inClouds=[]
-            fluxclouds=None
-        
-        #breakpoint()
-        return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
-                 [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
-                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,phaseCent=phasecen,nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,inClouds=inClouds,flux_clouds=fluxclouds).model_cube()
-                
+    # def model(self,param):
+    #     pa=param[0]
+    #     xc=param[1]
+    #     yc=param[2]
+    #     vsys=param[3]
+    #     inc=param[4]
+    #     totflux=param[5]
+    #     veldisp=param[6]
+    #     phasecen=[(xc-self.xc_img)*3600.,(yc-self.yc_img)*3600.]
+    #
+    #
+    #     vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[7+self.n_sbvars:7+self.n_velvars+self.n_sbvars],inc=inc)
+    #
+    #     if self.n_radmotionvars >0:
+    #         radmotion=self.radial_motion[0](self.sbRad,param[7+self.n_velvars+self.n_sbvars:])
+    #     else:
+    #         radmotion=None
+    #
+    #     if len(self.skySampClouds) >0:
+    #         inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,cent = phasecen)
+    #         sbprof=None
+    #         myargs={'vPhaseCent': phasecen,'inClouds': inClouds, 'flux_clouds': self.skySampClouds[:,3]}
+    #     else:
+    #         sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[7:7+self.n_sbvars])
+    #         myargs={'phaseCent': phasecen}
+    #
+    #
+    #     return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
+    #              [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
+    #              intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,**myargs).model_cube()
+    
     def model_simple(self,param):
         pa=param[0]
         xc=param[1]
@@ -324,15 +327,15 @@ class kinms_fitter:
         inc=param[4]
         totflux=param[5]
         veldisp=param[6]
+        phasecen=[xc,yc]
 
         if len(self.skySampClouds) >0:
-            inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,cent = [xc,yc])
-            fluxclouds=self.skySampClouds[:,3]
+            inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,cent = phasecen)
             sbprof=None
+            myargs={'vPhaseCent': phasecen,'inClouds': inClouds, 'flux_clouds': self.skySampClouds[:,3]}
         else:
             sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[7:7+self.n_sbvars])
-            inClouds=None
-            fluxclouds=None
+            myargs={'phaseCent': phasecen}
         
         vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[7+self.n_sbvars:],inc=inc)
         
@@ -343,17 +346,17 @@ class kinms_fitter:
         
         return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
                  [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
-                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,phaseCent=[xc,yc],nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,inClouds=inClouds,flux_clouds=fluxclouds).model_cube()
+                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,**myargs).model_cube()
         
             
         
     def mcmc_fit(self,initial_guesses,labels,minimums,maximums,fixed,priors,precision):
-        imx=self.xc_img
-        imy=self.yc_img    
-        initial_guesses[1]=(initial_guesses[1]-self.xc_img)*3600.
-        initial_guesses[2]=(initial_guesses[2]-self.yc_img)*3600.
-        self.xc_img=0
-        self.yc_img=0
+        # imx=self.xc_img
+        # imy=self.yc_img
+        # initial_guesses[1]=(initial_guesses[1]-self.xc_img)*3600.
+        # initial_guesses[2]=(initial_guesses[2]-self.yc_img)*3600.
+        # self.xc_img=0
+        # self.yc_img=0
         minimums[1:3]=(self.bmaj*-3)
         maximums[1:3]=(self.bmaj*3)
         precision[1:3]=(maximums[1:3]-minimums[1:3])*0.1
@@ -380,24 +383,25 @@ class kinms_fitter:
             print("Parameters Fixed:",labels[mcmc.fixed]) 
     
         
-        if self.chi2_var_correct:
-            correction_factor=((2*self.mask_sum)**0.25)
-        else:
-            correction_factor=1
+        if self.chi2_var_correct & (self.chi2_correct_fac == None):
+           self.chi2_correct_fac=(2*(self.mask_sum**0.25))
+
+        if not self.chi2_var_correct:
+            self.chi2_correct_fac=1
             
         if not self.silent: 
             if self.chi2_var_correct:
-                print("Correction for chi-sqr variance applied:",correction_factor)
+                print("Correction for chi-sqr variance applied:",self.chi2_correct_fac)
             else:
                 print("Correction for chi-sqr variance not applied")    
         
-        outputvalue, outputll= mcmc.run(self.cube,self.error*correction_factor,self.niters,nchains=1,plot=False)
+        outputvalue, outputll= mcmc.run(self.cube,self.error*self.chi2_correct_fac,self.niters,nchains=1,plot=False)
         
-        outputvalue[1]=imx+(outputvalue[1]/3600.)
-        outputvalue[2]=imy+(outputvalue[2]/3600.)
-        self.xc_img=imx
-        self.yc_img=imy
-        
+        # outputvalue[1]=imx+(outputvalue[1]/3600.)
+        # outputvalue[2]=imy+(outputvalue[2]/3600.)
+        # self.xc_img=imx
+        # self.yc_img=imy
+
         bestvals=np.median(outputvalue,1)    
         besterrs=np.std(outputvalue,1)
         
@@ -426,12 +430,12 @@ class kinms_fitter:
 
             
     def simple_fit(self,initial_guesses,labels,minimums,maximums,fixed):
-        imx=self.xc_img
-        imy=self.yc_img    
-        initial_guesses[1]=(initial_guesses[1]-self.xc_img)*3600.
-        initial_guesses[2]=(initial_guesses[2]-self.yc_img)*3600.
-        self.xc_img=0
-        self.yc_img=0
+        # imx=self.xc_img
+        # imy=self.yc_img
+        # initial_guesses[1]=(initial_guesses[1]-self.xc_img)*3600.
+        # initial_guesses[2]=(initial_guesses[2]-self.yc_img)*3600.
+        # self.xc_img=0
+        # self.yc_img=0
         minimums[1:3]=(self.bmaj*-3)
         maximums[1:3]=(self.bmaj*3)
         
@@ -443,10 +447,10 @@ class kinms_fitter:
         res = minimize(self.simple_chi2, initial_guesses, args={'Nfeval':0},method ='Powell' ,bounds=self.bounds, options={'disp': True,'adaptive':True,'maxfev':self.niters,'ftol':self.tolerance}) 
         
         results=res.x
-        results[1]=imx+(results[1]/3600.)
-        results[2]=imy+(results[2]/3600.)
-        self.xc_img=imx
-        self.yc_img=imy
+        # results[1]=imx+(results[1]/3600.)
+        # results[2]=imy+(results[2]/3600.)
+        # self.xc_img=imx
+        # self.yc_img=imy
             
         return results 
 
@@ -458,6 +462,12 @@ class kinms_fitter:
     def run(self,method='mcmc',justplot=False,**kwargs):
         self.bincentroids=np.arange(0,self.nrings)*self.bmaj
         self.error=self.rms
+
+        self.xc_guess=(self.xc_guess-self.xc_img)*3600.
+        self.yc_guess=(self.yc_guess-self.yc_img)*3600.
+
+        
+        
         
         if np.any(self.sb_profile) == None:
             # default SB profile is a single exponential disc
@@ -484,8 +494,9 @@ class kinms_fitter:
         initial_guesses,labels,minimums,maximums,fixed, priors,precision = self.setup_params()
         self.labels=labels
         
+        
         t=time.time()
-        init_model=self.model(initial_guesses)
+        init_model=self.model_simple(initial_guesses)
         self.timetaken=(time.time()-t)
         
         
@@ -524,7 +535,7 @@ class kinms_fitter:
                 if not self.silent: 
                     print("MCMC fitting process took {:.2f} seconds".format((time.time()-t)))
             self.pa_guess=bestvals[0]
-            best_model=self.model(bestvals)
+            best_model=self.model_simple(bestvals)
             if self.pdf:
                 savepath="./"
             else:
@@ -540,6 +551,9 @@ class kinms_fitter:
                     
                     plt.savefig(self.pdf_rootname+"_MCMCcornerplot.pdf")
                 plt.show()                        
+            
+            bestvals[1]=(bestvals[1]/3600.)+self.xc_img
+            bestvals[2]=(bestvals[2]/3600.)+self.yc_img
                                         
         
             return bestvals, besterrs, outputvalue, outputll, fixed
