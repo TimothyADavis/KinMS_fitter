@@ -5,12 +5,12 @@ from gastimator import gastimator
 from astropy.io import fits
 import matplotlib.pyplot as plt
 from gastimator import corner_plot, priors
-from astropy import wcs
+#from astropy import wcs
 from scipy.optimize import Bounds
 from scipy.optimize import minimize
 import matplotlib
 import warnings
-warnings.filterwarnings('ignore', category=wcs.FITSFixedWarning, append=True)
+#warnings.filterwarnings('ignore', category=wcs.FITSFixedWarning, append=True)
 import matplotlib.gridspec as gridspec
 from matplotlib.offsetbox import AnchoredText
 import astropy.units as u
@@ -22,6 +22,9 @@ from kinms_fitter.transformClouds import transformClouds
 from kinms_fitter.velocity_profs import velocity_profs      
 from kinms_fitter.prior_funcs import prior_funcs
 import time
+from spectral_cube import SpectralCube
+from spectral_cube.utils import SpectralCubeWarning
+warnings.filterwarnings(action='ignore', category=SpectralCubeWarning, append=True)
          
 class kinms_fitter:
     def __init__(self,filename,spatial_trim=None,spectral_trim=None,linefree_chans=[1,5]):
@@ -35,7 +38,7 @@ class kinms_fitter:
         self.spatial_trim=spatial_trim
         self.clip_cube()
         
-        self.wcs=wcs.WCS(self.hdr)
+        #self.wcs=wcs.WCS(self.hdr)
         self.xc_img=np.nanmedian(self.x1)
         self.yc_img=np.nanmedian(self.y1)
         self.xc_guess=np.nanmedian(self.x1)
@@ -78,7 +81,9 @@ class kinms_fitter:
         self.mask_sum=0
         self.labels=None
         self.pa_prior,self.xc_prior,self.yc_prior,self.vsys_prior,self.inc_prior,self.totflux_prior,self.velDisp_prior = None,None,None,None,None,None,None
-        
+        self.spectralcube=None
+        self.interactive=True
+        self.show_models=True
         
         self.tolerance=0.1 ## tolerance for simple fit. Smaller numbers are more stringent (longer runtime)
         try:
@@ -96,60 +101,93 @@ class kinms_fitter:
         cax.xaxis.set_label_position('top')
         return cb
             
+    # def read_in_a_cube(self,path):
+    #     hdulist=fits.open(path)
+    #     hdr=hdulist[0].header
+    #     cube = np.squeeze(hdulist[0].data.T) #squeeze to remove singular stokes axis if present
+    #     cube[np.isfinite(cube) == False] = 0.0
+    #
+    #     try:
+    #         if hdr['CASAMBM']:
+    #             beamtab = hdulist[1].data
+    #     except:
+    #         beamtab=None
+    #
+    #     return cube, hdr, beamtab
     def read_in_a_cube(self,path):
-        hdulist=fits.open(path)
-        hdr=hdulist[0].header
-        cube = np.squeeze(hdulist[0].data.T) #squeeze to remove singular stokes axis if present
+        self.spectralcube=SpectralCube.read(path).with_spectral_unit(u.km/u.s, velocity_convention='radio')#, rest_value=self.restfreq)
+
+        hdr=self.spectralcube.header
+        cube = np.squeeze(self.spectralcube.filled_data[:,:,:].T).value #squeeze to remove singular stokes axis if present
         cube[np.isfinite(cube) == False] = 0.0
         
         try:
-            if hdr['CASAMBM']:
-                beamtab = hdulist[1].data
+            beamtab=self.spectralcube.beam
         except:
-            beamtab=None
+            #try flipping them
+            beamvals=[self.spectralcube.header['bmaj'],self.spectralcube.header['bmin']]
+            beamtab=Beam(major=np.max(beamvals)*u.deg,minor=np.min(beamvals)*u.deg,pa=self.spectralcube.header['bpa']*u.deg)
             
         return cube, hdr, beamtab
         
     def get_header_coord_arrays(self,hdr):
-        self.wcs=wcs.WCS(hdr)
-        self.wcs=self.wcs.sub(['longitude','latitude','spectral'])
-        maxsize=np.max([hdr['NAXIS1'],hdr['NAXIS2'],hdr['NAXIS3']])
 
-        xp,yp=np.meshgrid(np.arange(0,maxsize),np.arange(0,maxsize))
-        zp = xp.copy()
+        y,x=self.spectralcube.spatial_coordinate_map
 
-        x,y,spectral = self.wcs.all_pix2world(xp,yp,zp, 0)
-        
-        
-
-        x1=np.median(x[0:hdr['NAXIS1'],0:hdr['NAXIS2']],0)
-        y1=np.median(y[0:hdr['NAXIS1'],0:hdr['NAXIS2']],1)
-        spectral1=spectral[0,0:hdr['NAXIS3']]
-
-        if (hdr['CTYPE3'] =='VRAD') or (hdr['CTYPE3'] =='VELO-LSR') or (hdr['CTYPE3'] =='VOPT') or (hdr['CTYPE3'] =='FELO-HEL'):
-            v1=spectral1
-            try:
-                if hdr['CUNIT3']=='m/s':
-                     v1/=1e3
-                     
-            except:
-                     v1/=1e3
-
-
-        else:
-           f1=spectral1*u.Hz
-           try:
-               self.restfreq = hdr['RESTFRQ']*u.Hz
-           except:
-               self.restfreq = hdr['RESTFREQ']*u.Hz
-           v1=f1.to(u.km/u.s, equivalencies=u.doppler_radio(self.restfreq))
-           v1=v1.value
-
+        x1=np.median(x[0:hdr['NAXIS2'],0:hdr['NAXIS1']],0).value
+        y1=np.median(y[0:hdr['NAXIS2'],0:hdr['NAXIS1']],1).value
+        v1=self.spectralcube.spectral_axis.value
 
         cd3= np.median(np.diff(v1))
-        cd1= np.median(np.diff(y1))
+        cd1= np.median(np.diff(x1))
         
+        if np.any(np.diff(x1) > 359):
+            # we have RA=0 wrap issue
+            x1[x1 > 180]-=360
+            
+            
         return x1,y1,v1,np.abs(cd1*3600),cd3
+            
+    # def get_header_coord_arrays(self,hdr):
+    #     self.wcs=wcs.WCS(hdr)
+    #     self.wcs=self.wcs.sub(['longitude','latitude','spectral'])
+    #     maxsize=np.max([hdr['NAXIS1'],hdr['NAXIS2'],hdr['NAXIS3']])
+    #
+    #     xp,yp=np.meshgrid(np.arange(0,maxsize),np.arange(0,maxsize))
+    #     zp = xp.copy()
+    #
+    #     x,y,spectral = self.wcs.all_pix2world(xp,yp,zp, 0)
+    #
+    #
+    #
+    #     x1=np.median(x[0:hdr['NAXIS1'],0:hdr['NAXIS2']],0)
+    #     y1=np.median(y[0:hdr['NAXIS1'],0:hdr['NAXIS2']],1)
+    #     spectral1=spectral[0,0:hdr['NAXIS3']]
+    #
+    #     if (hdr['CTYPE3'] =='VRAD') or (hdr['CTYPE3'] =='VELO-LSR') or (hdr['CTYPE3'] =='VOPT') or (hdr['CTYPE3'] =='FELO-HEL'):
+    #         v1=spectral1
+    #         try:
+    #             if hdr['CUNIT3']=='m/s':
+    #                  v1/=1e3
+    #
+    #         except:
+    #                  v1/=1e3
+    #
+    #
+    #     else:
+    #        f1=spectral1*u.Hz
+    #        try:
+    #            self.restfreq = hdr['RESTFRQ']*u.Hz
+    #        except:
+    #            self.restfreq = hdr['RESTFREQ']*u.Hz
+    #        v1=f1.to(u.km/u.s, equivalencies=u.doppler_radio(self.restfreq))
+    #        v1=v1.value
+    #
+    #
+    #     cd3= np.median(np.diff(v1))
+    #     cd1= np.median(np.diff(y1))
+    #     breakpoint()
+    #     return x1,y1,v1,np.abs(cd1*3600),cd3
            
     def rms_estimate(self,cube,chanstart,chanend):
         quarterx=np.array(self.x1.size/4.).astype(np.int)
@@ -444,7 +482,7 @@ class kinms_fitter:
         
         self.bounds = Bounds(minimums, maximums,keep_feasible=True)
 
-        res = minimize(self.simple_chi2, initial_guesses, args={'Nfeval':0},method ='Powell' ,bounds=self.bounds, options={'disp': True,'adaptive':True,'maxfev':self.niters,'ftol':self.tolerance}) 
+        res = minimize(self.simple_chi2, initial_guesses, args={'Nfeval':0},method ='Powell' ,bounds=self.bounds, options={'disp': True,'adaptive':True,'maxfev':self.niters,'maxiter':self.niters,'ftol':self.tolerance}) 
         
         results=res.x
         # results[1]=imx+(results[1]/3600.)
@@ -454,9 +492,9 @@ class kinms_fitter:
             
         return results 
 
-    def plot(self,overcube=None,savepath=None,**kwargs):
+    def plot(self,block=True,overcube=None,savepath=None,**kwargs):
         pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=self.rms,savepath=savepath,savename=self.pdf_rootname,**kwargs)
-        pl.makeplots()
+        pl.makeplots(block=block)
         self.mask_sum=pl.mask.sum()
         
     def run(self,method='mcmc',justplot=False,**kwargs):
@@ -507,7 +545,7 @@ class kinms_fitter:
             print("==========================================================")
             print("One model evaulation takes {:.2f} seconds".format(self.timetaken))
         
-        self.plot(overcube=init_model,**kwargs)
+        self.plot(overcube=init_model,block=self.interactive,**kwargs)
 
         if justplot:
             return 1,1,1,1,1
@@ -541,17 +579,20 @@ class kinms_fitter:
             else:
                 savepath=None
                 
-            self.plot(overcube=best_model,savepath=savepath,**kwargs)
+            self.plot(overcube=best_model,savepath=savepath,block=self.interactive,**kwargs)
             
             
             if ((method=='mcmc') or (method=='both')) and self.show_corner:   
                 fig=corner_plot.corner_plot(outputvalue[~fixed,:].T,like=outputll,\
                                         quantiles=[0.16, 0.5, 0.84],labels=self.labels[~fixed],verbose=False)
                 if self.pdf:
-                    
                     plt.savefig(self.pdf_rootname+"_MCMCcornerplot.pdf")
-                plt.show()                        
-            
+                if block==False:
+                    plt.draw()
+                    plt.pause(1e-6)
+                else:
+                    plt.show()
+                    
             bestvals[1]=(bestvals[1]/3600.)+self.xc_img
             bestvals[2]=(bestvals[2]/3600.)+self.yc_img
                                         
