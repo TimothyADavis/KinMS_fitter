@@ -22,7 +22,7 @@ setup(name='kinms_fitter',
            'spectral-cube',
            'scipy>=1.3.3',
            'jampy',
-           'kinms>=2.2.2',
+           'kinms>=2.2.5',
        ],
        classifiers=[
          'Development Status :: 3 - Alpha',
