@@ -83,7 +83,8 @@ class kinms_fitter:
         self.pa_prior,self.xc_prior,self.yc_prior,self.vsys_prior,self.inc_prior,self.totflux_prior,self.velDisp_prior = None,None,None,None,None,None,None
         self.spectralcube=None
         self.interactive=True
-        self.show_models=True
+        self.show_plots=True
+        self.output_cube_fileroot=False
         
         self.tolerance=0.1 ## tolerance for simple fit. Smaller numbers are more stringent (longer runtime)
         try:
@@ -357,7 +358,7 @@ class kinms_fitter:
     #              [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
     #              intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,**myargs).model_cube()
     
-    def model_simple(self,param):
+    def model_simple(self,param,fileName=''):
         pa=param[0]
         xc=param[1]
         yc=param[2]
@@ -384,7 +385,7 @@ class kinms_fitter:
         
         return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
                  [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
-                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,**myargs).model_cube()
+                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,ra=self.xc_img,dec=self.yc_img,fileName=fileName,**myargs).model_cube()
         
             
         
@@ -494,7 +495,7 @@ class kinms_fitter:
 
     def plot(self,block=True,overcube=None,savepath=None,**kwargs):
         pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=self.rms,savepath=savepath,savename=self.pdf_rootname,**kwargs)
-        pl.makeplots(block=block)
+        pl.makeplots(block=block,plot2screen=self.show_plots)
         self.mask_sum=pl.mask.sum()
         
     def run(self,method='mcmc',justplot=False,**kwargs):
@@ -573,7 +574,12 @@ class kinms_fitter:
                 if not self.silent: 
                     print("MCMC fitting process took {:.2f} seconds".format((time.time()-t)))
             self.pa_guess=bestvals[0]
-            best_model=self.model_simple(bestvals)
+            
+            if self.output_cube_fileroot != False:
+                fileName=self.output_cube_fileroot
+            else:
+                fileName=''
+            best_model=self.model_simple(bestvals,fileName=fileName)
             if self.pdf:
                 savepath="./"
             else:
@@ -587,11 +593,12 @@ class kinms_fitter:
                                         quantiles=[0.16, 0.5, 0.84],labels=self.labels[~fixed],verbose=False)
                 if self.pdf:
                     plt.savefig(self.pdf_rootname+"_MCMCcornerplot.pdf")
-                if block==False:
-                    plt.draw()
-                    plt.pause(1e-6)
-                else:
-                    plt.show()
+                if self.show_plots:    
+                    if self.interactive==False:
+                        plt.draw()
+                        plt.pause(1e-6)
+                    else:
+                        plt.show()
                     
             bestvals[1]=(bestvals[1]/3600.)+self.xc_img
             bestvals[2]=(bestvals[2]/3600.)+self.yc_img
