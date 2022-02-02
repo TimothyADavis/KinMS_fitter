@@ -125,10 +125,16 @@ class kinms_fitter:
         try:
             beamtab=self.spectralcube.beam
         except:
+            try:
+                beamtab=self.spectralcube.beams[np.floor(self.spectralcube.beams.size/2).astype(int)]
+            except:
             #try flipping them
-            beamvals=[self.spectralcube.header['bmaj'],self.spectralcube.header['bmin']]
-            beamtab=Beam(major=np.max(beamvals)*u.deg,minor=np.min(beamvals)*u.deg,pa=self.spectralcube.header['bpa']*u.deg)
-            
+                try:
+                    beamvals=[self.spectralcube.header['bmaj'],self.spectralcube.header['bmin']]
+                    beamtab=Beam(major=np.max(beamvals)*u.deg,minor=np.min(beamvals)*u.deg,pa=self.spectralcube.header['bpa']*u.deg)
+                except:
+                    beamtab=False
+ 
         return cube, hdr, beamtab
         
     def get_header_coord_arrays(self,hdr):
@@ -243,9 +249,9 @@ class kinms_fitter:
         datacube,hdr,beamtab = self.read_in_a_cube(cube)
         
         try:
-           self.bmaj=np.median(beamtab['BMAJ'])
-           self.bmin=np.median(beamtab['BMIN'])
-           self.bpa=np.median(beamtab['BPA'])
+           self.bmaj= beamtab.major.to(u.arcsec).value
+           self.bmin= beamtab.minor.to(u.arcsec).value
+           self.bpa=beamtab.pa.to(u.degree).value
         except:     
            try:
                self.bmaj=hdr['BMAJ']*3600.
@@ -382,6 +388,7 @@ class kinms_fitter:
             radmotion=self.radial_motion[0](self.sbRad,param[7+self.n_velvars+self.n_sbvars:])
         else:
             radmotion=None
+        
         
         return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
                  [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
@@ -544,7 +551,7 @@ class kinms_fitter:
             print("==============   Welcome to KinMS_fitter!   ==============")
             print(self.logo())
             print("==========================================================")
-            print("One model evaulation takes {:.2f} seconds".format(self.timetaken))
+            print("One model evaluation takes {:.2f} seconds".format(self.timetaken))
         
         self.plot(overcube=init_model,block=self.interactive,**kwargs)
 
@@ -588,17 +595,20 @@ class kinms_fitter:
             self.plot(overcube=best_model,savepath=savepath,block=self.interactive,**kwargs)
             
             
-            if ((method=='mcmc') or (method=='both')) and self.show_corner:   
-                fig=corner_plot.corner_plot(outputvalue[~fixed,:].T,like=outputll,\
+            if ((method=='mcmc') or (method=='both')) and self.show_corner:
+                if np.any(np.std(outputvalue[~fixed,:],1)==0): 
+                    print('Some parameters had no accepted guesses. Skipping corner plot. Trying increasing niters.')
+                else:
+                    fig=corner_plot.corner_plot(outputvalue[~fixed,:].T,like=outputll,\
                                         quantiles=[0.16, 0.5, 0.84],labels=self.labels[~fixed],verbose=False)
-                if self.pdf:
-                    plt.savefig(self.pdf_rootname+"_MCMCcornerplot.pdf")
-                if self.show_plots:    
-                    if self.interactive==False:
-                        plt.draw()
-                        plt.pause(1e-6)
-                    else:
-                        plt.show()
+                    if self.pdf:
+                        plt.savefig(self.pdf_rootname+"_MCMCcornerplot.pdf")
+                    if self.show_plots:    
+                        if self.interactive==False:
+                            plt.draw()
+                            plt.pause(1e-6)
+                        else:
+                            plt.show()
                     
             bestvals[1]=(bestvals[1]/3600.)+self.xc_img
             bestvals[2]=(bestvals[2]/3600.)+self.yc_img
