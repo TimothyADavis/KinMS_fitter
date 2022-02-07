@@ -542,7 +542,7 @@ class kinms_fitter:
         
         
         t=time.time()
-        init_model=self.model_simple(initial_guesses)
+        init_model=self.model_simple(initial_guesses,fileName=self.output_cube_fileroot)
         self.timetaken=(time.time()-t)
         
         
