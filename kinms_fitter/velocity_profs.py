@@ -266,11 +266,20 @@ class velocity_profs:
                 self.precisions=precisions
         
         def mass(self,r,theargs,norm=1):
-            
-            
+            if not hasattr(r, "__len__") and r == 0:
+                return 0
+                
             b=1.9992*theargs[2]-0.327 # for n between 0.5 and 10
             p=1.0 - (0.6097/theargs[2]) + (0.05563/(theargs[2]**2))
-            return norm*((4/3.)*np.pi*r**3)*((r/theargs[1])**(-p))*np.exp(-b*(((r/theargs[1])**(1/theargs[2])))-1)
+        
+            masses=norm*((4/3.)*np.pi*r**3)*((r/theargs[1])**(-p))*np.exp(-b*(((r/theargs[1])**(1/theargs[2])))-1)
+        
+            if hasattr(r, "__len__"):
+                masses[r==0]=0
+
+                    
+                    
+            return masses
             
             
 
@@ -289,13 +298,13 @@ class velocity_profs:
             
             norm=((10**theargs[0])/totmass)
             
-
+                
             smallestmass,errs=integrate.quad(self.mass,0,r[0],args=(theargs,norm))
             
-            mass=integrate.cumtrapz(self.mass(r,theargs,norm), r,initial=0)+smallestmass
-
+            mass=integrate.cumtrapz(self.mass(r,theargs,norm), r,initial=smallestmass)
             
             vsqr = (4.301e-3*mass)/r
+            vsqr[r==0]=0
             
             return np.sqrt(vsqr)
             

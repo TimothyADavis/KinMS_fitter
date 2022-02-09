@@ -33,6 +33,8 @@ class kinms_fitter:
         self.linefree_chans_start = linefree_chans[0]
         self.linefree_chans_end = linefree_chans[1]
         self.chans2do=spectral_trim
+        self.spectralcube=None
+        self.bunit=None
         self.cube =self.read_primary_cube(filename)
         
         self.spatial_trim=spatial_trim
@@ -81,11 +83,11 @@ class kinms_fitter:
         self.mask_sum=0
         self.labels=None
         self.pa_prior,self.xc_prior,self.yc_prior,self.vsys_prior,self.inc_prior,self.totflux_prior,self.velDisp_prior = None,None,None,None,None,None,None
-        self.spectralcube=None
+
         self.interactive=True
         self.show_plots=True
         self.output_cube_fileroot=False
-        
+
         self.tolerance=0.1 ## tolerance for simple fit. Smaller numbers are more stringent (longer runtime)
         try:
             self.objname=self.hdr['OBJECT']
@@ -117,7 +119,7 @@ class kinms_fitter:
     #     return cube, hdr, beamtab
     def read_in_a_cube(self,path):
         self.spectralcube=SpectralCube.read(path).with_spectral_unit(u.km/u.s, velocity_convention='radio')#, rest_value=self.restfreq)
-
+        self.bunit=self.spectralcube.unit.to_string()
         hdr=self.spectralcube.header
         cube = np.squeeze(self.spectralcube.filled_data[:,:,:].T).value #squeeze to remove singular stokes axis if present
         cube[np.isfinite(cube) == False] = 0.0
@@ -392,7 +394,7 @@ class kinms_fitter:
         
         return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
                  [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
-                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,ra=self.xc_img,dec=self.yc_img,fileName=fileName,**myargs).model_cube()
+                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,ra=self.xc_img,dec=self.yc_img,fileName=fileName,bunit=self.bunit,**myargs).model_cube()
         
             
         
@@ -542,7 +544,7 @@ class kinms_fitter:
         
         
         t=time.time()
-        init_model=self.model_simple(initial_guesses,fileName=self.output_cube_fileroot)
+        init_model=self.model_simple(initial_guesses)
         self.timetaken=(time.time()-t)
         
         
@@ -552,7 +554,7 @@ class kinms_fitter:
             print(self.logo())
             print("==========================================================")
             print("One model evaluation takes {:.2f} seconds".format(self.timetaken))
-        
+       
         self.plot(overcube=init_model,block=self.interactive,**kwargs)
 
         if justplot:
@@ -596,7 +598,7 @@ class kinms_fitter:
             
             
             if ((method=='mcmc') or (method=='both')) and self.show_corner:
-                if np.any(np.std(outputvalue[~fixed,:],1)==0): 
+                if np.any(np.nanmax(outputvalue[~fixed,:],1)==np.nanmin(outputvalue[~fixed,:],1)): 
                     print('Some parameters had no accepted guesses. Skipping corner plot. Trying increasing niters.')
                 else:
                     fig=corner_plot.corner_plot(outputvalue[~fixed,:].T,like=outputll,\
