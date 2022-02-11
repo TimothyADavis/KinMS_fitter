@@ -4,6 +4,7 @@ import numpy as np
 from jampy.mge_vcirc import mge_vcirc
 from kinms.radial_motion import radial_motion
 import scipy.integrate as integrate 
+from pprint import pformat
 
 class velocity_profs:
     def __init__(self):
@@ -52,10 +53,12 @@ class velocity_profs:
                 self.priors=priors
                         
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-                
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
         def __call__(self,x,args,**kwargs):
             ## return the velocity 
             return np.interp(x,self.bincentroids,args)
@@ -82,10 +85,12 @@ class velocity_profs:
                 self.priors=fixed
                         
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-                
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
         def __call__(self,x,args,**kwargs):
             ## return the velocity
             return np.sqrt(4.301e-3*(10**args[0])/(4.84*self.distance*x))       
@@ -124,10 +129,12 @@ class velocity_profs:
                 self.priors=fixed
                         
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-                
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
         def __call__(self,x,args,**kwargs):
             ## return the velocity 
             if self.freeparams==1:
@@ -163,10 +170,12 @@ class velocity_profs:
                 self.priors=fixed
                         
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-                
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
         def __call__(self,x,args,**kwargs):
             ## return the velocity 
             if self.freeparams==1:
@@ -198,10 +207,12 @@ class velocity_profs:
                 self.priors=fixed
                         
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-                
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
         def __call__(self,x,args,**kwargs):
             ## return the velocity
             return ((2*args[0])/np.pi)*np.arctan(x/args[1])   
@@ -227,10 +238,12 @@ class velocity_profs:
                 self.priors=fixed
                         
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-                
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
         def __call__(self,x,args,**kwargs):
             ## return the velocity
             v2t=np.heaviside(args[2]-x,1.0)*args[0]
@@ -261,7 +274,7 @@ class velocity_profs:
                 self.priors=fixed
                         
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
         
@@ -281,7 +294,9 @@ class velocity_profs:
                     
             return masses
             
-            
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)    
 
         def __call__(self,x,theargs,**kwargs):
             ## return the velocity
@@ -332,13 +347,17 @@ class velocity_profs:
                 self.priors=fixed
                         
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
         
             self.mymodel = [velocity_profs.sersic(self.distance,guesses=[self.guesses[0]+np.log10(1-self.guesses[3]),self.guesses[1],1],minimums=[self.minimums[0]+np.log10(1-self.maximums[3]),self.minimums[1],1],maximums=[self.maximums[0]+np.log10(1-self.minimums[3]),self.maximums[1],1],fixed=[self.fixed[0]&self.fixed[3],self.fixed[1],True]),\
                        velocity_profs.sersic(self.distance,guesses=[self.guesses[0]+np.log10(self.guesses[3]),self.guesses[2],4],minimums=[self.minimums[0]+np.log10(self.maximums[3]),self.minimums[2],4],maximums=[self.maximums[0]+np.log10(self.minimums[3]),self.maximums[2],4],fixed=[self.fixed[0]&self.fixed[3],self.fixed[2],True])]
-
+        
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
+            
         def __call__(self,x,theargs,**kwargs):
             ## return the velocity
             
@@ -370,11 +389,13 @@ class velocity_profs:
                 self.priors=fixed
                         
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
         
-
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
 
         def __call__(self,xs,theargs,**kwargs):
             ## return the velocity
@@ -409,10 +430,14 @@ class velocity_profs:
                 self.priors=fixed
                         
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-                
+        
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
+                    
         def __call__(self,x,args,**kwargs):
             ## return the velocity
             return np.clip(x,0,args[2])*args[0] + args[1]        

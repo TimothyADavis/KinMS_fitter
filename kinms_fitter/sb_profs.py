@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 import numpy as np
+from pprint import pformat
 
 class sb_profs:
     def __init__(self):
@@ -49,10 +50,14 @@ class sb_profs:
                 self.priors=fixed
                         
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-                
+    
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
+                    
         def __call__(self,x,args):
             if self.freeparams==1:
                 return np.exp(-x/args[0])
@@ -87,10 +92,13 @@ class sb_profs:
                 self.priors=fixed
                     
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-                
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
+                 
         def __call__(self,x,args):
             if self.freeparams==2:
                 args=np.append(1,args)
@@ -117,9 +125,12 @@ class sb_profs:
                 self.priors=fixed
                     
             if np.any(precisions) == None:
-                self.precisions=np.resize((self.max-self.min/10.),self.freeparams)
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-                
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
+                 
         def __call__(self,x,args):
             return ~((x>=args[0])&(x<args[1]))

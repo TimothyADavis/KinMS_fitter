@@ -3,6 +3,7 @@
 import numpy as np
 from gastimator import gastimator
 from astropy.io import fits
+from astropy.table import Table
 import matplotlib.pyplot as plt
 from gastimator import corner_plot, priors
 #from astropy import wcs
@@ -10,6 +11,7 @@ from scipy.optimize import Bounds
 from scipy.optimize import minimize
 import matplotlib
 import warnings
+from joblib import cpu_count 
 #warnings.filterwarnings('ignore', category=wcs.FITSFixedWarning, append=True)
 import matplotlib.gridspec as gridspec
 from matplotlib.offsetbox import AnchoredText
@@ -35,8 +37,8 @@ class kinms_fitter:
         self.chans2do=spectral_trim
         self.spectralcube=None
         self.bunit=None
+        self.filename=filename
         self.cube =self.read_primary_cube(filename)
-        
         self.spatial_trim=spatial_trim
         self.clip_cube()
         
@@ -82,6 +84,7 @@ class kinms_fitter:
         self.chi2_correct_fac=None
         self.mask_sum=0
         self.labels=None
+        self.text_output=True
         self.pa_prior,self.xc_prior,self.yc_prior,self.vsys_prior,self.inc_prior,self.totflux_prior,self.velDisp_prior = None,None,None,None,None,None,None
 
         self.interactive=True
@@ -421,12 +424,17 @@ class kinms_fitter:
         mcmc.precision= precision
         self.fixed=fixed
         
-        if self.niters < 3000:
-            self.nprocesses=1
         
-        if self.nprocesses != None:
+        
+        if self.nprocesses == None:
+            cpucount = np.int(cpu_count())-1
+            mcmc.nprocesses = np.clip(np.floor(self.niters/1250),1,cpucount).astype(int)
+        else:
             mcmc.nprocesses= int(self.nprocesses)
-        
+            
+            if self.niters/self.nprocesses < 1250:
+                self.errors_warnings.append('WARNING: The chain assigned to each processor was very short (<1250 steps)')
+                
         if not self.silent:    
             print("Parameters Fixed:",labels[mcmc.fixed]) 
     
@@ -506,11 +514,53 @@ class kinms_fitter:
         pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=self.rms,savepath=savepath,savename=self.pdf_rootname,**kwargs)
         pl.makeplots(block=block,plot2screen=self.show_plots)
         self.mask_sum=pl.mask.sum()
+    
+    def write_text(self,bestvals, errup,errdown, fixed,runtime,errors_warnings='None',fname="KinMS_fitter_output.txt"):
+        if isinstance(errup,int):
+            # simple mode used
+            errup=['--']*bestvals.size
+            errdown=errup
+            mode='Simple'
+        else:
+            mode='MCMC'
         
+
+        t=Table([self.labels,bestvals,errup,errdown,fixed],names=('Quantity', 'Best-fit', 'Error-up', 'Error-down','Fixed'))
+        # for col in t.itercols():
+        #    if col.info.dtype.kind == 'f':
+        #        col.info.format = '.2f'
+               
+        t.meta['comments']=self.logo().split('\n')[:-1]
+        t.meta['comments'].append('')
+        t.meta['comments'].append(' Cube Fitted:    '+self.filename)
+        t.meta['comments'].append(' Fitting method: '+mode)
+        if mode =='MCMC':
+            t.meta['comments'].append(' MCMC iterations:'+str(self.niters))
+        t.meta['comments'].append(' Runtime:        '+"{:.1f}".format(runtime)+"s")    
+        t.meta['comments'].append(' SBprofile:')
+        for sbcomp in self.sb_profile:
+            for line in sbcomp.__repr__().split('\n'):
+                 t.meta['comments'].append('                 '+line)
+        t.meta['comments'].append(' Velocity profile:')
+        for velcomp in self.vel_profile:
+            for line in velcomp.__repr__().split('\n'):
+                 t.meta['comments'].append('                 '+line)         
+        if errors_warnings ==[]:
+            errnone="None"
+        else:
+            errnone=""
+        t.meta['comments'].append(' Warnings:       '+errnone)
+        for errmsg in errors_warnings:
+            t.meta['comments'].append('                 '+errmsg)
+        t.meta['comments'].append('')
+                
+        t.write(fname,format='ascii.fixed_width_two_line',comment='#')
+        
+            
     def run(self,method='mcmc',justplot=False,**kwargs):
         self.bincentroids=np.arange(0,self.nrings)*self.bmaj
         self.error=self.rms
-
+        self.errors_warnings=[]
         self.xc_guess=(self.xc_guess-self.xc_img)*3600.
         self.yc_guess=(self.yc_guess-self.yc_img)*3600.
 
@@ -568,8 +618,9 @@ class kinms_fitter:
                 bestvals=self.simple_fit(initial_guesses,labels,minimums,maximums,fixed)
                 besterrs, outputvalue, outputll=0,0,0
                 initial_guesses=bestvals
+                runtime=(time.time()-t)
                 if not self.silent: 
-                    print("Simple fitting process took {:.2f} seconds".format((time.time()-t)))
+                    print("Simple fitting process took {:.2f} seconds".format(runtime))
                     print("Best fitting parameters:")
                     for name,val in zip(labels,bestvals):
                         print("   "+name+":",val)
@@ -578,10 +629,17 @@ class kinms_fitter:
                 if not self.silent:
                     print("==============  Begin MCMC fitting process  ==============")
                 bestvals, besterrs, outputvalue, outputll = self.mcmc_fit(initial_guesses,labels,minimums,maximums,fixed,priors,precision)
-                
-            
+                runtime=(time.time()-t)
                 if not self.silent: 
-                    print("MCMC fitting process took {:.2f} seconds".format((time.time()-t)))
+                    print("MCMC fitting process took {:.2f} seconds".format(runtime))
+                    
+                if np.any(np.nanmax(outputvalue[~fixed,:],1)==np.nanmin(outputvalue[~fixed,:],1)):
+                    self.errors_warnings.append('WARNING: Some parameters had no accepted guesses. Trying increasing niters.')
+                    self.show_corner=False
+                    if not self.silent:
+                        print('Some parameters had no accepted guesses. Skipping corner plot. Trying increasing niters.')
+                    
+
             self.pa_guess=bestvals[0]
             
             if self.output_cube_fileroot != False:
@@ -593,28 +651,43 @@ class kinms_fitter:
                 savepath="./"
             else:
                 savepath=None
+            
+            bestvals[1]=(bestvals[1]/3600.)+self.xc_img
+            bestvals[2]=(bestvals[2]/3600.)+self.yc_img
+                                        
+            if self.text_output:
+                if self.pdf_rootname != "KinMS_fitter":
+                    fname=self.pdf_rootname+"_KinMS_fitter_output.txt"
+                else:
+                    fname="KinMS_fitter_output.txt"
+                if method=='mcmc':    
+                    perc = np.percentile(outputvalue, [15.86, 50, 84.14], axis=1)
+                    sig_bestfit_up = (perc[2][:] - perc[1][:])
+                    sig_bestfit_down = (perc[1][:] - perc[0][:])
+                    sig_bestfit_up[1:3]=sig_bestfit_up[1:3]/3600. ## into degrees
+                    sig_bestfit_down[1:3]=sig_bestfit_down[1:3]/3600. ## into degrees
+                else:
+                    sig_bestfit_up=sig_bestfit_down=0
+                    
+                self.write_text(bestvals, sig_bestfit_up, sig_bestfit_down, fixed,runtime,errors_warnings=self.errors_warnings,fname=fname)
+            
+            
                 
             self.plot(overcube=best_model,savepath=savepath,block=self.interactive,**kwargs)
             
             
             if ((method=='mcmc') or (method=='both')) and self.show_corner:
-                if np.any(np.nanmax(outputvalue[~fixed,:],1)==np.nanmin(outputvalue[~fixed,:],1)): 
-                    print('Some parameters had no accepted guesses. Skipping corner plot. Trying increasing niters.')
-                else:
-                    fig=corner_plot.corner_plot(outputvalue[~fixed,:].T,like=outputll,\
-                                        quantiles=[0.16, 0.5, 0.84],labels=self.labels[~fixed],verbose=False)
-                    if self.pdf:
-                        plt.savefig(self.pdf_rootname+"_MCMCcornerplot.pdf")
-                    if self.show_plots:    
-                        if self.interactive==False:
-                            plt.draw()
-                            plt.pause(1e-6)
-                        else:
-                            plt.show()
+                fig=corner_plot.corner_plot(outputvalue[~fixed,:].T,like=outputll,\
+                                    quantiles=[0.16, 0.5, 0.84],labels=self.labels[~fixed],verbose=False)
+                if self.pdf:
+                    plt.savefig(self.pdf_rootname+"_MCMCcornerplot.pdf")
+                if self.show_plots:    
+                    if self.interactive==False:
+                        plt.draw()
+                        plt.pause(1e-6)
+                    else:
+                        plt.show()
                     
-            bestvals[1]=(bestvals[1]/3600.)+self.xc_img
-            bestvals[2]=(bestvals[2]/3600.)+self.yc_img
-                                        
-        
+                 
             return bestvals, besterrs, outputvalue, outputll, fixed
         
