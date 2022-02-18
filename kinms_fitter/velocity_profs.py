@@ -140,7 +140,7 @@ class velocity_profs:
             if self.freeparams==1:
                 bhmass=0
             else:
-                bhmass=args[1] 
+                bhmass=args[1]    
             return mge_vcirc(self.surf*args[0], self.sigma, self.qobs, np.clip(kwargs['inc'],self.mininc,90), 10**bhmass, self.distance, x)               
 
     class mge_vcirc_innerml:  
@@ -320,7 +320,6 @@ class velocity_profs:
             
             vsqr = (4.301e-3*mass)/r
             vsqr[r==0]=0
-            
             return np.sqrt(vsqr)
             
     class bulge_disc:  
@@ -350,7 +349,7 @@ class velocity_profs:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-        
+            #breakpoint()
             self.mymodel = [velocity_profs.sersic(self.distance,guesses=[self.guesses[0]+np.log10(1-self.guesses[3]),self.guesses[1],1],minimums=[self.minimums[0]+np.log10(1-self.maximums[3]),self.minimums[1],1],maximums=[self.maximums[0]+np.log10(1-self.minimums[3]),self.maximums[1],1],fixed=[self.fixed[0]&self.fixed[3],self.fixed[1],True]),\
                        velocity_profs.sersic(self.distance,guesses=[self.guesses[0]+np.log10(self.guesses[3]),self.guesses[2],4],minimums=[self.minimums[0]+np.log10(self.maximums[3]),self.minimums[2],4],maximums=[self.maximums[0]+np.log10(self.minimums[3]),self.maximums[2],4],fixed=[self.fixed[0]&self.fixed[3],self.fixed[2],True])]
         
@@ -361,7 +360,7 @@ class velocity_profs:
         def __call__(self,x,theargs,**kwargs):
             ## return the velocity
             
-            return velocity_profs.eval(self.mymodel,x,[theargs[0]*(1-theargs[3]),theargs[1],1,theargs[0]*theargs[3],theargs[2],4])
+            return velocity_profs.eval(self.mymodel,x,[theargs[0]+np.log10(1-theargs[3]),theargs[1],1,theargs[0]+np.log10(theargs[3]),theargs[2],4])
             
 
     class nfw:  

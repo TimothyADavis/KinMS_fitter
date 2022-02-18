@@ -86,7 +86,7 @@ class kinms_fitter:
         self.labels=None
         self.text_output=True
         self.pa_prior,self.xc_prior,self.yc_prior,self.vsys_prior,self.inc_prior,self.totflux_prior,self.velDisp_prior = None,None,None,None,None,None,None
-
+        self.save_all_accepted=True
         self.interactive=True
         self.show_plots=True
         self.output_cube_fileroot=False
@@ -606,9 +606,9 @@ class kinms_fitter:
             print("One model evaluation takes {:.2f} seconds".format(self.timetaken))
        
         self.plot(overcube=init_model,block=self.interactive,**kwargs)
-
+        
         if justplot:
-            return 1,1,1,1,1
+            return initial_guesses,1,1,1,1
         else:    
         
             t=time.time()
@@ -654,6 +654,9 @@ class kinms_fitter:
             
             bestvals[1]=(bestvals[1]/3600.)+self.xc_img
             bestvals[2]=(bestvals[2]/3600.)+self.yc_img
+            if (method=='mcmc')&(self.save_all_accepted):
+                np.savez(self.pdf_rootname+".npz",bestvals=bestvals, besterrs=besterrs, outputvalue=outputvalue, outputll=outputll,fixed=fixed,labels=self.labels)
+
                                         
             if self.text_output:
                 if self.pdf_rootname != "KinMS_fitter":
