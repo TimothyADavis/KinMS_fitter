@@ -296,8 +296,15 @@ class kinms_fitter:
         labels=np.array(["PA","Xc","Yc","Vsys","inc","totflux","veldisp"])
         fixed= minimums == maximums
         priors=np.array([self.pa_prior,self.xc_prior,self.yc_prior,self.vsys_prior,self.inc_prior,self.totflux_prior,self.velDisp_prior])#np.resize(None,fixed.size)
-        precision=(maximums-minimums)/10.        
-
+        precision=(maximums-minimums)/10. 
+               
+        
+        if 'beam' in self.bunit:
+            newunit=(self.spectralcube.unit*u.beam*u.km/u.s).to_string()
+        else:
+            newunit=(self.spectralcube.unit*u.km/u.s).to_string()
+            
+        units=np.array(['Deg','Deg','Deg','km/s','Deg',newunit,'km/s'])
         
         vars2look=[]
         if len(self.skySampClouds) == 0:
@@ -316,10 +323,12 @@ class kinms_fitter:
             priors=np.append(priors,np.concatenate([i.priors for i in list_vars]))
             precision=np.append(precision,np.concatenate([i.precisions for i in list_vars]))
             labels=np.append(labels,np.concatenate([i.labels for i in list_vars]))
+            units=np.append(units,np.concatenate([i.units for i in list_vars]))
             
         if np.any(self.initial_guesses != None):
             initial_guesses= self.initial_guesses
-        return initial_guesses,labels,minimums,maximums,fixed, priors,precision
+ 
+        return initial_guesses,labels,minimums,maximums,fixed, priors,precision,units
         
                      
     def clip_cube(self):
@@ -515,7 +524,7 @@ class kinms_fitter:
         pl.makeplots(block=block,plot2screen=self.show_plots)
         self.mask_sum=pl.mask.sum()
     
-    def write_text(self,bestvals, errup,errdown, fixed,runtime,errors_warnings='None',fname="KinMS_fitter_output.txt"):
+    def write_text(self,bestvals, errup,errdown,units, fixed,runtime,errors_warnings='None',fname="KinMS_fitter_output.txt"):
         if isinstance(errup,int):
             # simple mode used
             errup=['--']*bestvals.size
@@ -525,7 +534,7 @@ class kinms_fitter:
             mode='MCMC'
         
 
-        t=Table([self.labels,bestvals,errup,errdown,fixed],names=('Quantity', 'Best-fit', 'Error-up', 'Error-down','Fixed'))
+        t=Table([self.labels,bestvals,errup,errdown,units,fixed],names=('Quantity', 'Best-fit', 'Error-up', 'Error-down','Units','Fixed'))
         # for col in t.itercols():
         #    if col.info.dtype.kind == 'f':
         #        col.info.format = '.2f'
@@ -554,7 +563,7 @@ class kinms_fitter:
             t.meta['comments'].append('                 '+errmsg)
         t.meta['comments'].append('')
                 
-        t.write(fname,format='ascii.fixed_width_two_line',comment='#')
+        t.write(fname,format='ascii.fixed_width_two_line',comment='#',overwrite=True)
         
             
     def run(self,method='mcmc',justplot=False,**kwargs):
@@ -589,7 +598,7 @@ class kinms_fitter:
             self.n_radmotionvars = np.sum([i.freeparams for i in self.radial_motion])
         
         
-        initial_guesses,labels,minimums,maximums,fixed, priors,precision = self.setup_params()
+        initial_guesses,labels,minimums,maximums,fixed, priors,precision,units = self.setup_params()
         self.labels=labels
         
         
@@ -654,7 +663,13 @@ class kinms_fitter:
             
             bestvals[1]=(bestvals[1]/3600.)+self.xc_img
             bestvals[2]=(bestvals[2]/3600.)+self.yc_img
+            if (method=='mcmc'):
+                besterrs[1]=besterrs[1]/3600.
+                besterrs[2]=besterrs[2]/3600.
+            
             if (method=='mcmc')&(self.save_all_accepted):
+                besterrs[1]=besterrs[1]/3600.
+                besterrs[2]=besterrs[2]/3600.
                 np.savez(self.pdf_rootname+".npz",bestvals=bestvals, besterrs=besterrs, outputvalue=outputvalue, outputll=outputll,fixed=fixed,labels=self.labels)
 
                                         
@@ -672,7 +687,7 @@ class kinms_fitter:
                 else:
                     sig_bestfit_up=sig_bestfit_down=0
                     
-                self.write_text(bestvals, sig_bestfit_up, sig_bestfit_down, fixed,runtime,errors_warnings=self.errors_warnings,fname=fname)
+                self.write_text(bestvals, sig_bestfit_up, sig_bestfit_down, units, fixed,runtime,errors_warnings=self.errors_warnings,fname=fname)
             
             
                 

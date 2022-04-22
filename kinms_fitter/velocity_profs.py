@@ -35,13 +35,15 @@ class velocity_profs:
             self.bincentroids=bincentroids
             self.operation="quad"
             self.labels=np.array([])
+            self.units=[]
             for i in range(0,self.freeparams):
                 self.labels=np.append(self.labels,"V"+str(i))
+                self.units.append('km/s')
 
             self.min=np.array(minimums)
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
-
+            self.units=np.array(self.units)
             if np.any(fixed) == None:
                 self.fixed=np.resize(False,self.freeparams)
             else:
@@ -69,6 +71,7 @@ class velocity_profs:
             self.freeparams=1
             self.distance=distance
             self.labels=['logCentralMass']
+            self.units=['log_Msun']
             self.operation="quad"
             self.min=np.array(minimums)
             self.max=np.array(maximums)
@@ -102,10 +105,12 @@ class velocity_profs:
             if self.guess.size == 1:
                 self.freeparams=1
                 self.labels=['M/L']
+                self.units=['Msun/Lsun']
             else:
                 if self.guess.size == 2:
                     self.freeparams=2
                     self.labels=['M/L','logMBH']
+                    self.units=['Msun/Lsun','log_Msun']
                 else:
                     raise('Wrong number of guesses, expected one or two [M/L, (and optionally logBHmass)]')    
                 
@@ -149,6 +154,7 @@ class velocity_profs:
             self.operation="quad"
             self.freeparams=3
             self.labels=['M/Linner','M/Louter','logMBH']
+            self.units=['Msun/Lsun','Msun/Lsun','log_Msun']
             self.distance=distance
             self.surf=surf
             self.sigma=sigma
@@ -191,7 +197,7 @@ class velocity_profs:
             self.freeparams=2
             self.operation="quad"
             self.labels=['Vmax','Rturn']
-
+            self.units=['km/s','arcsec']
             self.min=np.array(minimums)
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
@@ -222,7 +228,7 @@ class velocity_profs:
             self.freeparams=4
             self.operation="quad"
             self.labels=['Vt','Vr','Rbar','phibar']
-
+            self.units=['km/s','km/s','arcsec','deg']
             self.min=np.array(minimums)
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
@@ -257,6 +263,7 @@ class velocity_profs:
             self.guess=np.array(guesses)
             self.freeparams=3
             self.labels=['mtot','re','n']
+            self.units=['log_Msun','arcsec','unitless']
             self.operation="quad"
             self.distance=distance
             self.min=np.array(minimums)
@@ -328,6 +335,7 @@ class velocity_profs:
             self.guesses=np.array(guesses)
             self.freeparams=4
             self.labels=['mtot','re_d','re_b','b_to_t']
+            self.units=['log_Msun','arcsec','arcsec','unitless']
             self.distance=distance
             self.minimums=np.array(minimums)
             self.maximums=np.array(maximums)
@@ -349,7 +357,7 @@ class velocity_profs:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
-            #breakpoint()
+            
             self.mymodel = [velocity_profs.sersic(self.distance,guesses=[self.guesses[0]+np.log10(1-self.guesses[3]),self.guesses[1],1],minimums=[self.minimums[0]+np.log10(1-self.maximums[3]),self.minimums[1],1],maximums=[self.maximums[0]+np.log10(1-self.minimums[3]),self.maximums[1],1],fixed=[self.fixed[0]&self.fixed[3],self.fixed[1],True]),\
                        velocity_profs.sersic(self.distance,guesses=[self.guesses[0]+np.log10(self.guesses[3]),self.guesses[2],4],minimums=[self.minimums[0]+np.log10(self.maximums[3]),self.minimums[2],4],maximums=[self.maximums[0]+np.log10(self.minimums[3]),self.maximums[2],4],fixed=[self.fixed[0]&self.fixed[3],self.fixed[2],True])]
         
@@ -371,6 +379,7 @@ class velocity_profs:
             self.hubbleparam=hubbleconst
             self.operation="quad"
             self.labels=['M200','c']
+            self.units=['log_Msun','unitless']
             self.distance=distance
             self.minimums=np.array(minimums)
             self.maximums=np.array(maximums)
@@ -413,6 +422,7 @@ class velocity_profs:
             self.freeparams=3
 
             self.labels=['MLgrad','MLinter','MLendpoint']
+            self.units=['Msun/Lsun/arcsec','Msun/Lsun','arcsec']
             self.operation="mult"
             self.min=np.array(minimums)
             self.max=np.array(maximums)

@@ -28,10 +28,12 @@ class sb_profs:
             if self.guess.size == 1:
                 self.freeparams=1
                 self.labels=['Rscale_exp']
+                self.units=['arcsec']
             else:
                 if self.guess.size == 2:
                     self.freeparams=2
                     self.labels=np.array(['PeakFlux_exp','Rscale_exp'])
+                    self.units=['arb','arcsec']
                 else:
                     raise('Wrong number of guesses, expected one or two [(optionally PeakFlux_exp), Rscale_exp]')
 
@@ -70,10 +72,12 @@ class sb_profs:
             if self.guess.size == 2:
                 self.freeparams=2
                 self.labels=['Mean_gauss','sigma_gauss']
+                self.units=['arcsec','arcsec']
             else:
                 if self.guess.size == 3:
                     self.freeparams=3
                     self.labels=np.array(['PeakFlux_gauss','Mean_gauss','sigma_gauss'])
+                    self.units=['arb','arcsec','arcsec']
                 else:
                     raise('Wrong number of guesses, expected two or ftree [(optionally PeakFlux_gauss), Mean_gauss, sigma_gauss]')
                     
@@ -109,6 +113,7 @@ class sb_profs:
         def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
             self.freeparams=2
             self.labels=np.array(['Start_cutoff','End_cutoff'])
+            self.units=['arcsec','arcsec']
             self.min=np.array(minimums)
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
