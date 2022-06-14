@@ -307,23 +307,26 @@ class velocity_profs:
 
         def __call__(self,x,theargs,**kwargs):
             ## return the velocity
+            
+            myargs=theargs.copy()
+            
             r=(4.84*self.distance*x)
+            myargs[1]=myargs[1]*4.84*self.distance
+            
+            radfac=10**(0.1763869*myargs[2] + 0.10969795)
+            myargs[1]=myargs[1]/radfac
             
             
-            radfac=10**(0.1763869*theargs[2] + 0.10969795)
-            theargs[1]=theargs[1]/radfac
-            
-            
-            totmass,err=integrate.quad(self.mass,0,np.inf,args=(theargs))
+            totmass,err=integrate.quad(self.mass,0,np.inf,args=(myargs))
             
             
             
-            norm=((10**theargs[0])/totmass)
+            norm=((10**myargs[0])/totmass)
             
                 
-            smallestmass,errs=integrate.quad(self.mass,0,r[0],args=(theargs,norm))
+            smallestmass,errs=integrate.quad(self.mass,0,r[0],args=(myargs,norm))
             
-            mass=integrate.cumtrapz(self.mass(r,theargs,norm), r,initial=smallestmass)
+            mass=integrate.cumtrapz(self.mass(r,myargs,norm), r,initial=smallestmass)
             
             vsqr = (4.301e-3*mass)/r
             vsqr[r==0]=0
@@ -348,10 +351,10 @@ class velocity_profs:
             else:
                 self.fixed=fixed
             
-            if np.any(priors) == None:
+            if np.all(np.array(priors) == None):
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
+                self.priors=priors
                         
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
@@ -391,11 +394,11 @@ class velocity_profs:
             else:
                 self.fixed=fixed
             
-            if np.any(priors) == None:
+            if np.all(np.array(priors) == None):
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
-                        
+                self.priors=priors
+          
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
@@ -410,11 +413,11 @@ class velocity_profs:
             r=self.distance*4.84e-3*xs
             c=theargs[1]
             m200=10**theargs[0]
-            v200=(10*4.301e-9*m200*self.hubbleparam)**(1/3)
-            r200=v200/(self.hubbleparam/10)
+            r200=10*(((4.301e-3*m200)/(100*(self.hubbleparam**2)))**(1/3))
+            v200=r200*(self.hubbleparam/100)
             x=r/r200
             top=np.log(1+(c*x)) - ((c*x)/(1+(c*x)))
-            bottom=np.log(1+c) - ((c)/(1+(c)))         
+            bottom=np.log(1+c) - ((c)/(1+(c)))     
             return v200*np.sqrt((1/x)*(top/bottom))
             
     class mlgrad_linear:  

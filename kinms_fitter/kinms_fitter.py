@@ -327,7 +327,7 @@ class kinms_fitter:
             
         if np.any(self.initial_guesses != None):
             initial_guesses= self.initial_guesses
- 
+        
         return initial_guesses,labels,minimums,maximums,fixed, priors,precision,units
         
                      
@@ -476,7 +476,7 @@ class kinms_fitter:
             model=self.model_simple(theargs)
             chi2=np.nansum((self.cube-model)**2)/(np.nansum((self.error*((2*self.cube.size)**0.25)))**2)
             if chi2==0:
-                breakpoint()
+                chi2=10000000
             if not self.silent:     
                 if info['Nfeval']%50 == 0:
                     print("Steps:",info['Nfeval'],"chi2:",chi2)
@@ -523,6 +523,7 @@ class kinms_fitter:
         pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=self.rms,savepath=savepath,savename=self.pdf_rootname,**kwargs)
         pl.makeplots(block=block,plot2screen=self.show_plots)
         self.mask_sum=pl.mask.sum()
+        return pl
     
     def write_text(self,bestvals, errup,errdown,units, fixed,runtime,errors_warnings='None',fname="KinMS_fitter_output.txt"):
         if isinstance(errup,int):
@@ -541,7 +542,10 @@ class kinms_fitter:
                
         t.meta['comments']=self.logo().split('\n')[:-1]
         t.meta['comments'].append('')
-        t.meta['comments'].append(' Cube Fitted:    '+self.filename)
+        try:
+            t.meta['comments'].append(' Cube Fitted:    '+self.filename)
+        except:
+            pass
         t.meta['comments'].append(' Fitting method: '+mode)
         if mode =='MCMC':
             t.meta['comments'].append(' MCMC iterations:'+str(self.niters))
@@ -614,7 +618,7 @@ class kinms_fitter:
             print("==========================================================")
             print("One model evaluation takes {:.2f} seconds".format(self.timetaken))
        
-        self.plot(overcube=init_model,block=self.interactive,**kwargs)
+        self.figout=self.plot(overcube=init_model,block=self.interactive,**kwargs)
         
         if justplot:
             return initial_guesses,1,1,1,1
@@ -637,6 +641,7 @@ class kinms_fitter:
             if (method=='mcmc') or (method=='both'):    
                 if not self.silent:
                     print("==============  Begin MCMC fitting process  ==============")
+                    
                 bestvals, besterrs, outputvalue, outputll = self.mcmc_fit(initial_guesses,labels,minimums,maximums,fixed,priors,precision)
                 runtime=(time.time()-t)
                 if not self.silent: 
@@ -691,7 +696,7 @@ class kinms_fitter:
             
             
                 
-            self.plot(overcube=best_model,savepath=savepath,block=self.interactive,**kwargs)
+            self.figout=self.plot(overcube=best_model,savepath=savepath,block=self.interactive,**kwargs)
             
             
             if ((method=='mcmc') or (method=='both')) and self.show_corner:
