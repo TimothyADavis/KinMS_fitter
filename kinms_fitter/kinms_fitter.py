@@ -6,13 +6,11 @@ from astropy.io import fits
 from astropy.table import Table
 import matplotlib.pyplot as plt
 from gastimator import corner_plot, priors
-#from astropy import wcs
 from scipy.optimize import Bounds
 from scipy.optimize import minimize
 import matplotlib
 import warnings
 from joblib import cpu_count 
-#warnings.filterwarnings('ignore', category=wcs.FITSFixedWarning, append=True)
 import matplotlib.gridspec as gridspec
 from matplotlib.offsetbox import AnchoredText
 import astropy.units as u
@@ -41,8 +39,6 @@ class kinms_fitter:
         self.cube =self.read_primary_cube(filename)
         self.spatial_trim=spatial_trim
         self.clip_cube()
-        
-        #self.wcs=wcs.WCS(self.hdr)
         self.xc_img=np.nanmedian(self.x1)
         self.yc_img=np.nanmedian(self.y1)
         self.xc_guess=np.nanmedian(self.x1)
@@ -74,6 +70,7 @@ class kinms_fitter:
         self.vsys_range=[np.nanmin(self.v1),np.nanmax(self.v1)]
         self.vel_range=[0,(np.nanmax(self.v1)-np.nanmin(self.v1))/2.]
         self.sbRad=np.arange(0,self.maxextent*2,self.cellsize/3.)
+        self.output_initial_model=False
         self.nSamps=np.int(5e5)
         self.sb_profile=None
         self.radial_motion=None
@@ -90,7 +87,7 @@ class kinms_fitter:
         self.interactive=True
         self.show_plots=True
         self.output_cube_fileroot=False
-
+        self.lnlike_func=None # dont override default    
         self.tolerance=0.1 ## tolerance for simple fit. Smaller numbers are more stringent (longer runtime)
         try:
             self.objname=self.hdr['OBJECT']
@@ -107,19 +104,7 @@ class kinms_fitter:
         cax.xaxis.set_label_position('top')
         return cb
             
-    # def read_in_a_cube(self,path):
-    #     hdulist=fits.open(path)
-    #     hdr=hdulist[0].header
-    #     cube = np.squeeze(hdulist[0].data.T) #squeeze to remove singular stokes axis if present
-    #     cube[np.isfinite(cube) == False] = 0.0
-    #
-    #     try:
-    #         if hdr['CASAMBM']:
-    #             beamtab = hdulist[1].data
-    #     except:
-    #         beamtab=None
-    #
-    #     return cube, hdr, beamtab
+
     def read_in_a_cube(self,path):
         self.spectralcube=SpectralCube.read(path).with_spectral_unit(u.km/u.s, velocity_convention='radio')#, rest_value=self.restfreq)
         self.bunit=self.spectralcube.unit.to_string()
@@ -160,46 +145,6 @@ class kinms_fitter:
             
         return x1,y1,v1,np.abs(cd1*3600),cd3
             
-    # def get_header_coord_arrays(self,hdr):
-    #     self.wcs=wcs.WCS(hdr)
-    #     self.wcs=self.wcs.sub(['longitude','latitude','spectral'])
-    #     maxsize=np.max([hdr['NAXIS1'],hdr['NAXIS2'],hdr['NAXIS3']])
-    #
-    #     xp,yp=np.meshgrid(np.arange(0,maxsize),np.arange(0,maxsize))
-    #     zp = xp.copy()
-    #
-    #     x,y,spectral = self.wcs.all_pix2world(xp,yp,zp, 0)
-    #
-    #
-    #
-    #     x1=np.median(x[0:hdr['NAXIS1'],0:hdr['NAXIS2']],0)
-    #     y1=np.median(y[0:hdr['NAXIS1'],0:hdr['NAXIS2']],1)
-    #     spectral1=spectral[0,0:hdr['NAXIS3']]
-    #
-    #     if (hdr['CTYPE3'] =='VRAD') or (hdr['CTYPE3'] =='VELO-LSR') or (hdr['CTYPE3'] =='VOPT') or (hdr['CTYPE3'] =='FELO-HEL'):
-    #         v1=spectral1
-    #         try:
-    #             if hdr['CUNIT3']=='m/s':
-    #                  v1/=1e3
-    #
-    #         except:
-    #                  v1/=1e3
-    #
-    #
-    #     else:
-    #        f1=spectral1*u.Hz
-    #        try:
-    #            self.restfreq = hdr['RESTFRQ']*u.Hz
-    #        except:
-    #            self.restfreq = hdr['RESTFREQ']*u.Hz
-    #        v1=f1.to(u.km/u.s, equivalencies=u.doppler_radio(self.restfreq))
-    #        v1=v1.value
-    #
-    #
-    #     cd3= np.median(np.diff(v1))
-    #     cd1= np.median(np.diff(y1))
-    #     breakpoint()
-    #     return x1,y1,v1,np.abs(cd1*3600),cd3
            
     def rms_estimate(self,cube,chanstart,chanend):
         quarterx=np.array(self.x1.size/4.).astype(np.int)
@@ -333,8 +278,6 @@ class kinms_fitter:
                      
     def clip_cube(self):
         
-
-
         if self.spatial_trim == None:
             self.spatial_trim = [0, self.x1.size, 0, self.y1.size]
             
@@ -344,40 +287,7 @@ class kinms_fitter:
         self.y1=self.y1[self.spatial_trim[2]:self.spatial_trim[3]]
         self.v1=self.v1[self.chans2do[0]:self.chans2do[1]]
         
-        
-            
-        
-    # def model(self,param):
-    #     pa=param[0]
-    #     xc=param[1]
-    #     yc=param[2]
-    #     vsys=param[3]
-    #     inc=param[4]
-    #     totflux=param[5]
-    #     veldisp=param[6]
-    #     phasecen=[(xc-self.xc_img)*3600.,(yc-self.yc_img)*3600.]
-    #
-    #
-    #     vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[7+self.n_sbvars:7+self.n_velvars+self.n_sbvars],inc=inc)
-    #
-    #     if self.n_radmotionvars >0:
-    #         radmotion=self.radial_motion[0](self.sbRad,param[7+self.n_velvars+self.n_sbvars:])
-    #     else:
-    #         radmotion=None
-    #
-    #     if len(self.skySampClouds) >0:
-    #         inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,cent = phasecen)
-    #         sbprof=None
-    #         myargs={'vPhaseCent': phasecen,'inClouds': inClouds, 'flux_clouds': self.skySampClouds[:,3]}
-    #     else:
-    #         sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[7:7+self.n_sbvars])
-    #         myargs={'phaseCent': phasecen}
-    #
-    #
-    #     return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
-    #              [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
-    #              intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,**myargs).model_cube()
-    
+
     def model_simple(self,param,fileName=''):
         pa=param[0]
         xc=param[1]
@@ -404,19 +314,15 @@ class kinms_fitter:
             radmotion=None
         
         
-        return KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,\
-                 [self.bmaj,self.bmin,self.bpa],inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,\
-                 intFlux=totflux,posAng=pa,fixSeed=True,vOffset=vsys - self.vsys_mid,nSamps=self.nSamps,vSys=vsys,radial_motion_func=radmotion,ra=self.xc_img,dec=self.yc_img,fileName=fileName,bunit=self.bunit,**myargs).model_cube()
-        
+        new=self.kinms_instance.model_cube(inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self.xc_img,dec=(phasecen[1]/3600.)+self.yc_img,fileName=fileName,bunit=self.bunit,**myargs)
+        #old=KinMSold(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],inc,nSamps=self.nSamps,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self.xc_img,dec=(phasecen[1]/3600.)+self.yc_img,fileName=fileName,bunit=self.bunit,**myargs,verbose=True).model_cube(toplot=True)
+
+        return new
+
             
         
     def mcmc_fit(self,initial_guesses,labels,minimums,maximums,fixed,priors,precision):
-        # imx=self.xc_img
-        # imy=self.yc_img
-        # initial_guesses[1]=(initial_guesses[1]-self.xc_img)*3600.
-        # initial_guesses[2]=(initial_guesses[2]-self.yc_img)*3600.
-        # self.xc_img=0
-        # self.yc_img=0
+
         minimums[1:3]=(self.bmaj*-3)
         maximums[1:3]=(self.bmaj*3)
         precision[1:3]=(maximums[1:3]-minimums[1:3])*0.1
@@ -433,7 +339,8 @@ class kinms_fitter:
         mcmc.precision= precision
         self.fixed=fixed
         
-        
+        if callable(self.lnlike_func): #lnlike func overridden
+            mcmc.lnlike_func=self.lnlike_func
         
         if self.nprocesses == None:
             cpucount = np.int(cpu_count())-1
@@ -460,12 +367,8 @@ class kinms_fitter:
             else:
                 print("Correction for chi-sqr variance not applied")    
         
-        outputvalue, outputll= mcmc.run(self.cube,self.error*self.chi2_correct_fac,self.niters,nchains=1,plot=False)
         
-        # outputvalue[1]=imx+(outputvalue[1]/3600.)
-        # outputvalue[2]=imy+(outputvalue[2]/3600.)
-        # self.xc_img=imx
-        # self.yc_img=imy
+        outputvalue, outputll= mcmc.run(self.cube,self.error*self.chi2_correct_fac,self.niters,nchains=1,plot=False)
 
         bestvals=np.median(outputvalue,1)    
         besterrs=np.std(outputvalue,1)
@@ -474,7 +377,7 @@ class kinms_fitter:
 
     def simple_chi2(self,theargs,info):
             model=self.model_simple(theargs)
-            chi2=np.nansum((self.cube-model)**2)/(np.nansum((self.error*((2*self.cube.size)**0.25)))**2)
+            chi2=np.nansum((self.cube-model)**2)/(np.nansum((self.error*self.chi2_correct_fac))**2)
             if chi2==0:
                 chi2=10000000
             if not self.silent:     
@@ -495,12 +398,10 @@ class kinms_fitter:
 
             
     def simple_fit(self,initial_guesses,labels,minimums,maximums,fixed):
-        # imx=self.xc_img
-        # imy=self.yc_img
-        # initial_guesses[1]=(initial_guesses[1]-self.xc_img)*3600.
-        # initial_guesses[2]=(initial_guesses[2]-self.yc_img)*3600.
-        # self.xc_img=0
-        # self.yc_img=0
+        if self.chi2_var_correct & (self.chi2_correct_fac == None):
+           self.chi2_correct_fac=(2*(self.mask_sum**0.25))
+           
+           
         minimums[1:3]=(self.bmaj*-3)
         maximums[1:3]=(self.bmaj*3)
         
@@ -512,10 +413,6 @@ class kinms_fitter:
         res = minimize(self.simple_chi2, initial_guesses, args={'Nfeval':0},method ='Powell' ,bounds=self.bounds, options={'disp': True,'adaptive':True,'maxfev':self.niters,'maxiter':self.niters,'ftol':self.tolerance}) 
         
         results=res.x
-        # results[1]=imx+(results[1]/3600.)
-        # results[2]=imy+(results[2]/3600.)
-        # self.xc_img=imx
-        # self.yc_img=imy
             
         return results 
 
@@ -536,9 +433,7 @@ class kinms_fitter:
         
 
         t=Table([self.labels,bestvals,errup,errdown,units,fixed],names=('Quantity', 'Best-fit', 'Error-up', 'Error-down','Units','Fixed'))
-        # for col in t.itercols():
-        #    if col.info.dtype.kind == 'f':
-        #        col.info.format = '.2f'
+
                
         t.meta['comments']=self.logo().split('\n')[:-1]
         t.meta['comments'].append('')
@@ -570,7 +465,7 @@ class kinms_fitter:
         t.write(fname,format='ascii.fixed_width_two_line',comment='#',overwrite=True)
         
             
-    def run(self,method='mcmc',justplot=False,**kwargs):
+    def run(self,method='mcmc',justplot=False,savepath='./',**kwargs):
         self.bincentroids=np.arange(0,self.nrings)*self.bmaj
         self.error=self.rms
         self.errors_warnings=[]
@@ -603,22 +498,37 @@ class kinms_fitter:
         
         
         initial_guesses,labels,minimums,maximums,fixed, priors,precision,units = self.setup_params()
+        
+        if initial_guesses[4] < 87: 
+            inc_multfac= (1/np.cos(np.deg2rad(initial_guesses[4])))
+        else:
+            inc_multfac= 20
+        
+        if inc_multfac > 2:    
+            self.sbRad=np.append(np.arange(0,self.maxextent*2,self.cellsize/3.),np.arange(self.maxextent*2,self.maxextent*inc_multfac,self.cellsize*3.))
+        
         self.labels=labels
+        if self.output_initial_model != False:
+            fileName=savepath+self.output_initial_model
+        else:
+            fileName=''
+            
+        ### setup the KinMS instance
+        self.kinms_instance=KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],nSamps=self.nSamps)
         
         
         t=time.time()
-        init_model=self.model_simple(initial_guesses)
+        init_model=self.model_simple(initial_guesses,fileName=fileName)
         self.timetaken=(time.time()-t)
-        
-        
+
         
         if not self.silent: 
             print("==============   Welcome to KinMS_fitter!   ==============")
             print(self.logo())
             print("==========================================================")
             print("One model evaluation takes {:.2f} seconds".format(self.timetaken))
-       
-        self.figout=self.plot(overcube=init_model,block=self.interactive,**kwargs)
+        
+        self.figout=self.plot(overcube=init_model,savepath=savepath,block=self.interactive,**kwargs)
         
         if justplot:
             return initial_guesses,1,1,1,1
@@ -661,10 +571,6 @@ class kinms_fitter:
             else:
                 fileName=''
             best_model=self.model_simple(bestvals,fileName=fileName)
-            if self.pdf:
-                savepath="./"
-            else:
-                savepath=None
             
             bestvals[1]=(bestvals[1]/3600.)+self.xc_img
             bestvals[2]=(bestvals[2]/3600.)+self.yc_img
@@ -683,7 +589,7 @@ class kinms_fitter:
                     fname=self.pdf_rootname+"_KinMS_fitter_output.txt"
                 else:
                     fname="KinMS_fitter_output.txt"
-                if method=='mcmc':    
+                if ((method=='mcmc') or (method=='both')):    
                     perc = np.percentile(outputvalue, [15.86, 50, 84.14], axis=1)
                     sig_bestfit_up = (perc[2][:] - perc[1][:])
                     sig_bestfit_down = (perc[1][:] - perc[0][:])

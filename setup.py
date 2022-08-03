@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
  
 setup(name='kinms_fitter',
-       version='0.2.9',
+       version='0.3.0',
        description='Wrapper for KinMSpy that automates most common galaxy fitting tasks',
        url='https://github.com/TimothyADavis/KinMS_fitter',
        author='Timothy A. Davis',
@@ -22,7 +22,7 @@ setup(name='kinms_fitter',
            'spectral-cube',
            'scipy>=1.3.3',
            'jampy',
-           'kinms>=2.2.8',
+           'kinms>=3.0.0',
        ],
        classifiers=[
          'Development Status :: 3 - Alpha',

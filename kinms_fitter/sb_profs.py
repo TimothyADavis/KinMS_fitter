@@ -49,7 +49,7 @@ class sb_profs:
             if np.any(priors) == None:
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
+                self.priors=priors
                         
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
@@ -93,7 +93,7 @@ class sb_profs:
             if np.any(priors) == None:
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
+                self.priors=priors
                     
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
@@ -127,7 +127,7 @@ class sb_profs:
             if np.any(priors) == None:
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
+                self.priors=priors
                     
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)

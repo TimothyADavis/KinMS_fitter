@@ -5,7 +5,7 @@ from jampy.mge_vcirc import mge_vcirc
 from kinms.radial_motion import radial_motion
 import scipy.integrate as integrate 
 from pprint import pformat
-
+from scipy import special
 class velocity_profs:
     def __init__(self):
         pass    
@@ -85,7 +85,7 @@ class velocity_profs:
             if np.any(priors) == None:
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
+                self.priors=priors
                         
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
@@ -131,7 +131,7 @@ class velocity_profs:
             if np.any(priors) == None:
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
+                self.priors=priors
                         
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
@@ -173,7 +173,7 @@ class velocity_profs:
             if np.any(priors) == None:
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
+                self.priors=priors
                         
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
@@ -210,7 +210,7 @@ class velocity_profs:
             if np.any(priors) == None:
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
+                self.priors=priors
                         
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
@@ -241,7 +241,7 @@ class velocity_profs:
             if np.any(priors) == None:
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
+                self.priors=priors
                         
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
@@ -278,7 +278,7 @@ class velocity_profs:
             if np.any(priors) == None:
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
+                self.priors=priors
                         
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
@@ -439,7 +439,7 @@ class velocity_profs:
             if np.any(priors) == None:
                 self.priors=np.resize(None,self.freeparams)
             else:
-                self.priors=fixed
+                self.priors=priors
                         
             if np.any(precisions) == None:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
@@ -455,3 +455,63 @@ class velocity_profs:
             return np.clip(x,0,args[2])*args[0] + args[1]        
                           
 
+    class exponential_disc:  
+        def __init__(self,distance,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
+            self.guess=np.array(guesses)
+            self.guesses=np.array(guesses)
+            if self.guess.size == 2:
+                self.freeparams=2
+                self.labels=['Mdisk','rscale']
+                self.units=['log_Msun','arcsec']
+            else:
+                if self.guess.size == 3:
+                    self.freeparams=3
+                    self.labels=['Mdisk','rscale','zscale']
+                    self.units=['log_Msun','arcsec','arcsec']
+                else:
+                    raise('Wrong number of guesses, expected two or three [Mdisk, rscale, (and optionally zscale)]')    
+
+            self.operation="quad"
+            self.distance=distance
+            self.minimums=np.array(minimums)
+            self.maximums=np.array(maximums)
+            self.max=np.array(maximums)
+            self.min=np.array(minimums)
+
+            if np.any(fixed) == None:
+                self.fixed=np.resize(False,self.freeparams)
+            else:
+                self.fixed=fixed
+            
+            if np.all(np.array(priors) == None):
+                self.priors=np.resize(None,self.freeparams)
+            else:
+                self.priors=priors
+          
+            if np.any(precisions) == None:
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
+            else:
+                self.precisions=precisions
+        
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
+            
+        def __call__(self,xs,theargs,**kwargs):
+            ## return the velocity
+            r=self.distance*4.84*xs
+            rd=self.distance*4.84*theargs[1]
+            
+            x=r/rd
+            
+            
+            ## based on eqn 8.74 in "Dynamics and Astrophysics of Galaxies" by Bovy 
+            prefac=((4.301e-3*(10**theargs[0]))/(2*rd))*(x**2)
+            endfac=special.i0(x/2.)*special.k0(x/2.) - special.i1(x/2.)*special.k1(x/2.)
+            vcsqr=prefac*endfac
+            
+            if self.freeparams==3:
+                zd=theargs[2]*4.84*self.distance
+                vcsqr=vcsqr- ((((4.301e-3*(10**theargs[0]))/(rd**2))*zd)*x*np.exp(-x))
+
+            return np.sqrt(vcsqr)    
