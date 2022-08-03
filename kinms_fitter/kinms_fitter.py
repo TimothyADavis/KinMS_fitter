@@ -422,16 +422,7 @@ class kinms_fitter:
         self.mask_sum=pl.mask.sum()
         return pl
     
-    def write_text(self,bestvals, errup,errdown,units, fixed,runtime,errors_warnings='None',fname="KinMS_fitter_output.txt"):
-        if isinstance(errup,int):
-            # simple mode used
-            errup=['--']*bestvals.size
-            errdown=errup
-            mode='Simple'
-        else:
-            mode='MCMC'
-        
-
+    def write_text(self,bestvals, errup,errdown,units, fixed,runtime,mode,errors_warnings='None',fname="KinMS_fitter_output.txt"):
         t=Table([self.labels,bestvals,errup,errdown,units,fixed],names=('Quantity', 'Best-fit', 'Error-up', 'Error-down','Units','Fixed'))
 
                
@@ -598,7 +589,7 @@ class kinms_fitter:
                 else:
                     sig_bestfit_up=sig_bestfit_down=0
                     
-                self.write_text(bestvals, sig_bestfit_up, sig_bestfit_down, units, fixed,runtime,errors_warnings=self.errors_warnings,fname=fname)
+                self.write_text(bestvals, sig_bestfit_up, sig_bestfit_down, units, fixed,runtime,method,errors_warnings=self.errors_warnings,fname=fname)
             
             
                 
