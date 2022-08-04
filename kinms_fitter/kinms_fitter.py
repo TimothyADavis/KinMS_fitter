@@ -423,6 +423,8 @@ class kinms_fitter:
         return pl
     
     def write_text(self,bestvals, errup,errdown,units, fixed,runtime,mode,errors_warnings='None',fname="KinMS_fitter_output.txt"):
+        
+        breakpoint()
         t=Table([self.labels,bestvals,errup,errdown,units,fixed],names=('Quantity', 'Best-fit', 'Error-up', 'Error-down','Units','Fixed'))
 
                
@@ -587,7 +589,7 @@ class kinms_fitter:
                     sig_bestfit_up[1:3]=sig_bestfit_up[1:3]/3600. ## into degrees
                     sig_bestfit_down[1:3]=sig_bestfit_down[1:3]/3600. ## into degrees
                 else:
-                    sig_bestfit_up=sig_bestfit_down=0
+                    sig_bestfit_up=sig_bestfit_down=np.zeros(bestvals.size)
                     
                 self.write_text(bestvals, sig_bestfit_up, sig_bestfit_down, units, fixed,runtime,method,errors_warnings=self.errors_warnings,fname=fname)
             
