@@ -18,6 +18,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from kinms import KinMS
 from kinms.utils.KinMS_figures import KinMS_plotter
 from kinms_fitter.sb_profs import sb_profs
+from kinms_fitter.warp_funcs import warp_funcs
 from kinms_fitter.transformClouds import transformClouds
 from kinms_fitter.velocity_profs import velocity_profs      
 from kinms_fitter.prior_funcs import prior_funcs
@@ -28,7 +29,19 @@ warnings.filterwarnings(action='ignore', category=SpectralCubeWarning, append=Tr
          
 class kinms_fitter:
     def __init__(self,filename,spatial_trim=None,spectral_trim=None,linefree_chans=[1,5]):
+        """
+        Initalise the KinMS_fitter instance, reading in the observed datacube and trimming it as needed.
+
+        :param filename: Path to datacube in FITS format.
+        :type filename: string
+        :param spatial_trim: Spatial trim in pixels [xstart,xstop,ystart,ystop]
+        :type spatial_trim: list[int] or None
+        :param spectral_trim: Channels to include spectrally [channel_start, channel_stop]
+        :type spectral_trim: list[int] or None
+        :param linefree_chans: Channels to use when estimating the RMS [channel_start, channel_stop]
+        :type linefree_chans: list[int] or None
         
+        """
         self.pa_guess=0
         self.linefree_chans_start = linefree_chans[0]
         self.linefree_chans_end = linefree_chans[1]
@@ -52,8 +65,7 @@ class kinms_fitter:
         self.cellsize=np.abs(self.hdr['CDELT1']*3600)
         self.nprocesses=None
         self.niters=3000
-        self.pdf=False
-        self.pdf_rootname="KinMS_fitter"
+        self.pdf=True
         self.silent=False
         self.show_corner= True
         self.totflux_guess=np.nansum(self.cube)
@@ -75,10 +87,14 @@ class kinms_fitter:
         self.sb_profile=None
         self.radial_motion=None
         self.vel_profile=None
+        self.inc_profile=None
+        self.pa_profile=None
         self.timetaken=0
         self.initial_guesses=None
         self.chi2_var_correct=True
         self.chi2_correct_fac=None
+        self.n_pavars=1
+        self.n_incvars=1
         self.mask_sum=0
         self.labels=None
         self.text_output=True
@@ -95,6 +111,16 @@ class kinms_fitter:
             self.objname="Object"
     
     def colorbar(self,mappable,ticks=None):
+        """
+        Return a list of random ingredients as strings.
+
+        :param kind: Optional "kind" of ingredients.
+        :type kind: list[str] or None
+        :raise lumache.InvalidKindError: If the kind is invalid.
+        :return: The ingredients list.
+        :rtype: list[str]
+
+        """
         ax = mappable.axes
         fig = ax.figure
         divider = make_axes_locatable(ax)
@@ -112,6 +138,11 @@ class kinms_fitter:
         cube = np.squeeze(self.spectralcube.filled_data[:,:,:].T).value #squeeze to remove singular stokes axis if present
         cube[np.isfinite(cube) == False] = 0.0
         
+        try:
+            self.pdf_rootname=hdr['OBJECT']+"_KinMS_fitter"
+        except:
+            self.pdf_rootname="KinMS_fitter"
+            
         try:
             beamtab=self.spectralcube.beam
         except:
@@ -234,24 +265,27 @@ class kinms_fitter:
         nums=np.arange(0,self.nrings)
                 
          
-        # xcen, ycen, vsys
-        initial_guesses=np.array([self.pa_guess,self.xc_guess,self.yc_guess,self.vsys_guess,self.inc_guess,self.totflux_guess,self.velDisp_guess])
-        minimums=np.array([self.pa_range[0],self.xcent_range[0],self.ycent_range[0],self.vsys_range[0],self.inc_range[0],self.totflux_range[0],self.velDisp_range[0]])
-        maximums=np.array([self.pa_range[1],self.xcent_range[1],self.ycent_range[1],self.vsys_range[1],self.inc_range[1],self.totflux_range[1],self.velDisp_range[1]])
-        labels=np.array(["PA","Xc","Yc","Vsys","inc","totflux","veldisp"])
+        # xcen, ycen, vsys, totflux, veldisp
+        initial_guesses=np.array([self.xc_guess,self.yc_guess,self.vsys_guess,self.totflux_guess,self.velDisp_guess])
+        minimums=np.array([self.xcent_range[0],self.ycent_range[0],self.vsys_range[0],self.totflux_range[0],self.velDisp_range[0]])
+        maximums=np.array([self.xcent_range[1],self.ycent_range[1],self.vsys_range[1],self.totflux_range[1],self.velDisp_range[1]])
+        labels=np.array(["Xc","Yc","Vsys","totflux","veldisp"])
         fixed= minimums == maximums
-        priors=np.array([self.pa_prior,self.xc_prior,self.yc_prior,self.vsys_prior,self.inc_prior,self.totflux_prior,self.velDisp_prior])#np.resize(None,fixed.size)
-        precision=(maximums-minimums)/10. 
-               
+        priors=np.array([self.xc_prior,self.yc_prior,self.vsys_prior,self.totflux_prior,self.velDisp_prior])#np.resize(None,fixed.size)
+        precision=(maximums-minimums)/10.    
         
         if 'beam' in self.bunit:
             newunit=(self.spectralcube.unit*u.beam*u.km/u.s).to_string()
         else:
             newunit=(self.spectralcube.unit*u.km/u.s).to_string()
             
-        units=np.array(['Deg','Deg','Deg','km/s','Deg',newunit,'km/s'])
+        units=np.array(['Deg','Deg','km/s',newunit,'km/s'])
         
-        vars2look=[]
+            
+        
+        vars2look=[self.pa_profile,self.inc_profile]
+        
+    
         if len(self.skySampClouds) == 0:
             vars2look.append(self.sb_profile)
         vars2look.append(self.vel_profile)
@@ -260,7 +294,7 @@ class kinms_fitter:
 
             
             
-        for list_vars in vars2look: 
+        for list_vars in vars2look:
             initial_guesses= np.append(initial_guesses,np.concatenate([i.guess for i in list_vars])) 
             minimums=np.append(minimums,np.concatenate([i.min for i in list_vars]))
             maximums=np.append(maximums,np.concatenate([i.max for i in list_vars]))
@@ -289,27 +323,28 @@ class kinms_fitter:
         
 
     def model_simple(self,param,fileName=''):
-        pa=param[0]
-        xc=param[1]
-        yc=param[2]
-        vsys=param[3]
-        inc=param[4]
-        totflux=param[5]
-        veldisp=param[6]
+        xc=param[0]
+        yc=param[1]
+        vsys=param[2]
+        totflux=param[3]
+        veldisp=param[4]
         phasecen=[xc,yc]
+        
+        
+        pa=warp_funcs.eval(self.pa_profile,self.sbRad,param[5:5+self.n_pavars])
+        inc=warp_funcs.eval(self.inc_profile,self.sbRad,param[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
 
         if len(self.skySampClouds) >0:
-            inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,cent = phasecen)
+            inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,cent = phasecen,sbRad=self.sbRad)
             sbprof=None
             myargs={'vPhaseCent': phasecen,'inClouds': inClouds, 'flux_clouds': self.skySampClouds[:,3]}
         else:
-            sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[7:7+self.n_sbvars])
+            sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars:5+self.n_pavars+self.n_incvars+self.n_sbvars])
             myargs={'phaseCent': phasecen}
-        
-        vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[7+self.n_sbvars:],inc=inc)
+        vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_sbvars:],inc=inc[0])
         
         if self.n_radmotionvars >0:
-            radmotion=self.radial_motion[0](self.sbRad,param[7+self.n_velvars+self.n_sbvars:])
+            radmotion=self.radial_motion[0](self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_velvars+self.n_sbvars:])
         else:
             radmotion=None
         
@@ -322,11 +357,6 @@ class kinms_fitter:
             
         
     def mcmc_fit(self,initial_guesses,labels,minimums,maximums,fixed,priors,precision):
-
-        minimums[1:3]=(self.bmaj*-3)
-        maximums[1:3]=(self.bmaj*3)
-        precision[1:3]=(maximums[1:3]-minimums[1:3])*0.1
-
         mcmc = gastimator(self.model_simple)
         
         mcmc.labels=labels
@@ -400,10 +430,6 @@ class kinms_fitter:
     def simple_fit(self,initial_guesses,labels,minimums,maximums,fixed):
         if self.chi2_var_correct & (self.chi2_correct_fac == None):
            self.chi2_correct_fac=(2*(self.mask_sum**0.25))
-           
-           
-        minimums[1:3]=(self.bmaj*-3)
-        maximums[1:3]=(self.bmaj*3)
         
         minimums[fixed]=initial_guesses[fixed]
         maximums[fixed]=initial_guesses[fixed]
@@ -424,8 +450,8 @@ class kinms_fitter:
     
     def write_text(self,bestvals, errup,errdown,units, fixed,runtime,mode,errors_warnings='None',fname="KinMS_fitter_output.txt"):
         
-        breakpoint()
-        t=Table([self.labels,bestvals,errup,errdown,units,fixed],names=('Quantity', 'Best-fit', 'Error-up', 'Error-down','Units','Fixed'))
+        
+        t=Table([self.labels,bestvals,errup,errdown,units,fixed],names=('Quantity', 'Best-fit', '1sig Error-up', '1sig Error-down','Units','Fixed'))
 
                
         t.meta['comments']=self.logo().split('\n')[:-1]
@@ -459,14 +485,24 @@ class kinms_fitter:
         
             
     def run(self,method='mcmc',justplot=False,savepath='./',**kwargs):
+        method=method.lower()
+        if (method!='mcmc')&(method!='both')&(method!='simple'):
+            raise Exception('Method must be one of "mcmc", "simple", or "both"')
         self.bincentroids=np.arange(0,self.nrings)*self.bmaj
         self.error=self.rms
         self.errors_warnings=[]
         self.xc_guess=(self.xc_guess-self.xc_img)*3600.
         self.yc_guess=(self.yc_guess-self.yc_img)*3600.
-
+        self.xcent_range=(self.xcent_range-self.xc_img)*3600.
+        self.ycent_range=(self.ycent_range-self.yc_img)*3600.
         
-        
+        if np.any(self.inc_profile) == None:
+            self.inc_profile=[warp_funcs.flat(self.inc_guess,self.inc_range[0],self.inc_range[1],priors=self.inc_prior,fixed=[self.inc_range[1]==self.inc_range[0]],labels='inc',units='deg')]
+        self.n_incvars = np.sum([i.freeparams for i in self.inc_profile])
+            
+        if np.any(self.pa_profile) == None:
+            self.pa_profile=[warp_funcs.flat(self.pa_guess,self.pa_range[0],self.pa_range[1],priors=self.pa_prior,fixed=[self.pa_range[1]==self.pa_range[0]],labels='PA',units='deg')]
+        self.n_pavars = np.sum([i.freeparams for i in self.pa_profile])    
         
         if np.any(self.sb_profile) == None:
             # default SB profile is a single exponential disc
@@ -480,7 +516,7 @@ class kinms_fitter:
             
         if np.any(self.vel_profile) == None:
             # default vel profile is tilted rings
-            self.vel_profile=[velocity_profs.tilted_rings(self.bincentroids,guesses=np.resize(self.vel_guess,self.nrings),minimums=np.resize(self.vel_range[0],self.nrings),maximums=np.resize(self.vel_range[1],self.nrings),priors=np.resize(prior_funcs.physical_velocity_prior(self.bincentroids,7+self.n_sbvars).eval,self.nrings))]
+            self.vel_profile=[velocity_profs.tilted_rings(self.bincentroids,guesses=np.resize(self.vel_guess,self.nrings),minimums=np.resize(self.vel_range[0],self.nrings),maximums=np.resize(self.vel_range[1],self.nrings),priors=np.resize(prior_funcs.physical_velocity_prior(self.bincentroids,5+self.n_pavars+self.n_incvars+self.n_sbvars).eval,self.nrings))]
         self.n_velvars = np.sum([i.freeparams for i in self.vel_profile])
         
         
@@ -491,9 +527,9 @@ class kinms_fitter:
         
         
         initial_guesses,labels,minimums,maximums,fixed, priors,precision,units = self.setup_params()
-        
-        if initial_guesses[4] < 87: 
-            inc_multfac= (1/np.cos(np.deg2rad(initial_guesses[4])))
+        central_inc_guess=warp_funcs.eval(self.inc_profile,np.array([0]),initial_guesses[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
+        if central_inc_guess < 87: 
+            inc_multfac= (1/np.cos(np.deg2rad(central_inc_guess)))
         else:
             inc_multfac= 20
         
@@ -509,7 +545,7 @@ class kinms_fitter:
         ### setup the KinMS instance
         self.kinms_instance=KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],nSamps=self.nSamps)
         
-        
+        self.pa_guess=warp_funcs.eval(self.pa_profile,np.array([0]),initial_guesses[5:5+self.n_pavars])[0]
         t=time.time()
         init_model=self.model_simple(initial_guesses,fileName=fileName)
         self.timetaken=(time.time()-t)
@@ -557,7 +593,7 @@ class kinms_fitter:
                         print('Some parameters had no accepted guesses. Skipping corner plot. Trying increasing niters.')
                     
 
-            self.pa_guess=bestvals[0]
+            self.pa_guess=warp_funcs.eval(self.pa_profile,np.array([0]),bestvals[5:5+self.n_pavars])[0]
             
             if self.output_cube_fileroot != False:
                 fileName=self.output_cube_fileroot
@@ -565,15 +601,14 @@ class kinms_fitter:
                 fileName=''
             best_model=self.model_simple(bestvals,fileName=fileName)
             
-            bestvals[1]=(bestvals[1]/3600.)+self.xc_img
-            bestvals[2]=(bestvals[2]/3600.)+self.yc_img
+            bestvals[0]=(bestvals[0]/3600.)+self.xc_img
+            bestvals[1]=(bestvals[1]/3600.)+self.yc_img
+            
             if (method=='mcmc'):
+                besterrs[0]=besterrs[0]/3600.
                 besterrs[1]=besterrs[1]/3600.
-                besterrs[2]=besterrs[2]/3600.
             
             if (method=='mcmc')&(self.save_all_accepted):
-                besterrs[1]=besterrs[1]/3600.
-                besterrs[2]=besterrs[2]/3600.
                 np.savez(self.pdf_rootname+".npz",bestvals=bestvals, besterrs=besterrs, outputvalue=outputvalue, outputll=outputll,fixed=fixed,labels=self.labels)
 
                                         
@@ -586,11 +621,10 @@ class kinms_fitter:
                     perc = np.percentile(outputvalue, [15.86, 50, 84.14], axis=1)
                     sig_bestfit_up = (perc[2][:] - perc[1][:])
                     sig_bestfit_down = (perc[1][:] - perc[0][:])
-                    sig_bestfit_up[1:3]=sig_bestfit_up[1:3]/3600. ## into degrees
-                    sig_bestfit_down[1:3]=sig_bestfit_down[1:3]/3600. ## into degrees
+                    sig_bestfit_up[0:2]=sig_bestfit_up[0:2]/3600. ## into degrees
+                    sig_bestfit_down[0:2]=sig_bestfit_down[0:2]/3600. ## into degrees
                 else:
                     sig_bestfit_up=sig_bestfit_down=np.zeros(bestvals.size)
-                    
                 self.write_text(bestvals, sig_bestfit_up, sig_bestfit_down, units, fixed,runtime,method,errors_warnings=self.errors_warnings,fname=fname)
             
             
