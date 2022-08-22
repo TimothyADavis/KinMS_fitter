@@ -72,15 +72,15 @@ class kinms_fitter:
         self.expscale_guess=self.maxextent/5.
         self.inc_guess=45.
         self.velDisp_guess=8.
-        self.velDisp_range=[0,50]
-        self.inc_range=[1,89]
-        self.expscale_range=[0,self.maxextent]
-        self.totflux_range=[0,np.nansum(self.cube)*3.]
-        self.xcent_range=[np.min(self.x1),np.max(self.x1)]
-        self.ycent_range=[np.min(self.y1),np.max(self.y1)]
-        self.pa_range=[0,360]
-        self.vsys_range=[np.nanmin(self.v1),np.nanmax(self.v1)]
-        self.vel_range=[0,(np.nanmax(self.v1)-np.nanmin(self.v1))/2.]
+        self.velDisp_range=np.array([0,50])
+        self.inc_range=np.array([1,89])
+        self.expscale_range=np.array([0,self.maxextent])
+        self.totflux_range=np.array([0,np.nansum(self.cube)*3.])
+        self.xcent_range=np.array([np.min(self.x1),np.max(self.x1)])
+        self.ycent_range=np.array([np.min(self.y1),np.max(self.y1)])
+        self.pa_range=np.array([0,360])
+        self.vsys_range=np.array([np.nanmin(self.v1),np.nanmax(self.v1)])
+        self.vel_range=np.array([0,(np.nanmax(self.v1)-np.nanmin(self.v1))/2.])
         self.sbRad=np.arange(0,self.maxextent*2,self.cellsize/3.)
         self.output_initial_model=False
         self.nSamps=np.int(5e5)
@@ -493,8 +493,8 @@ class kinms_fitter:
         self.errors_warnings=[]
         self.xc_guess=(self.xc_guess-self.xc_img)*3600.
         self.yc_guess=(self.yc_guess-self.yc_img)*3600.
-        self.xcent_range=(self.xcent_range-self.xc_img)*3600.
-        self.ycent_range=(self.ycent_range-self.yc_img)*3600.
+        self.xcent_range=(np.array(self.xcent_range)-self.xc_img)*3600.
+        self.ycent_range=(np.array(self.ycent_range)-self.yc_img)*3600.
         
         if np.any(self.inc_profile) == None:
             self.inc_profile=[warp_funcs.flat(self.inc_guess,self.inc_range[0],self.inc_range[1],priors=self.inc_prior,fixed=[self.inc_range[1]==self.inc_range[0]],labels='inc',units='deg')]
