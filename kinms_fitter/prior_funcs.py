@@ -26,9 +26,9 @@ class prior_funcs:
             return self.__class__.__name__  
         def eval(self,x,allvalues=[],ival=0):
             if ival==self.zero_index:
-                return 1
+                return 0
             else:
                 if ((allvalues[ival-1]**2*self.rads[ival-1 - self.zero_index]/self.rads[ival - self.zero_index])<x**2):
-                    return 1
+                    return 0
                 else:
-                    return 1e-300
+                    return -1e50

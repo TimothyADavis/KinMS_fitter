@@ -52,14 +52,14 @@ class kinms_fitter:
         self.cube =self.read_primary_cube(filename)
         self.spatial_trim=spatial_trim
         self.clip_cube()
-        self.xc_img=np.nanmedian(self.x1)
-        self.yc_img=np.nanmedian(self.y1)
+        self._xc_img=np.nanmedian(self.x1)
+        self._yc_img=np.nanmedian(self.y1)
         self.xc_guess=np.nanmedian(self.x1)
         self.yc_guess=np.nanmedian(self.y1)
         self.vsys_guess=np.nanmedian(self.v1)
         self.vsys_mid=np.nanmedian(self.v1)
         self.skySampClouds=np.array([])
-        self.maxextent=np.max([np.max(np.abs(self.x1-self.xc_img)),np.max(np.abs(self.y1-self.yc_img))])*3600.
+        self.maxextent=np.max([np.max(np.abs(self.x1-self._xc_img)),np.max(np.abs(self.y1-self._yc_img))])*3600.
         self.nrings=np.floor(self.maxextent/self.bmaj).astype(np.int)
         self.vel_guess= np.nanstd(self.v1)
         self.cellsize=np.abs(self.hdr['CDELT1']*3600)
@@ -349,8 +349,8 @@ class kinms_fitter:
             radmotion=None
         
         
-        new=self.kinms_instance.model_cube(inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self.xc_img,dec=(phasecen[1]/3600.)+self.yc_img,fileName=fileName,bunit=self.bunit,**myargs)
-        #old=KinMSold(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],inc,nSamps=self.nSamps,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self.xc_img,dec=(phasecen[1]/3600.)+self.yc_img,fileName=fileName,bunit=self.bunit,**myargs,verbose=True).model_cube(toplot=True)
+        new=self.kinms_instance.model_cube(inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self._xc_img,dec=(phasecen[1]/3600.)+self._yc_img,fileName=fileName,bunit=self.bunit,**myargs)
+        #old=KinMSold(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],inc,nSamps=self.nSamps,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self._xc_img,dec=(phasecen[1]/3600.)+self._yc_img,fileName=fileName,bunit=self.bunit,**myargs,verbose=True).model_cube(toplot=True)
 
         return new
 
@@ -491,10 +491,11 @@ class kinms_fitter:
         self.bincentroids=np.arange(0,self.nrings)*self.bmaj
         self.error=self.rms
         self.errors_warnings=[]
-        self.xc_guess=(self.xc_guess-self.xc_img)*3600.
-        self.yc_guess=(self.yc_guess-self.yc_img)*3600.
-        self.xcent_range=(np.array(self.xcent_range)-self.xc_img)*3600.
-        self.ycent_range=(np.array(self.ycent_range)-self.yc_img)*3600.
+        ### set up offset coordinates
+        self.xc_guess=(self.xc_guess-self._xc_img)*3600.
+        self.yc_guess=(self.yc_guess-self._yc_img)*3600.
+        self.xcent_range=(np.array(self.xcent_range)-self._xc_img)*3600.
+        self.ycent_range=(np.array(self.ycent_range)-self._yc_img)*3600.
         
         if np.any(self.inc_profile) == None:
             self.inc_profile=[warp_funcs.flat(self.inc_guess,self.inc_range[0],self.inc_range[1],priors=self.inc_prior,fixed=[self.inc_range[1]==self.inc_range[0]],labels='inc',units='deg')]
@@ -601,8 +602,8 @@ class kinms_fitter:
                 fileName=''
             best_model=self.model_simple(bestvals,fileName=fileName)
             
-            bestvals[0]=(bestvals[0]/3600.)+self.xc_img
-            bestvals[1]=(bestvals[1]/3600.)+self.yc_img
+            bestvals[0]=(bestvals[0]/3600.)+self._xc_img
+            bestvals[1]=(bestvals[1]/3600.)+self._yc_img
             
             if (method=='mcmc'):
                 besterrs[0]=besterrs[0]/3600.
