@@ -1,0 +1,146 @@
+:py:mod:`KinMS_testsuite`
+=========================
+
+.. py:module:: KinMS_testsuite
+
+.. autoapi-nested-parse::
+
+   Copyright (C) 2019, Timothy A. Davis, Nikki Zabel, James M. Dawson
+   E-mail: DavisT -at- cardiff.ac.uk, zabelnj -at- cardiff.ac.uk, dawsonj5 -at- cardiff.ac.uk
+   Updated versions of the software are available through github:
+   https://github.com/TimothyADavis/KinMSpy
+
+   If you have found this software useful for your research,
+   I would appreciate an acknowledgment to the use of the
+   "KINematic Molecular Simulation (KinMS) routines of Davis et al., (2013)".
+   [MNRAS, Volume 429, Issue 1, p.534-555]
+
+   This software is provided as is without any warranty whatsoever.
+   For details of permissions granted please see LICENCE.md
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   KinMS_testsuite.internet
+   KinMS_testsuite.expdisk
+   KinMS_testsuite.expdisk_gasgrav
+   KinMS_testsuite.ngc4324
+   KinMS_testsuite.use_inclouds
+   KinMS_testsuite.inclouds_spiral
+   KinMS_testsuite.infits
+   KinMS_testsuite.veldisp
+   KinMS_testsuite.diskthick
+   KinMS_testsuite.warp
+   KinMS_testsuite.retclouds
+   KinMS_testsuite.run_tests
+
+
+
+.. py:function:: internet(host='8.8.8.8', port=53, timeout=3)
+
+   Host: 8.8.8.8 (google-public-dns-a.google.com)
+   OpenPort: 53/tcp
+   Service: domain (DNS/TCP)
+
+
+.. py:function:: expdisk(scalerad=10, inc=60, fileName=None)
+
+   A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates how
+   to create a simulation of an exponential disk of molecular gas. The user can input values for the scalerad and inc
+   variables, and the procedure will the create the simulation and display it to screen.
+   :param scalerad: Scale radius for the exponential disk (in arcseconds)
+   :param inc: Inclination to project the disk (in degrees)
+   :return: N/A
+
+
+.. py:function:: expdisk_gasgrav(scalerad=5, inc=45, gasmass=10000000000.0, distance=16.5)
+
+   A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+   how to create a simulation of an exponential disk of molecular gas, including the effect of the potential of the gas
+   on its own rotation. The user can input values for the scalerad and inc variables, and the procedure will the create
+   the simulation and display it to screen.
+   :param scalerad: Scale radius for the exponential disk (in arcseconds)
+   :param inc: Inclination to project the disk (in degrees)
+   :param gasmass: Total mass of the gas (in solar masses)
+   :param distance: Distance to the galaxy (in Mpc)
+   :return: N/A
+
+
+.. py:function:: ngc4324()
+
+   A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure makes a basic
+   simulation of the molecular gas ring in NGC4324, and plots the simulation moment zero, one and PVD against the
+   observed ones from the CARMA observations of Alatalo et al., 2012.
+   :return: N/A
+
+
+.. py:function:: use_inclouds()
+
+   A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+   how to use the "inclouds" parameter set to create simulations, in this case of a very unrealistic object. Once you
+   understand this example then see the "infits" and "inclouds spiral" test for more realistic examples.
+   :return: N/A
+
+
+.. py:function:: inclouds_spiral()
+
+   A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+   how to use the "inclouds" parameter set to create simulations, in this case of molecular gas in a two armed spiral
+   pattern. Any default parameters can be changed by specifying them at the command line (see KinMS.pro or the full
+   details of all the available parameters).
+   :return: N/A
+
+
+.. py:function:: infits()
+
+   A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+   how to use an input FITS image to create a simulation of what the molecular gas may look like, with a given
+   instrument (in this case CARMA). We use a GALEX (Morrissey et al., 2007) FUV image of NGC1437A, and scale it
+   assuming the FUV emission comes from star-formation and thus molecular gas, and that the galaxy has a total
+   integrated CO flux of 30 Jy km/s. We use the FITS image to set the surface-brightness, and impose a flat velocity
+   gradient.
+   :return: N/A
+
+
+.. py:function:: veldisp()
+
+   A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+   how to create a simulation of an exponential disk of molecular gas with a velocity dispersion that varies with
+   radius.
+   :return: N/A
+
+
+.. py:function:: diskthick()
+
+   A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+   how to create a simulation of an exponential disk of molecular gas with a thickness that varies with radius. Any
+   default parameters can be changed by specifying them at the command line (see KinMS.pro for the full details of all
+   the available parameters).
+   :return: N/A
+
+
+.. py:function:: warp()
+
+   A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+   how to create a simulation of a warped exponential disk of molecular gas.
+   :return: N/A
+
+
+.. py:function:: retclouds()
+
+   A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+   how to use the return clouds feature to recursivly build models - here a misaligned central and outer disc.
+   :return: N/A
+
+
+.. py:function:: run_tests()
+
+

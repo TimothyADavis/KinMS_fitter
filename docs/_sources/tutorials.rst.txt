@@ -1,0 +1,16 @@
+Tutorials
+=========
+
+
+An iPython notebook tutorial on KinMS_fitter, **which is the recommended way to use KinMS for most users**, can be found `here <https://github.com/TimothyADavis/KinMS_fitter/blob/main/kinms_fitter/docs/KinMS_fitter_tutorial.ipynb>`_.
+
+For those with more complicated use-cases, who need to understand the basics of the base KinMS routines, a tutorial can be found `here <https://github.com/TimothyADavis/KinMSpy/blob/master/kinms/docs/KinMS_example_notebook.ipynb>`_.
+
+A further suite of examples can be found in examples/KinMS_testsuite.py, which can be modified and updated for most use cases. To run these tests you can run the following commands from within python on KinMS is installed:
+
+.. code-block:: console
+
+   $ from kinms.examples.KinMS_testsuite import *
+   $ run_tests()
+   
+If you need go through the nuts and bolts of fitting, see the walk through `here <https://github.com/TimothyADavis/KinMSpy/blob/master/kinms/docs/KinMSpy_tutorial.ipynb>`_.

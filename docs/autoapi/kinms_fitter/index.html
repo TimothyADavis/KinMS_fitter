@@ -1,0 +1,1106 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>kinms_fitter &#8212; KinMS  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../index.html">
+    <img class="logo" src="../../_static/logo_small.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=timothyadavis&repo=kinms_fitter&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">API Reference</a></li>
+</ul>
+
+
+<hr />
+<ul>
+    
+    <li class="toctree-l1"><a href="https://kinms.space">KinMS Website</a></li>
+    
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-kinms_fitter">
+<span id="kinms-fitter"></span><h1><a class="reference internal" href="../../generated/kinms_fitter.html#module-kinms_fitter" title="kinms_fitter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter</span></code></a><a class="headerlink" href="#module-kinms_fitter" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="kinms_fitter/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.kinms_fitter</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="prior_funcs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.prior_funcs</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="sb_profs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.sb_profs</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="transformClouds/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.transformClouds</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="velocity_profs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.velocity_profs</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="warp_funcs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.warp_funcs</span></code></a></li>
+</ul>
+</div>
+</section>
+<section id="package-contents">
+<h2>Package Contents<a class="headerlink" href="#package-contents" title="Permalink to this headline">¶</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="kinms_fitter/index.html#module-kinms_fitter.kinms_fitter" title="kinms_fitter.kinms_fitter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kinms_fitter</span></code></a></p></td>
+<td><p>Wrapper for easily kinematically modelling datacubes (typically from ALMA or VLA) using KinMS.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="sb_profs/index.html#module-kinms_fitter.sb_profs" title="kinms_fitter.sb_profs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sb_profs</span></code></a></p></td>
+<td><p>Creates flexible surface brightness profiles that can be combined together.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../generated/kinms_fitter.velocity_profs.html#kinms_fitter.velocity_profs" title="kinms_fitter.velocity_profs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">velocity_profs</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="warp_funcs/index.html#module-kinms_fitter.warp_funcs" title="kinms_fitter.warp_funcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">warp_funcs</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="transformClouds/index.html#module-kinms_fitter.transformClouds" title="kinms_fitter.transformClouds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transformClouds</span></code></a>(inclouds[, posAng, inc, cent, sbRad])</p></td>
+<td><p>Transforms skySampler cloudlets for use in KinMS.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">kinms_fitter.</span></span><span class="sig-name descname"><span class="pre">kinms_fitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_trim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral_trim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linefree_chans</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">5]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for easily kinematically modelling datacubes (typically from ALMA or VLA) using KinMS.
+…</p>
+<dl class="simple">
+<dt>xc_guess<span class="classifier">float</span></dt><dd><p>Guess for Kinematic/morphological centre of the disc. RA, in degrees. [Default = Centre of supplied cube after clipping]</p>
+</dd>
+<dt>yc_guess<span class="classifier">float</span></dt><dd><p>Guess for Kinematic/morphological centre of the disc. Dec, in degrees. [Default = Centre of supplied cube after clipping]</p>
+</dd>
+<dt>vsys_guess<span class="classifier">float</span></dt><dd><p>Guess for Systemic velocity of the gas, in the radio velocity convention. km/s.  [Default = Velocity of central channel of supplied cube after clipping]</p>
+</dd>
+<dt>totflux_guess<span class="classifier">float</span></dt><dd><p>Total flux guess. Units the same as those used in the cube (e.g. Jy km/s). [Default = total sum of the input cube]
+velDisp_guess : float
+Velocity dispersion guess. km/s. [Default = 8 km/s]</p>
+</dd>
+<dt>pa_guess<span class="classifier">float</span></dt><dd><p>Optional position angle guess, if no warp specified. Degrees. [Default = 0 deg]</p>
+</dd>
+<dt>inc_guess<span class="classifier">float</span></dt><dd><p>Optional Inclination angle guess, if no warp specified. Degrees. [Default = 45 deg]</p>
+</dd>
+<dt>inc_profile<span class="classifier">list of warp_profile objects</span></dt><dd><p>Optional variation of the inclination with radius as described by warp_profile objects. [Default = None]</p>
+</dd>
+<dt>pa_profile<span class="classifier">list of warp_profile objects</span></dt><dd><p>Optional variation of the inclination with radius as described by warp_profile objects. [Default = None]</p>
+</dd>
+<dt>sb_profile<span class="classifier">list of sb_profs objects</span></dt><dd><p>Optional - Define the surface brightness profile with a list of sb_profs objects which will be evaluated in order. [Default = single exponential disc]
+expscale_guess : float
+Optional - defines the scalelength of the default single exponential disc used if sb_profile is not set. arcseconds. [Default = a fifth of the total extent of the cube]
+skySampClouds : ndarray
+Optional - Input cloud model made with the skySampler tool if you dont want to fit the gas distribution.</p>
+</dd>
+<dt>vel_profile<span class="classifier">list of vel_profs objects</span></dt><dd><p>Define the circular velocity profile with a list of vel_profs objects. [Default = tilted rings]</p>
+</dd>
+<dt>radial_motion<span class="classifier">list of radial_motion objects</span></dt><dd><p>Optional - Define the radial motion types with radial_motion objects (see base KinMS documentation). [Default: None]</p>
+</dd>
+<dt>nrings<span class="classifier">int</span></dt><dd><p>Optional - Number of tilted rings to use, spaced a beamwidth apart. [Default = fill the total extent of the cube]</p>
+</dd>
+<dt>vel_guess<span class="classifier">float</span></dt><dd><p>Optional - starting guess for the tilted ring asymptotic velocity. km/s [Default = 28percent of the velocity width coverved by the cube]</p>
+</dd>
+<dt>xcent_range<span class="classifier">two element ndarray</span></dt><dd><p>Allowed range for fitting of the kinematic centre. RA in degrees [Default: minimum and maximum RA within the input cube]</p>
+</dd>
+<dt>ycent_range<span class="classifier">two element ndarray</span></dt><dd><p>Allowed range for fitting of the kinematic centre. Dec in degrees [Default: minimum and maximum Dec within the input cube]
+vsys_range : two element ndarray
+Allowed range for fitting of the systemic velocity. km/s. [Default: minimum and maximum velocity contained within the input cube]</p>
+</dd>
+<dt>totflux_range<span class="classifier">two element ndarray</span></dt><dd><p>Allowed range for fitting of the total flux. Units the same as input cube. [Default: Min=0 and Max=3x the total flux in the input cube]</p>
+</dd>
+<dt>velDisp_range<span class="classifier">two element ndarray</span></dt><dd><p>Allowed range for fitting of the velocity dispersion. km/s. [Default: Min=0 and Max=50 km/s]</p>
+</dd>
+<dt>pa_range<span class="classifier">two element ndarray</span></dt><dd><p>Optional - Allowed range for fitting of the position angle. Degrees. [Default: Min=0 and Max=360 degrees]</p>
+</dd>
+<dt>inc_range<span class="classifier">two element ndarray</span></dt><dd><p>Optional - Allowed range for fitting of the inclination angle. Degrees. [Default: Min=0 and Max=89 degrees]</p>
+</dd>
+<dt>expscale_range<span class="classifier">two element ndarray</span></dt><dd><p>Optional - Allowed range for fitting of the default exponential scale radius. arcseconds. [Default: Min=0 and Max=the size of your input cube]</p>
+</dd>
+<dt>vel_range<span class="classifier">two element ndarray</span></dt><dd><p>Optional - Allowed range for fitting of the tilted ring velocities. km/s. [Default: Min=0 and Max=half the cube total velocity width]</p>
+</dd>
+<dt>pa_prior<span class="classifier">object</span></dt><dd><p>Optional - supply an object defining the PA prior (see GAStimator documentation). [Default = boxcar between range limits]</p>
+</dd>
+<dt>xc_prior<span class="classifier">object</span></dt><dd><p>Optional - supply an object defining the RA centre prior (see GAStimator documentation). [Default = boxcar between range limits]</p>
+</dd>
+<dt>yc_prior<span class="classifier">object</span></dt><dd><p>Optional - supply an object defining the Dec centre prior (see GAStimator documentation). [Default = boxcar between range limits]</p>
+</dd>
+<dt>vsys_prior<span class="classifier">object</span></dt><dd><p>Optional - supply an object defining the Vsys prior (see GAStimator documentation). [Default = boxcar between range limits]</p>
+</dd>
+<dt>inc_prior<span class="classifier">object</span></dt><dd><p>Optional - supply an object defining the inc prior (see GAStimator documentation). [Default = boxcar between range limits]</p>
+</dd>
+<dt>totflux_prior<span class="classifier">object</span></dt><dd><p>Optional - supply an object defining the totflux prior (see GAStimator documentation). [Default = boxcar between range limits]</p>
+</dd>
+<dt>velDisp_prior<span class="classifier">object</span></dt><dd><p>Optional - supply an object defining the velocity dispersion prior (see GAStimator documentation). [Default = boxcar between range limits]
+initial_guesses : ndarray
+Override the initial guesses used for the fit. [Default = No override]</p>
+</dd>
+</dl>
+<blockquote>
+<div><p>objname : string
+Name of the object you are fitting. [Default = read from FITS header OBJECT entry, or ‘object’]
+nprocesses : int
+Number of processors to use for MCMC fitting. [Default = fall back on GAStimator default choices]</p>
+</div></blockquote>
+<dl class="simple">
+<dt>niters<span class="classifier">int</span></dt><dd><p>Number of iterations to use when fitting. [Default=3000]</p>
+</dd>
+<dt>output_initial_model<span class="classifier">bool</span></dt><dd><p>Save the initially generated model as a FITS file. [Default=False]</p>
+</dd>
+<dt>pdf<span class="classifier">bool</span></dt><dd><p>Make PDF outputs. [Default = True]</p>
+</dd>
+<dt>silent<span class="classifier">bool</span></dt><dd><p>Fit silently. [Default = False]</p>
+</dd>
+<dt>show_corner<span class="classifier">bool</span></dt><dd><p>Show corner plots if MCMC fitting. [Default = True]</p>
+</dd>
+<dt>nSamps<span class="classifier">int</span></dt><dd><p>Number of samples to use for KinMS model. [Default = 5e5]
+chi2_var_correct : bool
+Use chi-sqr variance correction. [Default = True]
+text_output : bool
+Save output text files. [Default = True]</p>
+</dd>
+<dt>save_all_accepted<span class="classifier">bool</span></dt><dd><p>Save all the accepted guesses (allowing you to recreate corner plots etc). [Default = True]</p>
+</dd>
+<dt>interactive<span class="classifier">bool</span></dt><dd><p>Use interactive mode for plots. [Default = True]</p>
+</dd>
+<dt>show_plots<span class="classifier">bool</span></dt><dd><p>Show the diagnotic plots. [Default = True]</p>
+</dd>
+<dt>output_cube_fileroot<span class="classifier">string</span></dt><dd><p>File root for output best fit datacube. [Default = False]
+lnlike_func : object
+Override the default likelihood function. [Default =. Dont override]
+tolerance : float
+Tolerance for simple fit. Smaller numbers are more stringent (longer runtime) [Default=0.1]</p>
+</dd>
+</dl>
+<blockquote>
+<div><p>bunit : string
+Unit of datacube fluxes</p>
+</div></blockquote>
+<dl class="simple">
+<dt>cellsize<span class="classifier">float</span></dt><dd><p>Cube cellsize in arcsec
+timetaken : float
+Time taken for the fit in seconds.</p>
+</dd>
+<dt>chi2_correct_fac<span class="classifier">float</span></dt><dd><p>chi2 correction factor applied.</p>
+</dd>
+<dt>mask_sum<span class="classifier">0</span></dt><dd><p>Number of detected pixels in the data mask.</p>
+</dd>
+<dt>labels<span class="classifier">ndarray of strings</span></dt><dd><p>Label for each fitted quantity</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.colorbar">
+<span class="sig-name descname"><span class="pre">colorbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mappable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.colorbar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a colorbar to a given plot</p>
+<dl class="simple">
+<dt>param mappable<span class="classifier">matplotlib figure</span></dt><dd><p>Figure which to add the colorbar too</p>
+</dd>
+<dt>param ticks<span class="classifier">ndarray</span></dt><dd><p>Ticks to show on the colourbar. [Default = None]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.read_in_a_cube">
+<span class="sig-name descname"><span class="pre">read_in_a_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.read_in_a_cube" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads in the datacube.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.get_header_coord_arrays">
+<span class="sig-name descname"><span class="pre">get_header_coord_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.get_header_coord_arrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get coordinate arrays from a FITS header</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.rms_estimate">
+<span class="sig-name descname"><span class="pre">rms_estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chanstart</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chanend</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.rms_estimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate the RMS in the inner quarter of the datacube in a given channel range.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.from_fits_history">
+<span class="sig-name descname"><span class="pre">from_fits_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.from_fits_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get beam parameters if they happen to be in history keywords.</p>
+<p>Stolen from radio_beam, with thanks!</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.read_primary_cube">
+<span class="sig-name descname"><span class="pre">read_primary_cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cube</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.read_primary_cube" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper method for reading in datacube.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.setup_params">
+<span class="sig-name descname"><span class="pre">setup_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.setup_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup the fit guesses, minima, maxima etc from the inputs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.clip_cube">
+<span class="sig-name descname"><span class="pre">clip_cube</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.clip_cube" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clip the input datacube to size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.model_simple">
+<span class="sig-name descname"><span class="pre">model_simple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.model_simple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to create a model from the given input parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.mcmc_fit">
+<span class="sig-name descname"><span class="pre">mcmc_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.mcmc_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to run the MCMC fit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.simple_chi2">
+<span class="sig-name descname"><span class="pre">simple_chi2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.simple_chi2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Likelihood function for the simple fit mode.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.logo">
+<span class="sig-name descname"><span class="pre">logo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.logo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the KinMS logo.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.simple_fit">
+<span class="sig-name descname"><span class="pre">simple_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.simple_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the simple fit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overcube</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes the plots.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.write_text">
+<span class="sig-name descname"><span class="pre">write_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bestvals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errdown</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'None'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'KinMS_fitter_output.txt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.write_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write output text files.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.kinms_fitter.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mcmc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">justplot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.kinms_fitter.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the fit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>string - choice of 'mcmc'</em><em>, </em><em>'simple'</em><em> or </em><em>'both'.</em>) – Type of fit to run.</p></li>
+<li><p><strong>justplot</strong> (<em>bool</em>) – Just show the initial model plot without fitting. Helpful for setting initial guesses.</p></li>
+<li><p><strong>savepath</strong> (<em>string</em>) – Path to append to saved files.</p></li>
+<li><p><strong>**kwargs</strong> – <p>any additional keywords to pass to other methods.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.sb_profs">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">kinms_fitter.</span></span><span class="sig-name descname"><span class="pre">sb_profs</span></span><a class="headerlink" href="#kinms_fitter.sb_profs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates flexible surface brightness profiles that can be combined together.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.sb_profs.expdisk">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">expdisk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.sb_profs.expdisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an exponentially declining surface brightness profile.</p>
+<dl class="simple">
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. If a single element, then the disc profile is normalised (peak=1). If two elements then elements should be [‘PeakFlux_exp’,’Rscale_exp’]. Rscale units of arcsec.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameters.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameters.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameters (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = All False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.sb_profs.expdisk.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.sb_profs.expdisk.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.sb_profs.expdisk.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.sb_profs.expdisk.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.sb_profs.gaussian">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.sb_profs.gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an gaussian surface brightness profile.</p>
+<dl class="simple">
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. If a two elements, then the gaussian profile is normalised (peak=1). If three elements then elements should be [‘PeakFlux_gauss’,’Mean_gauss’,’sigma_gauss’]. Units of mean/sigma are arcsec.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameters.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameters.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameters (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = All False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.sb_profs.gaussian.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.sb_profs.gaussian.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.sb_profs.gaussian.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.sb_profs.gaussian.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.sb_profs.cutoff">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">cutoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.sb_profs.cutoff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an cutoff in a surface brightness profile between two radii.</p>
+<dl class="simple">
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. Two elements [‘Start_cutoff’,’End_cutoff’]. Units of arcsec.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameters.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameters.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameters (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = All False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.sb_profs.cutoff.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.sb_profs.cutoff.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.sb_profs.cutoff.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.sb_profs.cutoff.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.sb_profs.eval">
+<span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.sb_profs.eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates a list of surface brightness profiles.</p>
+<dl class="simple">
+<dt>modellist<span class="classifier">list of objects</span></dt><dd><p>List of sb_prof objects, or objects that have the same methods/inputs.</p>
+</dd>
+<dt>r: ndarray of floats</dt><dd><p>Radius array, units of arcseconds.</p>
+</dd>
+<dt>params: ndarray of floats</dt><dd><p>Parameters to use in each model in the list.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>out<span class="classifier">ndarray of floats</span></dt><dd><p>Output combined surface brightness profile.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">kinms_fitter.</span></span><span class="sig-name descname"><span class="pre">velocity_profs</span></span><a class="headerlink" href="#kinms_fitter.velocity_profs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Circular velocity curves from physical and arbitary models that can be combined together.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.tilted_rings">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">tilted_rings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bincentroids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.tilted_rings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Arbitary velocity profile using the tilted ring formalism.</p>
+<dl class="simple">
+<dt>bincentroids: ndarray of float</dt><dd><p>Radii at which to constrain the profile. Linearly interpolated between these points.</p>
+</dd>
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. Size of bincentroids, units of km/s.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameters.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameters.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameters (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = All False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.tilted_rings.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.tilted_rings.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.tilted_rings.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.tilted_rings.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.keplarian">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">keplarian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.keplarian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keplarian velocity profile for a point mass at r=0.</p>
+<dl class="simple">
+<dt>distance: ndarray of float</dt><dd><p>Distance to the object in Mpc.</p>
+</dd>
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. One element log10 of the central mass (in Msun).</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameter.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameter.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameter (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameter. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.keplarian.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.keplarian.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.keplarian.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.keplarian.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.mge_vcirc">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">mge_vcirc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qobs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.mge_vcirc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaulate an MGE model of the potential, with or without a central point mass.</p>
+<dl class="simple">
+<dt>surf<span class="classifier">ndarray of float</span></dt><dd><p>Luminosity of each gaussian component, units of Lsun.</p>
+</dd>
+<dt>sigma<span class="classifier">ndarray of float</span></dt><dd><p>Width of each gaussian, units of arcsec.</p>
+</dd>
+<dt>qobs<span class="classifier">ndarray of float</span></dt><dd><p>Axial ratio of each gaussian.</p>
+</dd>
+<dt>distance: ndarray of float</dt><dd><p>Distance to the object in Mpc.</p>
+</dd>
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. One or two elements [M/L and optionally log10_CentralMass in Msun].</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameter.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameter.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameter (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameter. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.mge_vcirc.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.mge_vcirc.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.mge_vcirc.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.mge_vcirc.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.arctan">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">arctan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.arctan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Arctangent velocity profile.</p>
+<dl class="simple">
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. Vmax and Rturn in units of km/s and arcseconds.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameter.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameter.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameter (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameter. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.arctan.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.arctan.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.arctan.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.arctan.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.radial_barflow">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">radial_barflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.radial_barflow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Radial barflow from Spekkens+Sellwood.</p>
+<dl class="simple">
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. Vtangential, Vradial, BarRadius and BarPA in units of km/s, km/s, arcsec, degrees.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameter.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameter.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameter (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameter. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.radial_barflow.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.radial_barflow.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.radial_barflow.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.radial_barflow.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.sersic">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">sersic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.sersic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocity curve arising from a sersic mass distribution (spherically symmetric).</p>
+<dl class="simple">
+<dt>distance: float</dt><dd><p>Distance to the object in Mpc.</p>
+</dd>
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. Total mass, effective radius and sersic index. Units of log10(Msun), arcsec and unitless.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameter.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameter.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameter (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameter. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.sersic.mass">
+<span class="sig-name descname"><span class="pre">mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.sersic.mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.sersic.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.sersic.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.sersic.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theargs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.sersic.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.bulge_disc">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">bulge_disc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.bulge_disc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocity curve arising from a combination of a n=4 and n=1 sersic mass distributions (spherically symmetric).</p>
+<dl class="simple">
+<dt>distance: float</dt><dd><p>Distance to the object in Mpc.</p>
+</dd>
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. Total mass, effective radius and sersic index. Units of log10(Msun), arcsec and unitless.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameter.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameter.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameter (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameter. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.bulge_disc.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.bulge_disc.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.bulge_disc.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theargs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.bulge_disc.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.nfw">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">nfw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hubbleconst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">68.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.nfw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocity curve arising from an NFW halo.</p>
+<dl class="simple">
+<dt>distance: float</dt><dd><p>Distance to the object in Mpc.</p>
+</dd>
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. M200 and concentration. Units of log10(Msun) and unitless.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameter.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameter.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameter (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameter. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.nfw.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.nfw.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.nfw.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theargs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.nfw.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.exponential_disc">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">exponential_disc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.exponential_disc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocity curve arising from a razor thin exponential disc. Based on eqn 8.74 in “Dynamics and Astrophysics of Galaxies” by Bovy.</p>
+<dl class="simple">
+<dt>distance: float</dt><dd><p>Distance to the object in Mpc.</p>
+</dd>
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. Mdisk and Scaleradius. Units of log10(Msun) and arcsec.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameter.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameter.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameter (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameter. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.exponential_disc.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.exponential_disc.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.exponential_disc.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theargs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.exponential_disc.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.velocity_profs.eval">
+<span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.velocity_profs.eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates a list of velocity_profs objects, returning the total circular velocity profile.</p>
+<dl class="simple">
+<dt>modellist<span class="classifier">list of objects</span></dt><dd><p>List of sb_prof objects, or objects that have the same methods/inputs.</p>
+</dd>
+<dt>r: ndarray of floats</dt><dd><p>Radius array, units of arcseconds.</p>
+</dd>
+<dt>params: ndarray of floats</dt><dd><p>Parameters to use in each model in the list.</p>
+</dd>
+<dt>inc: float</dt><dd><p>Inclination of system, in degrees.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kinms_fitter.transformClouds">
+<span class="sig-prename descclassname"><span class="pre">kinms_fitter.</span></span><span class="sig-name descname"><span class="pre">transformClouds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inclouds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posAng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.0,</span> <span class="pre">0.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sbRad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.transformClouds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms skySampler cloudlets for use in KinMS.</p>
+<p>Calculate the galaxy co-ordinates of clouds from the sky plane. This MUST be used if any of the following conditions are true:
+inc != 0
+posAng != 90
+cent != [0,0]</p>
+<p>This exists as a stand-alone routine since an MCMC fit to the galaxy will likely need to run this every step,
+and the sampleClouds routine is computationally expensive
+============
+Inputs:</p>
+<p>clouds: np.ndarray The output of the sampleClouds array [x,y,I]</p>
+<p>posAng: 0=&lt;float&lt;360 The position angle of the galaxy major axis, measured from the y-axis of the cube</p>
+<p>inc: 0=&lt;float&lt;90 The inclination of the galaxy, with 90 being edge-on</p>
+<p>cent: [float,float] The photometric centre of the galaxy relative to the centre of the cube</p>
+<p>Outputs:</p>
+<p>clouds: np.ndarray Positions and intensities of particles [x’,y’,I]</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.warp_funcs">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">kinms_fitter.</span></span><span class="sig-name descname"><span class="pre">warp_funcs</span></span><a class="headerlink" href="#kinms_fitter.warp_funcs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates position angle/inclination warps as a function of radius.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.warp_funcs.linear">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PA'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.warp_funcs.linear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a warp thats linear with radius (optionally: that also flattens after some radius).</p>
+<dl class="simple">
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. Two or three elements [Gradient, Intercept, (optionally Cutoff_Radius)]. Units of deg/arcsec, deg, (arcsec).</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameters.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameters.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameters (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = All False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.warp_funcs.linear.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.warp_funcs.linear.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.warp_funcs.linear.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.warp_funcs.linear.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required warp profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.warp_funcs.flat">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">flat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['PA']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['deg']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.warp_funcs.flat" title="Permalink to this definition">¶</a></dt>
+<dd><p>No warp- inc/PA flat with radius.</p>
+<dl class="simple">
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guess. One element, units of degrees.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameters.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameters.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameters (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = All False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.warp_funcs.flat.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.warp_funcs.flat.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.warp_funcs.flat.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.warp_funcs.flat.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required warp profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kinms_fitter.warp_funcs.tilted_rings">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">tilted_rings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bincentroids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precisions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PA'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.warp_funcs.tilted_rings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Arbitary warp using the tilted ring formalism.</p>
+<dl class="simple">
+<dt>bincentroids: ndarray of float</dt><dd><p>Radii at which to constrain the profile. Linearly interpolated between these points.</p>
+</dd>
+<dt>guesses<span class="classifier">ndarray of float</span></dt><dd><p>Initial guesses. Size of bincentroids, units of degrees.</p>
+</dd>
+<dt>minimums<span class="classifier">ndarray of float</span></dt><dd><p>Minimums for the given parameters.</p>
+</dd>
+<dt>maximums<span class="classifier">ndarray of float</span></dt><dd><p>Maximums for the given parameters.</p>
+</dd>
+<dt>priors<span class="classifier">ndarray of objects</span></dt><dd><p>Optional- Priors for the given parameters (see GAStimator priors).</p>
+</dd>
+<dt>precisions<span class="classifier">ndarray of float</span></dt><dd><p>Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]</p>
+</dd>
+<dt>fixed: ndarray of bool</dt><dd><p>Optional - Fix this parameter to the input value in guesses. [Default = All False]</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.warp_funcs.tilted_rings.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.warp_funcs.tilted_rings.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.warp_funcs.tilted_rings.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.warp_funcs.tilted_rings.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the required warp profile.</p>
+<dl class="simple">
+<dt>x<span class="classifier">ndarray of float</span></dt><dd><p>Input radial array in arcseconds</p>
+</dd>
+<dt>args<span class="classifier">ndarray of float</span></dt><dd><p>Input arguments to evalue the profile with</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kinms_fitter.warp_funcs.eval">
+<span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinms_fitter.warp_funcs.eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates a list of warp functions.</p>
+<dl class="simple">
+<dt>modellist<span class="classifier">list of objects</span></dt><dd><p>List of warp_funcs objects, or objects that have the same methods/inputs.</p>
+</dd>
+<dt>r: ndarray of floats</dt><dd><p>Radius array, units of arcseconds.</p>
+</dd>
+<dt>params: ndarray of floats</dt><dd><p>Parameters to use in each model in the list.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>out<span class="classifier">ndarray of floats</span></dt><dd><p>Output combined warp profile.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2022, Timothy A. Davis.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/autoapi/kinms_fitter/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

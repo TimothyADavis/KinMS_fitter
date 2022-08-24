@@ -1,0 +1,23 @@
+kinms\_fitter.sb\_profs
+=======================
+
+.. currentmodule:: kinms_fitter
+
+.. autoclass:: sb_profs
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~sb_profs.__init__
+      ~sb_profs.eval
+   
+   
+
+   
+   
+   

@@ -1,0 +1,46 @@
+:py:mod:`sauron_colormap`
+=========================
+
+.. py:module:: sauron_colormap
+
+.. autoapi-nested-parse::
+
+   Copyright (C) 2014-2015, Michele Cappellari
+   E-mail: michele.cappellari_at_physics.ox.ac.uk
+   http://purl.org/cappellari
+
+   V1.0: Created to emulate my IDL procedure with the same name. 
+         Michele Cappellari, Oxford, 28 March 2014
+   V1.1: Included reversed colormap. MC, Oxford, 9 August 2015
+         
+
+
+
+Module Contents
+---------------
+
+.. py:data:: _cdict
+   
+
+   
+
+.. py:data:: _rdict
+   
+
+   
+
+.. py:data:: sauron
+   
+
+   
+
+.. py:data:: sauron_r
+   
+
+   
+
+.. py:data:: n
+   :annotation: = 41
+
+   
+

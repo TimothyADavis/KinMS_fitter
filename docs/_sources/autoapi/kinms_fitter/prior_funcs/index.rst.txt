@@ -1,0 +1,46 @@
+:py:mod:`kinms_fitter.prior_funcs`
+==================================
+
+.. py:module:: kinms_fitter.prior_funcs
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   kinms_fitter.prior_funcs.prior_funcs
+
+
+
+
+.. py:class:: prior_funcs
+
+   Priors for use in KinMS_fitter.
+
+   .. py:class:: gaussian(mu, sigma)
+
+      .. py:method:: __repr__()
+
+         Return repr(self).
+
+
+      .. py:method:: eval(x, **kwargs)
+
+
+
+   .. py:class:: physical_velocity_prior(rads, vel_zero_index)
+
+      .. py:method:: __repr__()
+
+         Return repr(self).
+
+
+      .. py:method:: eval(x, allvalues=[], ival=0)
+
+
+
+

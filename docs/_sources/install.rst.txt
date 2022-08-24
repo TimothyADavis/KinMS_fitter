@@ -1,0 +1,14 @@
+Installation
+============
+
+To use KinMS_fitter, simply install it using pip:
+
+.. code-block:: console
+
+   $ pip install kinms-fitter
+
+Or download the code zip file from <https://github.com/TimothyADavis/KinMS_fitter>, unzip it, open a terminal in that folder and install it manually: 
+  
+.. code-block:: console
+
+   $ python setup.py install

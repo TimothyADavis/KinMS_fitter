@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>KinMS_testsuite &#8212; KinMS  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../index.html">
+    <img class="logo" src="../../_static/logo_small.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=timothyadavis&repo=kinms_fitter&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">API Reference</a></li>
+</ul>
+
+
+<hr />
+<ul>
+    
+    <li class="toctree-l1"><a href="https://kinms.space">KinMS Website</a></li>
+    
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-KinMS_testsuite">
+<span id="kinms-testsuite"></span><h1><a class="reference internal" href="#module-KinMS_testsuite" title="KinMS_testsuite"><code class="xref py py-mod docutils literal notranslate"><span class="pre">KinMS_testsuite</span></code></a><a class="headerlink" href="#module-KinMS_testsuite" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (C) 2019, Timothy A. Davis, Nikki Zabel, James M. Dawson
+E-mail: DavisT -at- cardiff.ac.uk, zabelnj -at- cardiff.ac.uk, dawsonj5 -at- cardiff.ac.uk
+Updated versions of the software are available through github:
+<a class="reference external" href="https://github.com/TimothyADavis/KinMSpy">https://github.com/TimothyADavis/KinMSpy</a></p>
+<p>If you have found this software useful for your research,
+I would appreciate an acknowledgment to the use of the
+“KINematic Molecular Simulation (KinMS) routines of Davis et al., (2013)”.
+[MNRAS, Volume 429, Issue 1, p.534-555]</p>
+<p>This software is provided as is without any warranty whatsoever.
+For details of permissions granted please see LICENCE.md</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#KinMS_testsuite.internet" title="KinMS_testsuite.internet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">internet</span></code></a>([host, port, timeout])</p></td>
+<td><p>Host: 8.8.8.8 (google-public-dns-a.google.com)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#KinMS_testsuite.expdisk" title="KinMS_testsuite.expdisk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expdisk</span></code></a>([scalerad, inc, fileName])</p></td>
+<td><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates how</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#KinMS_testsuite.expdisk_gasgrav" title="KinMS_testsuite.expdisk_gasgrav"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expdisk_gasgrav</span></code></a>([scalerad, inc, gasmass, distance])</p></td>
+<td><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#KinMS_testsuite.ngc4324" title="KinMS_testsuite.ngc4324"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ngc4324</span></code></a>()</p></td>
+<td><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure makes a basic</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#KinMS_testsuite.use_inclouds" title="KinMS_testsuite.use_inclouds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_inclouds</span></code></a>()</p></td>
+<td><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#KinMS_testsuite.inclouds_spiral" title="KinMS_testsuite.inclouds_spiral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inclouds_spiral</span></code></a>()</p></td>
+<td><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#KinMS_testsuite.infits" title="KinMS_testsuite.infits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infits</span></code></a>()</p></td>
+<td><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#KinMS_testsuite.veldisp" title="KinMS_testsuite.veldisp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">veldisp</span></code></a>()</p></td>
+<td><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#KinMS_testsuite.diskthick" title="KinMS_testsuite.diskthick"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diskthick</span></code></a>()</p></td>
+<td><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#KinMS_testsuite.warp" title="KinMS_testsuite.warp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">warp</span></code></a>()</p></td>
+<td><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#KinMS_testsuite.retclouds" title="KinMS_testsuite.retclouds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retclouds</span></code></a>()</p></td>
+<td><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#KinMS_testsuite.run_tests" title="KinMS_testsuite.run_tests"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_tests</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.internet">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">internet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'8.8.8.8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">53</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.internet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Host: 8.8.8.8 (google-public-dns-a.google.com)
+OpenPort: 53/tcp
+Service: domain (DNS/TCP)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.expdisk">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">expdisk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalerad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.expdisk" title="Permalink to this definition">¶</a></dt>
+<dd><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates how
+to create a simulation of an exponential disk of molecular gas. The user can input values for the scalerad and inc
+variables, and the procedure will the create the simulation and display it to screen.
+:param scalerad: Scale radius for the exponential disk (in arcseconds)
+:param inc: Inclination to project the disk (in degrees)
+:return: N/A</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.expdisk_gasgrav">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">expdisk_gasgrav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalerad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gasmass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.expdisk_gasgrav" title="Permalink to this definition">¶</a></dt>
+<dd><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+how to create a simulation of an exponential disk of molecular gas, including the effect of the potential of the gas
+on its own rotation. The user can input values for the scalerad and inc variables, and the procedure will the create
+the simulation and display it to screen.
+:param scalerad: Scale radius for the exponential disk (in arcseconds)
+:param inc: Inclination to project the disk (in degrees)
+:param gasmass: Total mass of the gas (in solar masses)
+:param distance: Distance to the galaxy (in Mpc)
+:return: N/A</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.ngc4324">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">ngc4324</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.ngc4324" title="Permalink to this definition">¶</a></dt>
+<dd><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure makes a basic
+simulation of the molecular gas ring in NGC4324, and plots the simulation moment zero, one and PVD against the
+observed ones from the CARMA observations of Alatalo et al., 2012.
+:return: N/A</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.use_inclouds">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">use_inclouds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.use_inclouds" title="Permalink to this definition">¶</a></dt>
+<dd><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+how to use the “inclouds” parameter set to create simulations, in this case of a very unrealistic object. Once you
+understand this example then see the “infits” and “inclouds spiral” test for more realistic examples.
+:return: N/A</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.inclouds_spiral">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">inclouds_spiral</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.inclouds_spiral" title="Permalink to this definition">¶</a></dt>
+<dd><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+how to use the “inclouds” parameter set to create simulations, in this case of molecular gas in a two armed spiral
+pattern. Any default parameters can be changed by specifying them at the command line (see KinMS.pro or the full
+details of all the available parameters).
+:return: N/A</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.infits">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">infits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.infits" title="Permalink to this definition">¶</a></dt>
+<dd><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+how to use an input FITS image to create a simulation of what the molecular gas may look like, with a given
+instrument (in this case CARMA). We use a GALEX (Morrissey et al., 2007) FUV image of NGC1437A, and scale it
+assuming the FUV emission comes from star-formation and thus molecular gas, and that the galaxy has a total
+integrated CO flux of 30 Jy km/s. We use the FITS image to set the surface-brightness, and impose a flat velocity
+gradient.
+:return: N/A</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.veldisp">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">veldisp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.veldisp" title="Permalink to this definition">¶</a></dt>
+<dd><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+how to create a simulation of an exponential disk of molecular gas with a velocity dispersion that varies with
+radius.
+:return: N/A</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.diskthick">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">diskthick</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.diskthick" title="Permalink to this definition">¶</a></dt>
+<dd><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+how to create a simulation of an exponential disk of molecular gas with a thickness that varies with radius. Any
+default parameters can be changed by specifying them at the command line (see KinMS.pro for the full details of all
+the available parameters).
+:return: N/A</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.warp">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">warp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.warp" title="Permalink to this definition">¶</a></dt>
+<dd><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+how to create a simulation of a warped exponential disk of molecular gas.
+:return: N/A</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.retclouds">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">retclouds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.retclouds" title="Permalink to this definition">¶</a></dt>
+<dd><p>A test procedure to demonstrate the KinMS code, and check if it works on your system. This procedure demonstrates
+how to use the return clouds feature to recursivly build models - here a misaligned central and outer disc.
+:return: N/A</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="KinMS_testsuite.run_tests">
+<span class="sig-prename descclassname"><span class="pre">KinMS_testsuite.</span></span><span class="sig-name descname"><span class="pre">run_tests</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#KinMS_testsuite.run_tests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2022, Timothy A. Davis.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/autoapi/KinMS_testsuite/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

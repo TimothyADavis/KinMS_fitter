@@ -1,0 +1,240 @@
+:py:mod:`kinms_fitter.kinms_fitter`
+===================================
+
+.. py:module:: kinms_fitter.kinms_fitter
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   kinms_fitter.kinms_fitter.kinms_fitter
+
+
+
+
+.. py:class:: kinms_fitter(filename, spatial_trim=None, spectral_trim=None, linefree_chans=[1, 5])
+
+   Wrapper for easily kinematically modelling datacubes (typically from ALMA or VLA) using KinMS.
+   ...
+
+   Changeable Attributes
+   ---------------------
+   xc_guess : float
+       Guess for Kinematic/morphological centre of the disc. RA, in degrees. [Default = Centre of supplied cube after clipping]
+   yc_guess : float
+       Guess for Kinematic/morphological centre of the disc. Dec, in degrees. [Default = Centre of supplied cube after clipping]
+   vsys_guess : float
+       Guess for Systemic velocity of the gas, in the radio velocity convention. km/s.  [Default = Velocity of central channel of supplied cube after clipping]
+   totflux_guess : float
+       Total flux guess. Units the same as those used in the cube (e.g. Jy km/s). [Default = total sum of the input cube]
+       velDisp_guess : float
+       Velocity dispersion guess. km/s. [Default = 8 km/s]
+   pa_guess : float
+       Optional position angle guess, if no warp specified. Degrees. [Default = 0 deg]
+   inc_guess : float
+       Optional Inclination angle guess, if no warp specified. Degrees. [Default = 45 deg]
+   inc_profile : list of warp_profile objects
+       Optional variation of the inclination with radius as described by warp_profile objects. [Default = None]
+   pa_profile : list of warp_profile objects
+       Optional variation of the inclination with radius as described by warp_profile objects. [Default = None]
+   sb_profile : list of sb_profs objects
+       Optional - Define the surface brightness profile with a list of sb_profs objects which will be evaluated in order. [Default = single exponential disc]
+       expscale_guess : float
+       Optional - defines the scalelength of the default single exponential disc used if sb_profile is not set. arcseconds. [Default = a fifth of the total extent of the cube]
+       skySampClouds : ndarray
+       Optional - Input cloud model made with the skySampler tool if you dont want to fit the gas distribution.
+   vel_profile : list of vel_profs objects
+        Define the circular velocity profile with a list of vel_profs objects. [Default = tilted rings]
+   radial_motion : list of radial_motion objects
+       Optional - Define the radial motion types with radial_motion objects (see base KinMS documentation). [Default: None]
+   nrings : int
+       Optional - Number of tilted rings to use, spaced a beamwidth apart. [Default = fill the total extent of the cube]
+   vel_guess :  float
+       Optional - starting guess for the tilted ring asymptotic velocity. km/s [Default = 28percent of the velocity width coverved by the cube]
+   xcent_range : two element ndarray
+       Allowed range for fitting of the kinematic centre. RA in degrees [Default: minimum and maximum RA within the input cube]
+   ycent_range : two element ndarray
+       Allowed range for fitting of the kinematic centre. Dec in degrees [Default: minimum and maximum Dec within the input cube]
+       vsys_range : two element ndarray
+       Allowed range for fitting of the systemic velocity. km/s. [Default: minimum and maximum velocity contained within the input cube]
+   totflux_range : two element ndarray
+       Allowed range for fitting of the total flux. Units the same as input cube. [Default: Min=0 and Max=3x the total flux in the input cube]
+   velDisp_range : two element ndarray
+       Allowed range for fitting of the velocity dispersion. km/s. [Default: Min=0 and Max=50 km/s]
+   pa_range : two element ndarray
+       Optional - Allowed range for fitting of the position angle. Degrees. [Default: Min=0 and Max=360 degrees]
+   inc_range : two element ndarray
+       Optional - Allowed range for fitting of the inclination angle. Degrees. [Default: Min=0 and Max=89 degrees]
+   expscale_range : two element ndarray
+       Optional - Allowed range for fitting of the default exponential scale radius. arcseconds. [Default: Min=0 and Max=the size of your input cube]
+   vel_range : two element ndarray
+       Optional - Allowed range for fitting of the tilted ring velocities. km/s. [Default: Min=0 and Max=half the cube total velocity width]
+   pa_prior :  object
+       Optional - supply an object defining the PA prior (see GAStimator documentation). [Default = boxcar between range limits]
+   xc_prior :  object
+       Optional - supply an object defining the RA centre prior (see GAStimator documentation). [Default = boxcar between range limits]
+   yc_prior :  object
+       Optional - supply an object defining the Dec centre prior (see GAStimator documentation). [Default = boxcar between range limits]
+   vsys_prior :  object
+       Optional - supply an object defining the Vsys prior (see GAStimator documentation). [Default = boxcar between range limits]
+   inc_prior :  object
+       Optional - supply an object defining the inc prior (see GAStimator documentation). [Default = boxcar between range limits]
+   totflux_prior :  object
+       Optional - supply an object defining the totflux prior (see GAStimator documentation). [Default = boxcar between range limits]
+   velDisp_prior :  object
+       Optional - supply an object defining the velocity dispersion prior (see GAStimator documentation). [Default = boxcar between range limits]
+       initial_guesses : ndarray
+       Override the initial guesses used for the fit. [Default = No override]
+
+   Control Attributes
+   ------------------
+       objname : string
+       Name of the object you are fitting. [Default = read from FITS header OBJECT entry, or 'object']
+       nprocesses : int
+       Number of processors to use for MCMC fitting. [Default = fall back on GAStimator default choices]
+   niters : int
+       Number of iterations to use when fitting. [Default=3000]
+   output_initial_model : bool
+       Save the initially generated model as a FITS file. [Default=False]
+   pdf : bool
+       Make PDF outputs. [Default = True]
+   silent : bool
+       Fit silently. [Default = False]
+   show_corner : bool
+       Show corner plots if MCMC fitting. [Default = True]
+   nSamps : int
+       Number of samples to use for KinMS model. [Default = 5e5]
+       chi2_var_correct : bool
+       Use chi-sqr variance correction. [Default = True]
+       text_output : bool
+       Save output text files. [Default = True]
+   save_all_accepted : bool
+       Save all the accepted guesses (allowing you to recreate corner plots etc). [Default = True]
+   interactive : bool
+       Use interactive mode for plots. [Default = True]
+   show_plots : bool
+       Show the diagnotic plots. [Default = True]
+   output_cube_fileroot : string
+       File root for output best fit datacube. [Default = False]
+       lnlike_func : object
+       Override the default likelihood function. [Default =. Dont override]  
+       tolerance : float 
+       Tolerance for simple fit. Smaller numbers are more stringent (longer runtime) [Default=0.1]
+       
+   Informational Attributes (dont change unless you know what you are doing)
+   -------------------------------------------------------------------------
+       bunit : string
+       Unit of datacube fluxes
+   cellsize : float
+       Cube cellsize in arcsec
+       timetaken : float
+       Time taken for the fit in seconds.
+   chi2_correct_fac : float
+       chi2 correction factor applied.
+   mask_sum : 0
+       Number of detected pixels in the data mask.
+   labels : ndarray of strings
+       Label for each fitted quantity
+    
+
+   .. py:method:: colorbar(mappable, ticks=None)
+
+      Add a colorbar to a given plot
+
+      param mappable : matplotlib figure
+          Figure which to add the colorbar too
+      param ticks : ndarray
+          Ticks to show on the colourbar. [Default = None]
+
+
+   .. py:method:: read_in_a_cube(path)
+
+      Reads in the datacube.
+
+
+   .. py:method:: get_header_coord_arrays(hdr)
+
+      Get coordinate arrays from a FITS header
+
+
+   .. py:method:: rms_estimate(cube, chanstart, chanend)
+
+      Estimate the RMS in the inner quarter of the datacube in a given channel range.
+
+
+   .. py:method:: from_fits_history(hdr)
+
+      Get beam parameters if they happen to be in history keywords.
+
+      Stolen from radio_beam, with thanks!
+
+
+   .. py:method:: read_primary_cube(cube)
+
+      Wrapper method for reading in datacube.
+
+
+   .. py:method:: setup_params()
+
+      Setup the fit guesses, minima, maxima etc from the inputs.
+
+
+   .. py:method:: clip_cube()
+
+      Clip the input datacube to size.
+
+
+   .. py:method:: model_simple(param, fileName='')
+
+      Function to create a model from the given input parameters.
+
+
+   .. py:method:: mcmc_fit(initial_guesses, labels, minimums, maximums, fixed, priors, precision)
+
+      Function to run the MCMC fit.
+
+
+   .. py:method:: simple_chi2(theargs, info)
+
+      Likelihood function for the simple fit mode.
+
+
+   .. py:method:: logo()
+
+      Returns the KinMS logo.
+
+
+   .. py:method:: simple_fit(initial_guesses, labels, minimums, maximums, fixed)
+
+      Runs the simple fit.
+
+
+   .. py:method:: plot(block=True, overcube=None, savepath=None, **kwargs)
+
+      Makes the plots.
+
+
+   .. py:method:: write_text(bestvals, errup, errdown, units, fixed, runtime, mode, errors_warnings='None', fname='KinMS_fitter_output.txt')
+
+      Write output text files.
+
+
+   .. py:method:: run(method='mcmc', justplot=False, savepath='./', **kwargs)
+
+      Run the fit.
+
+      :param method: Type of fit to run.
+      :type method: string - choice of 'mcmc', 'simple' or 'both'.
+      :param justplot: Just show the initial model plot without fitting. Helpful for setting initial guesses.
+      :type justplot: bool
+      :param savepath: Path to append to saved files.
+      :type savepath: string
+      :param **kwargs: any additional keywords to pass to other methods.
+
+
+

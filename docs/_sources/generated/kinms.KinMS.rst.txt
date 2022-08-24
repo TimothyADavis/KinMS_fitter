@@ -1,0 +1,39 @@
+kinms.KinMS
+===========
+
+.. currentmodule:: kinms
+
+.. autoclass:: KinMS
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~KinMS.__init__
+      ~KinMS.add_fluxes
+      ~KinMS.create_warp
+      ~KinMS.find_clouds_in_cube
+      ~KinMS.gasGravity_velocity
+      ~KinMS.generate_cloudlets
+      ~KinMS.histo_with_bincount
+      ~KinMS.inclination_projection
+      ~KinMS.kinms_create_velField_oneSided
+      ~KinMS.kinms_sampleFromArbDist_oneSided
+      ~KinMS.makebeam
+      ~KinMS.model_cube
+      ~KinMS.normalise_cube
+      ~KinMS.position_angle_rotation
+      ~KinMS.print_variables
+      ~KinMS.save_fits
+      ~KinMS.set_cloud_positions
+      ~KinMS.set_cloud_velocities
+   
+   
+
+   
+   
+   

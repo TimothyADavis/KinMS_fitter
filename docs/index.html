@@ -1,0 +1,643 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>KinMS API documentation &#8212; KinMS  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="install.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="#">
+    <img class="logo" src="_static/logo_small.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=timothyadavis&repo=kinms_fitter&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a></li>
+</ul>
+
+
+<hr />
+<ul>
+    
+    <li class="toctree-l1"><a href="https://kinms.space">KinMS Website</a></li>
+    
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="install.html" title="next chapter">Installation</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="kinms-api-documentation">
+<h1>KinMS API documentation<a class="headerlink" href="#kinms-api-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>KinMS_fitter is a wrapper for KinMSpy that automates most common galaxy fitting tasks, and has a flexible interface for defining surface brightness/velocity profile functions.</p>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoapi/kinms_fitter/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/kinms_fitter/index.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.kinms_fitter</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#classes">Classes</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter">kinms_fitter</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.colorbar">colorbar</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.read_in_a_cube">read_in_a_cube</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.get_header_coord_arrays">get_header_coord_arrays</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.rms_estimate">rms_estimate</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.from_fits_history">from_fits_history</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.read_primary_cube">read_primary_cube</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.setup_params">setup_params</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.clip_cube">clip_cube</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.model_simple">model_simple</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.mcmc_fit">mcmc_fit</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.simple_chi2">simple_chi2</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.logo">logo</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.simple_fit">simple_fit</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.plot">plot</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.write_text">write_text</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/kinms_fitter/index.html#kinms_fitter.kinms_fitter.kinms_fitter.run">run</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms_fitter/prior_funcs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.prior_funcs</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms_fitter/prior_funcs/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/prior_funcs/index.html#classes">Classes</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/prior_funcs/index.html#kinms_fitter.prior_funcs.prior_funcs">prior_funcs</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/prior_funcs/index.html#kinms_fitter.prior_funcs.prior_funcs.gaussian">gaussian</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/prior_funcs/index.html#kinms_fitter.prior_funcs.prior_funcs.gaussian.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/prior_funcs/index.html#kinms_fitter.prior_funcs.prior_funcs.gaussian.eval">eval</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/prior_funcs/index.html#kinms_fitter.prior_funcs.prior_funcs.physical_velocity_prior">physical_velocity_prior</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/prior_funcs/index.html#kinms_fitter.prior_funcs.prior_funcs.physical_velocity_prior.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/prior_funcs/index.html#kinms_fitter.prior_funcs.prior_funcs.physical_velocity_prior.eval">eval</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.sb_profs</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#classes">Classes</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#kinms_fitter.sb_profs.sb_profs">sb_profs</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#kinms_fitter.sb_profs.sb_profs.expdisk">expdisk</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#kinms_fitter.sb_profs.sb_profs.expdisk.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#kinms_fitter.sb_profs.sb_profs.expdisk.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#kinms_fitter.sb_profs.sb_profs.gaussian">gaussian</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#kinms_fitter.sb_profs.sb_profs.gaussian.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#kinms_fitter.sb_profs.sb_profs.gaussian.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#kinms_fitter.sb_profs.sb_profs.cutoff">cutoff</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#kinms_fitter.sb_profs.sb_profs.cutoff.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#kinms_fitter.sb_profs.sb_profs.cutoff.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/sb_profs/index.html#kinms_fitter.sb_profs.sb_profs.eval">eval</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms_fitter/transformClouds/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.transformClouds</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms_fitter/transformClouds/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/transformClouds/index.html#functions">Functions</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/transformClouds/index.html#kinms_fitter.transformClouds.transformClouds">transformClouds</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.velocity_profs</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#classes">Classes</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs">velocity_profs</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.tilted_rings">tilted_rings</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.tilted_rings.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.tilted_rings.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.keplarian">keplarian</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.keplarian.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.keplarian.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.mge_vcirc">mge_vcirc</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.mge_vcirc.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.mge_vcirc.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.arctan">arctan</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.arctan.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.arctan.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.radial_barflow">radial_barflow</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.radial_barflow.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.radial_barflow.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.sersic">sersic</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.sersic.mass">mass</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.sersic.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.sersic.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.bulge_disc">bulge_disc</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.bulge_disc.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.bulge_disc.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.nfw">nfw</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.nfw.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.nfw.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.exponential_disc">exponential_disc</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.exponential_disc.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.exponential_disc.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/velocity_profs/index.html#kinms_fitter.velocity_profs.velocity_profs.eval">eval</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms_fitter.warp_funcs</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#classes">Classes</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#kinms_fitter.warp_funcs.warp_funcs">warp_funcs</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#kinms_fitter.warp_funcs.warp_funcs.linear">linear</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#kinms_fitter.warp_funcs.warp_funcs.linear.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#kinms_fitter.warp_funcs.warp_funcs.linear.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#kinms_fitter.warp_funcs.warp_funcs.flat">flat</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#kinms_fitter.warp_funcs.warp_funcs.flat.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#kinms_fitter.warp_funcs.warp_funcs.flat.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#kinms_fitter.warp_funcs.warp_funcs.tilted_rings">tilted_rings</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#kinms_fitter.warp_funcs.warp_funcs.tilted_rings.__repr__">__repr__</a></li>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#kinms_fitter.warp_funcs.warp_funcs.tilted_rings.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms_fitter/warp_funcs/index.html#kinms_fitter.warp_funcs.warp_funcs.eval">eval</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/kinms_fitter/index.html#package-contents">Package Contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms_fitter/index.html#classes">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms_fitter/index.html#functions">Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter">kinms_fitter</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.colorbar">colorbar</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.read_in_a_cube">read_in_a_cube</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.get_header_coord_arrays">get_header_coord_arrays</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.rms_estimate">rms_estimate</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.from_fits_history">from_fits_history</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.read_primary_cube">read_primary_cube</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.setup_params">setup_params</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.clip_cube">clip_cube</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.model_simple">model_simple</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.mcmc_fit">mcmc_fit</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.simple_chi2">simple_chi2</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.logo">logo</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.simple_fit">simple_fit</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.plot">plot</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.write_text">write_text</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.kinms_fitter.run">run</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.sb_profs">sb_profs</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.sb_profs.expdisk">expdisk</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.sb_profs.expdisk.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.sb_profs.expdisk.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.sb_profs.gaussian">gaussian</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.sb_profs.gaussian.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.sb_profs.gaussian.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.sb_profs.cutoff">cutoff</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.sb_profs.cutoff.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.sb_profs.cutoff.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.sb_profs.eval">eval</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs">velocity_profs</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.tilted_rings">tilted_rings</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.tilted_rings.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.tilted_rings.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.keplarian">keplarian</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.keplarian.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.keplarian.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.mge_vcirc">mge_vcirc</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.mge_vcirc.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.mge_vcirc.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.arctan">arctan</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.arctan.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.arctan.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.radial_barflow">radial_barflow</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.radial_barflow.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.radial_barflow.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.sersic">sersic</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.sersic.mass">mass</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.sersic.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.sersic.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.bulge_disc">bulge_disc</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.bulge_disc.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.bulge_disc.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.nfw">nfw</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.nfw.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.nfw.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.exponential_disc">exponential_disc</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.exponential_disc.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.exponential_disc.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.velocity_profs.eval">eval</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.transformClouds">transformClouds</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.warp_funcs">warp_funcs</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.warp_funcs.linear">linear</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.warp_funcs.linear.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.warp_funcs.linear.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.warp_funcs.flat">flat</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.warp_funcs.flat.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.warp_funcs.flat.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.warp_funcs.tilted_rings">tilted_rings</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.warp_funcs.tilted_rings.__repr__">__repr__</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.warp_funcs.tilted_rings.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms_fitter/index.html#kinms_fitter.warp_funcs.eval">eval</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="autoapi/kinms/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/kinms/index.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms/KinMS/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms.KinMS</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#classes">Classes</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMSError">KinMSError</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS">KinMS</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.print_variables">print_variables</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.makebeam">makebeam</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.kinms_sampleFromArbDist_oneSided">kinms_sampleFromArbDist_oneSided</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.kinms_create_velField_oneSided">kinms_create_velField_oneSided</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.save_fits">save_fits</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.gasGravity_velocity">gasGravity_velocity</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.generate_cloudlets">generate_cloudlets</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.set_cloud_positions">set_cloud_positions</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.create_warp">create_warp</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.inclination_projection">inclination_projection</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.position_angle_rotation">position_angle_rotation</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.set_cloud_velocities">set_cloud_velocities</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.find_clouds_in_cube">find_clouds_in_cube</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.histo_with_bincount">histo_with_bincount</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.add_fluxes">add_fluxes</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.normalise_cube">normalise_cube</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS/index.html#kinms.KinMS.KinMS.model_cube">model_cube</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms.KinMS2</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#classes">Classes</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMSError">KinMSError</a></li>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS">KinMS</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.print_variables">print_variables</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.makebeam">makebeam</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.kinms_sampleFromArbDist_oneSided">kinms_sampleFromArbDist_oneSided</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.kinms_create_velField_oneSided">kinms_create_velField_oneSided</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.save_fits">save_fits</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.gasGravity_velocity">gasGravity_velocity</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.generate_cloudlets">generate_cloudlets</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.set_cloud_positions">set_cloud_positions</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.create_warp">create_warp</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.inclination_projection">inclination_projection</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.position_angle_rotation">position_angle_rotation</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.set_cloud_velocities">set_cloud_velocities</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.find_clouds_in_cube">find_clouds_in_cube</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.add_fluxes">add_fluxes</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.normalise_cube">normalise_cube</a></li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/KinMS2/index.html#kinms.KinMS2.KinMS.model_cube">model_cube</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms/radial_motion/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinms.radial_motion</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms/radial_motion/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/radial_motion/index.html#classes">Classes</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms/radial_motion/index.html#kinms.radial_motion.radial_motion">radial_motion</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/radial_motion/index.html#kinms.radial_motion.radial_motion.bisymmetric_flow">bisymmetric_flow</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms/radial_motion/index.html#kinms.radial_motion.radial_motion.bisymmetric_flow.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/radial_motion/index.html#kinms.radial_motion.radial_motion.lopsided_flow">lopsided_flow</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms/radial_motion/index.html#kinms.radial_motion.radial_motion.lopsided_flow.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="autoapi/kinms/radial_motion/index.html#kinms.radial_motion.radial_motion.pure_radial">pure_radial</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="autoapi/kinms/radial_motion/index.html#kinms.radial_motion.radial_motion.pure_radial.__call__">__call__</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/kinms/index.html#package-contents">Package Contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/kinms/index.html#classes">Classes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS">KinMS</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.print_variables">print_variables</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.makebeam">makebeam</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.kinms_sampleFromArbDist_oneSided">kinms_sampleFromArbDist_oneSided</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.kinms_create_velField_oneSided">kinms_create_velField_oneSided</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.save_fits">save_fits</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.gasGravity_velocity">gasGravity_velocity</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.generate_cloudlets">generate_cloudlets</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.set_cloud_positions">set_cloud_positions</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.create_warp">create_warp</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.inclination_projection">inclination_projection</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.position_angle_rotation">position_angle_rotation</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.set_cloud_velocities">set_cloud_velocities</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.find_clouds_in_cube">find_clouds_in_cube</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.histo_with_bincount">histo_with_bincount</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.add_fluxes">add_fluxes</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.normalise_cube">normalise_cube</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS.model_cube">model_cube</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2">KinMS2</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.print_variables">print_variables</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.makebeam">makebeam</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.kinms_sampleFromArbDist_oneSided">kinms_sampleFromArbDist_oneSided</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.kinms_create_velField_oneSided">kinms_create_velField_oneSided</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.save_fits">save_fits</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.gasGravity_velocity">gasGravity_velocity</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.generate_cloudlets">generate_cloudlets</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.set_cloud_positions">set_cloud_positions</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.create_warp">create_warp</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.inclination_projection">inclination_projection</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.position_angle_rotation">position_angle_rotation</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.set_cloud_velocities">set_cloud_velocities</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.find_clouds_in_cube">find_clouds_in_cube</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.add_fluxes">add_fluxes</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.normalise_cube">normalise_cube</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.KinMS2.model_cube">model_cube</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/kinms/index.html#kinms.radial_motion">radial_motion</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.radial_motion.bisymmetric_flow">bisymmetric_flow</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms/index.html#kinms.radial_motion.bisymmetric_flow.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.radial_motion.lopsided_flow">lopsided_flow</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms/index.html#kinms.radial_motion.lopsided_flow.__call__">__call__</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/kinms/index.html#kinms.radial_motion.pure_radial">pure_radial</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="autoapi/kinms/index.html#kinms.radial_motion.pure_radial.__call__">__call__</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="autoapi/sauron_colormap/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sauron_colormap</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/sauron_colormap/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/sauron_colormap/index.html#sauron_colormap._cdict">_cdict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/sauron_colormap/index.html#sauron_colormap._rdict">_rdict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/sauron_colormap/index.html#sauron_colormap.sauron">sauron</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/sauron_colormap/index.html#sauron_colormap.sauron_r">sauron_r</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/sauron_colormap/index.html#sauron_colormap.n">n</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="autoapi/KinMS_figures/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">KinMS_figures</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/KinMS_figures/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/KinMS_figures/index.html#classes">Classes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_figures/index.html#KinMS_figures.KinMS_plotter">KinMS_plotter</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/KinMS_figures/index.html#KinMS_figures.KinMS_plotter.gaussian">gaussian</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/KinMS_figures/index.html#KinMS_figures.KinMS_plotter.makebeam">makebeam</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/KinMS_figures/index.html#KinMS_figures.KinMS_plotter.smoothmask">smoothmask</a></li>
+<li class="toctree-l6"><a class="reference internal" href="autoapi/KinMS_figures/index.html#KinMS_figures.KinMS_plotter.makeplots">makeplots</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">KinMS_testsuite</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#module-contents">Module Contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#functions">Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.internet">internet</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.expdisk">expdisk</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.expdisk_gasgrav">expdisk_gasgrav</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.ngc4324">ngc4324</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.use_inclouds">use_inclouds</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.inclouds_spiral">inclouds_spiral</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.infits">infits</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.veldisp">veldisp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.diskthick">diskthick</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.warp">warp</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.retclouds">retclouds</a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/KinMS_testsuite/index.html#KinMS_testsuite.run_tests">run_tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2022, Timothy A. Davis.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

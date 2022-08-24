@@ -1,0 +1,9 @@
+API
+===
+
+.. autosummary::
+   :recursive:
+   :toctree: generated
+
+   kinms_fitter
+   kinms

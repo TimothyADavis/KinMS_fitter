@@ -1,0 +1,79 @@
+:py:mod:`conf`
+==============
+
+.. py:module:: conf
+
+
+Module Contents
+---------------
+
+.. py:data:: project
+   :annotation: = kinmspytest
+
+   
+
+.. py:data:: copyright
+   :annotation: = 2020, KinMS_Team
+
+   
+
+.. py:data:: author
+   :annotation: = KinMS_Team
+
+   
+
+.. py:data:: release
+   :annotation: = 2.0.0
+
+   
+
+.. py:data:: extensions
+   :annotation: = ['sphinx.ext.autodoc']
+
+   
+
+.. py:data:: master_doc
+   :annotation: = index
+
+   
+
+.. py:data:: autoclass_content
+   :annotation: = both
+
+   
+
+.. py:data:: templates_path
+   :annotation: = ['_templates']
+
+   
+
+.. py:data:: exclude_patterns
+   :annotation: = []
+
+   
+
+.. py:data:: html_theme
+   :annotation: = sphinx_rtd_theme
+
+   
+
+.. py:data:: html_static_path
+   :annotation: = ['_static']
+
+   
+
+.. py:data:: html_theme_options
+   
+
+   
+
+.. py:data:: html_logo
+   :annotation: = ../../utils/logo_files/Logo.png
+
+   
+
+.. py:data:: html_favicon
+   :annotation: = ../../utils/logo_files/tab.ico
+
+   
+

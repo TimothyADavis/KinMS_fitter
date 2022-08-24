@@ -28,6 +28,130 @@ from spectral_cube.utils import SpectralCubeWarning
 warnings.filterwarnings(action='ignore', category=SpectralCubeWarning, append=True)
          
 class kinms_fitter:
+    """
+    Wrapper for easily kinematically modelling datacubes (typically from ALMA or VLA) using KinMS.
+    ...
+
+    Changeable Attributes
+    ---------------------
+    xc_guess : float
+        Guess for Kinematic/morphological centre of the disc. RA, in degrees. [Default = Centre of supplied cube after clipping]
+    yc_guess : float
+        Guess for Kinematic/morphological centre of the disc. Dec, in degrees. [Default = Centre of supplied cube after clipping]
+    vsys_guess : float
+        Guess for Systemic velocity of the gas, in the radio velocity convention. km/s.  [Default = Velocity of central channel of supplied cube after clipping]
+    totflux_guess : float
+        Total flux guess. Units the same as those used in the cube (e.g. Jy km/s). [Default = total sum of the input cube]
+	velDisp_guess : float
+        Velocity dispersion guess. km/s. [Default = 8 km/s]
+    pa_guess : float
+        Optional position angle guess, if no warp specified. Degrees. [Default = 0 deg]
+    inc_guess : float
+        Optional Inclination angle guess, if no warp specified. Degrees. [Default = 45 deg]
+    inc_profile : list of warp_profile objects
+        Optional variation of the inclination with radius as described by warp_profile objects. [Default = None]
+    pa_profile : list of warp_profile objects
+        Optional variation of the inclination with radius as described by warp_profile objects. [Default = None]
+    sb_profile : list of sb_profs objects
+        Optional - Define the surface brightness profile with a list of sb_profs objects which will be evaluated in order. [Default = single exponential disc]
+	expscale_guess : float
+        Optional - defines the scalelength of the default single exponential disc used if sb_profile is not set. arcseconds. [Default = a fifth of the total extent of the cube]
+	skySampClouds : ndarray
+        Optional - Input cloud model made with the skySampler tool if you dont want to fit the gas distribution.
+    vel_profile : list of vel_profs objects
+         Define the circular velocity profile with a list of vel_profs objects. [Default = tilted rings]
+    radial_motion : list of radial_motion objects
+        Optional - Define the radial motion types with radial_motion objects (see base KinMS documentation). [Default: None]
+    nrings : int
+        Optional - Number of tilted rings to use, spaced a beamwidth apart. [Default = fill the total extent of the cube]
+    vel_guess :  float
+        Optional - starting guess for the tilted ring asymptotic velocity. km/s [Default = 28percent of the velocity width coverved by the cube]
+    xcent_range : two element ndarray
+        Allowed range for fitting of the kinematic centre. RA in degrees [Default: minimum and maximum RA within the input cube]
+    ycent_range : two element ndarray
+        Allowed range for fitting of the kinematic centre. Dec in degrees [Default: minimum and maximum Dec within the input cube]
+	vsys_range : two element ndarray
+        Allowed range for fitting of the systemic velocity. km/s. [Default: minimum and maximum velocity contained within the input cube]
+    totflux_range : two element ndarray
+        Allowed range for fitting of the total flux. Units the same as input cube. [Default: Min=0 and Max=3x the total flux in the input cube]
+    velDisp_range : two element ndarray
+        Allowed range for fitting of the velocity dispersion. km/s. [Default: Min=0 and Max=50 km/s]
+    pa_range : two element ndarray
+        Optional - Allowed range for fitting of the position angle. Degrees. [Default: Min=0 and Max=360 degrees]
+    inc_range : two element ndarray
+        Optional - Allowed range for fitting of the inclination angle. Degrees. [Default: Min=0 and Max=89 degrees]
+    expscale_range : two element ndarray
+        Optional - Allowed range for fitting of the default exponential scale radius. arcseconds. [Default: Min=0 and Max=the size of your input cube]
+    vel_range : two element ndarray
+        Optional - Allowed range for fitting of the tilted ring velocities. km/s. [Default: Min=0 and Max=half the cube total velocity width]
+    pa_prior :  object
+    	Optional - supply an object defining the PA prior (see GAStimator documentation). [Default = boxcar between range limits]
+    xc_prior :  object
+    	Optional - supply an object defining the RA centre prior (see GAStimator documentation). [Default = boxcar between range limits]
+    yc_prior :  object
+    	Optional - supply an object defining the Dec centre prior (see GAStimator documentation). [Default = boxcar between range limits]
+    vsys_prior :  object
+    	Optional - supply an object defining the Vsys prior (see GAStimator documentation). [Default = boxcar between range limits]
+    inc_prior :  object
+    	Optional - supply an object defining the inc prior (see GAStimator documentation). [Default = boxcar between range limits]
+    totflux_prior :  object
+    	Optional - supply an object defining the totflux prior (see GAStimator documentation). [Default = boxcar between range limits]
+    velDisp_prior :  object
+    	Optional - supply an object defining the velocity dispersion prior (see GAStimator documentation). [Default = boxcar between range limits]
+	initial_guesses : ndarray
+        Override the initial guesses used for the fit. [Default = No override]
+    
+    Control Attributes
+    ------------------
+	objname : string
+        Name of the object you are fitting. [Default = read from FITS header OBJECT entry, or 'object']
+	nprocesses : int
+        Number of processors to use for MCMC fitting. [Default = fall back on GAStimator default choices]
+    niters : int
+        Number of iterations to use when fitting. [Default=3000]
+    output_initial_model : bool
+        Save the initially generated model as a FITS file. [Default=False]
+    pdf : bool
+        Make PDF outputs. [Default = True]
+    silent : bool
+        Fit silently. [Default = False]
+    show_corner : bool
+        Show corner plots if MCMC fitting. [Default = True]
+    nSamps : int
+        Number of samples to use for KinMS model. [Default = 5e5]
+	chi2_var_correct : bool
+        Use chi-sqr variance correction. [Default = True]
+	text_output : bool
+        Save output text files. [Default = True]
+    save_all_accepted : bool
+        Save all the accepted guesses (allowing you to recreate corner plots etc). [Default = True]
+    interactive : bool
+        Use interactive mode for plots. [Default = True]
+    show_plots : bool
+        Show the diagnotic plots. [Default = True]
+    output_cube_fileroot : string
+        File root for output best fit datacube. [Default = False]
+	lnlike_func : object
+        Override the default likelihood function. [Default =. Dont override]  
+	tolerance : float 
+        Tolerance for simple fit. Smaller numbers are more stringent (longer runtime) [Default=0.1]
+	
+    Informational Attributes (dont change unless you know what you are doing)
+    -------------------------------------------------------------------------
+	bunit : string
+        Unit of datacube fluxes
+    cellsize : float
+        Cube cellsize in arcsec
+	timetaken : float
+        Time taken for the fit in seconds.
+    chi2_correct_fac : float
+        chi2 correction factor applied.
+    mask_sum : 0
+        Number of detected pixels in the data mask.
+    labels : ndarray of strings
+        Label for each fitted quantity
+     
+    """
     def __init__(self,filename,spatial_trim=None,spectral_trim=None,linefree_chans=[1,5]):
         """
         Initalise the KinMS_fitter instance, reading in the observed datacube and trimming it as needed.
@@ -105,21 +229,17 @@ class kinms_fitter:
         self.output_cube_fileroot=False
         self.lnlike_func=None # dont override default    
         self.tolerance=0.1 ## tolerance for simple fit. Smaller numbers are more stringent (longer runtime)
-        try:
-            self.objname=self.hdr['OBJECT']
-        except:
-            self.objname="Object"
+
+        
     
     def colorbar(self,mappable,ticks=None):
         """
-        Return a list of random ingredients as strings.
-
-        :param kind: Optional "kind" of ingredients.
-        :type kind: list[str] or None
-        :raise lumache.InvalidKindError: If the kind is invalid.
-        :return: The ingredients list.
-        :rtype: list[str]
-
+        Add a colorbar to a given plot
+        
+        param mappable : matplotlib figure
+            Figure which to add the colorbar too
+        param ticks : ndarray
+            Ticks to show on the colourbar. [Default = None]
         """
         ax = mappable.axes
         fig = ax.figure
@@ -132,6 +252,9 @@ class kinms_fitter:
             
 
     def read_in_a_cube(self,path):
+        """
+        Reads in the datacube.
+        """
         self.spectralcube=SpectralCube.read(path).with_spectral_unit(u.km/u.s, velocity_convention='radio')#, rest_value=self.restfreq)
         self.bunit=self.spectralcube.unit.to_string()
         hdr=self.spectralcube.header
@@ -139,9 +262,11 @@ class kinms_fitter:
         cube[np.isfinite(cube) == False] = 0.0
         
         try:
+            self.objname=self.hdr['OBJECT']
             self.pdf_rootname=hdr['OBJECT']+"_KinMS_fitter"
         except:
             self.pdf_rootname="KinMS_fitter"
+            self.objname="Object"
             
         try:
             beamtab=self.spectralcube.beam
@@ -159,7 +284,9 @@ class kinms_fitter:
         return cube, hdr, beamtab
         
     def get_header_coord_arrays(self,hdr):
-
+        """
+        Get coordinate arrays from a FITS header
+        """
         y,x=self.spectralcube.spatial_coordinate_map
 
         x1=np.median(x[0:hdr['NAXIS2'],0:hdr['NAXIS1']],0).value
@@ -178,12 +305,17 @@ class kinms_fitter:
             
            
     def rms_estimate(self,cube,chanstart,chanend):
+        """
+        Estimate the RMS in the inner quarter of the datacube in a given channel range.
+        """
         quarterx=np.array(self.x1.size/4.).astype(np.int)
         quartery=np.array(self.y1.size/4.).astype(np.int)
         return np.nanstd(cube[quarterx*1:3*quarterx,1*quartery:3*quartery,chanstart:chanend])
         
     def from_fits_history(self, hdr):
         """
+        Get beam parameters if they happen to be in history keywords.
+        
         Stolen from radio_beam, with thanks!
         """
         # a line looks like
@@ -225,7 +357,9 @@ class kinms_fitter:
             return None,None,None
                         
     def read_primary_cube(self,cube):
-        
+        """
+        Wrapper method for reading in datacube.
+        """
         ### read in cube ###
         datacube,hdr,beamtab = self.read_in_a_cube(cube)
         
@@ -262,6 +396,9 @@ class kinms_fitter:
     
         
     def setup_params(self):
+        """
+        Setup the fit guesses, minima, maxima etc from the inputs.
+        """
         nums=np.arange(0,self.nrings)
                 
          
@@ -311,7 +448,9 @@ class kinms_fitter:
         
                      
     def clip_cube(self):
-        
+        """
+        Clip the input datacube to size.
+        """
         if self.spatial_trim == None:
             self.spatial_trim = [0, self.x1.size, 0, self.y1.size]
             
@@ -323,6 +462,9 @@ class kinms_fitter:
         
 
     def model_simple(self,param,fileName=''):
+        """
+        Function to create a model from the given input parameters.
+        """
         xc=param[0]
         yc=param[1]
         vsys=param[2]
@@ -357,6 +499,9 @@ class kinms_fitter:
             
         
     def mcmc_fit(self,initial_guesses,labels,minimums,maximums,fixed,priors,precision):
+        """
+        Function to run the MCMC fit.
+        """
         mcmc = gastimator(self.model_simple)
         
         mcmc.labels=labels
@@ -406,17 +551,23 @@ class kinms_fitter:
         return bestvals, besterrs, outputvalue, outputll    
 
     def simple_chi2(self,theargs,info):
-            model=self.model_simple(theargs)
-            chi2=np.nansum((self.cube-model)**2)/(np.nansum((self.error*self.chi2_correct_fac))**2)
-            if chi2==0:
-                chi2=10000000
-            if not self.silent:     
-                if info['Nfeval']%50 == 0:
-                    print("Steps:",info['Nfeval'],"chi2:",chi2)
-            info['Nfeval'] += 1 
-            return chi2
+        """
+        Likelihood function for the simple fit mode.
+        """
+        model=self.model_simple(theargs)
+        chi2=np.nansum((self.cube-model)**2)/(np.nansum((self.error*self.chi2_correct_fac))**2)
+        if chi2==0:
+            chi2=10000000
+        if not self.silent:     
+            if info['Nfeval']%50 == 0:
+                print("Steps:",info['Nfeval'],"chi2:",chi2)
+        info['Nfeval'] += 1 
+        return chi2
     
     def logo(self):
+        """
+        Returns the KinMS logo.
+        """
         return """
         ██╗  ██╗██╗███╗   ██╗███╗   ███╗███████╗
         ██║ ██╔╝██║████╗  ██║████╗ ████║██╔════╝
@@ -428,6 +579,9 @@ class kinms_fitter:
 
             
     def simple_fit(self,initial_guesses,labels,minimums,maximums,fixed):
+        """
+        Runs the simple fit.
+        """
         if self.chi2_var_correct & (self.chi2_correct_fac == None):
            self.chi2_correct_fac=(2*(self.mask_sum**0.25))
         
@@ -443,13 +597,18 @@ class kinms_fitter:
         return results 
 
     def plot(self,block=True,overcube=None,savepath=None,**kwargs):
+        """
+        Makes the plots.
+        """
         pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=self.rms,savepath=savepath,savename=self.pdf_rootname,**kwargs)
         pl.makeplots(block=block,plot2screen=self.show_plots)
         self.mask_sum=pl.mask.sum()
         return pl
     
     def write_text(self,bestvals, errup,errdown,units, fixed,runtime,mode,errors_warnings='None',fname="KinMS_fitter_output.txt"):
-        
+        """
+        Write output text files.
+        """
         
         t=Table([self.labels,bestvals,errup,errdown,units,fixed],names=('Quantity', 'Best-fit', '1sig Error-up', '1sig Error-down','Units','Fixed'))
 
@@ -485,6 +644,18 @@ class kinms_fitter:
         
             
     def run(self,method='mcmc',justplot=False,savepath='./',**kwargs):
+        """
+        Run the fit.
+
+        :param method: Type of fit to run.
+        :type method: string - choice of 'mcmc', 'simple' or 'both'.
+        :param justplot: Just show the initial model plot without fitting. Helpful for setting initial guesses.
+        :type justplot: bool
+        :param savepath: Path to append to saved files.
+        :type savepath: string
+        :param **kwargs: any additional keywords to pass to other methods.
+        """
+        
         method=method.lower()
         if (method!='mcmc')&(method!='both')&(method!='simple'):
             raise Exception('Method must be one of "mcmc", "simple", or "both"')

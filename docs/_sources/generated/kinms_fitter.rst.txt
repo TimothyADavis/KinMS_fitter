@@ -1,0 +1,5 @@
+﻿kinms_fitter
+============
+
+.. automodule:: kinms_fitter
+    :members:

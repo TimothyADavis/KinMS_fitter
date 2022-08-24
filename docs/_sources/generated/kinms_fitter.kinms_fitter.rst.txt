@@ -1,0 +1,38 @@
+kinms\_fitter.kinms\_fitter
+===========================
+
+.. currentmodule:: kinms_fitter
+
+.. autoclass:: kinms_fitter
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~kinms_fitter.__init__
+      ~kinms_fitter.clip_cube
+      ~kinms_fitter.colorbar
+      ~kinms_fitter.from_fits_history
+      ~kinms_fitter.get_header_coord_arrays
+      ~kinms_fitter.logo
+      ~kinms_fitter.mcmc_fit
+      ~kinms_fitter.model_simple
+      ~kinms_fitter.plot
+      ~kinms_fitter.read_in_a_cube
+      ~kinms_fitter.read_primary_cube
+      ~kinms_fitter.rms_estimate
+      ~kinms_fitter.run
+      ~kinms_fitter.setup_params
+      ~kinms_fitter.simple_chi2
+      ~kinms_fitter.simple_fit
+      ~kinms_fitter.write_text
+   
+   
+
+   
+   
+   

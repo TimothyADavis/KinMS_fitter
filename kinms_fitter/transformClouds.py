@@ -2,6 +2,8 @@ import numpy as np
 
 def transformClouds(inclouds, posAng = 90., inc = 0., cent = [0.,0.],sbRad=None):
     """
+    Transforms skySampler cloudlets for use in KinMS.
+    
     Calculate the galaxy co-ordinates of clouds from the sky plane. This MUST be used if any of the following conditions are true:
     inc != 0
     posAng != 90

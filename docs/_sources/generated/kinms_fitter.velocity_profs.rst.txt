@@ -1,0 +1,23 @@
+kinms\_fitter.velocity\_profs
+=============================
+
+.. currentmodule:: kinms_fitter
+
+.. autoclass:: velocity_profs
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~velocity_profs.__init__
+      ~velocity_profs.eval
+   
+   
+
+   
+   
+   

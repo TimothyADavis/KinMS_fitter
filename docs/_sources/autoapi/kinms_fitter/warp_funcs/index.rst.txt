@@ -1,0 +1,158 @@
+:py:mod:`kinms_fitter.warp_funcs`
+=================================
+
+.. py:module:: kinms_fitter.warp_funcs
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   kinms_fitter.warp_funcs.warp_funcs
+
+
+
+
+.. py:class:: warp_funcs
+
+   Creates position angle/inclination warps as a function of radius.
+
+   .. py:class:: linear(guesses, minimums, maximums, priors=None, precisions=None, fixed=None, labels_prefix='PA')
+
+      Creates a warp thats linear with radius (optionally: that also flattens after some radius).     
+
+      Inputs
+      ------
+      guesses : ndarray of float
+          Initial guesses. Two or three elements [Gradient, Intercept, (optionally Cutoff_Radius)]. Units of deg/arcsec, deg, (arcsec). 
+      minimums  : ndarray of float
+          Minimums for the given parameters.
+      maximums  : ndarray of float
+          Maximums for the given parameters.
+      priors : ndarray of objects
+          Optional- Priors for the given parameters (see GAStimator priors).
+      precisions : ndarray of float
+          Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]
+      fixed: ndarray of bool
+          Optional - Fix this parameter to the input value in guesses. [Default = All False]
+
+      .. py:method:: __repr__()
+
+         Return repr(self).
+
+
+      .. py:method:: __call__(x, args)
+
+         Returns the required warp profile.
+
+         Inputs
+         ------
+         x : ndarray of float
+             Input radial array in arcseconds
+         args : ndarray of float
+             Input arguments to evalue the profile with
+
+
+
+
+   .. py:class:: flat(guesses, minimums, maximums, priors=None, precisions=None, fixed=None, labels=['PA'], units=['deg'])
+
+      No warp- inc/PA flat with radius.     
+
+      Inputs
+      ------
+      guesses : ndarray of float
+          Initial guess. One element, units of degrees.
+      minimums  : ndarray of float
+          Minimums for the given parameters.
+      maximums  : ndarray of float
+          Maximums for the given parameters.
+      priors : ndarray of objects
+          Optional- Priors for the given parameters (see GAStimator priors).
+      precisions : ndarray of float
+          Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]
+      fixed: ndarray of bool
+          Optional - Fix this parameter to the input value in guesses. [Default = All False]
+
+      .. py:method:: __repr__()
+
+         Return repr(self).
+
+
+      .. py:method:: __call__(x, args)
+
+         Returns the required warp profile.
+
+         Inputs
+         ------
+         x : ndarray of float
+             Input radial array in arcseconds
+         args : ndarray of float
+             Input arguments to evalue the profile with
+
+
+
+
+   .. py:class:: tilted_rings(bincentroids, guesses, minimums, maximums, priors=None, precisions=None, fixed=None, labels_prefix='PA')
+
+      Arbitary warp using the tilted ring formalism. 
+
+      Inputs
+      ------
+      bincentroids: ndarray of float
+          Radii at which to constrain the profile. Linearly interpolated between these points.
+      guesses : ndarray of float
+          Initial guesses. Size of bincentroids, units of degrees.
+      minimums  : ndarray of float
+          Minimums for the given parameters.
+      maximums  : ndarray of float
+          Maximums for the given parameters.
+      priors : ndarray of objects
+          Optional- Priors for the given parameters (see GAStimator priors).
+      precisions : ndarray of float
+          Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]
+      fixed: ndarray of bool
+          Optional - Fix this parameter to the input value in guesses. [Default = All False]
+
+      .. py:method:: __repr__()
+
+         Return repr(self).
+
+
+      .. py:method:: __call__(x, args, **kwargs)
+
+         Returns the required warp profile.
+
+         Inputs
+         ------
+         x : ndarray of float
+             Input radial array in arcseconds
+         args : ndarray of float
+             Input arguments to evalue the profile with
+
+
+
+
+   .. py:method:: eval(r, params)
+
+      Evaluates a list of warp functions.
+
+      Inputs
+      ------
+      modellist : list of objects
+          List of warp_funcs objects, or objects that have the same methods/inputs.
+      r: ndarray of floats
+          Radius array, units of arcseconds.
+      params: ndarray of floats
+          Parameters to use in each model in the list.
+      Returns
+      -------
+      out : ndarray of floats
+          Output combined warp profile.
+
+
+

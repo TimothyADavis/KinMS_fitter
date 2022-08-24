@@ -4,10 +4,29 @@ import numpy as np
 from pprint import pformat
 
 class warp_funcs:
+    """
+    Creates position angle/inclination warps as a function of radius.
+    """
     def __init__(self):
         pass    
     
     def eval(modellist,r,params):    
+        """
+        Evaluates a list of warp functions.
+        
+        Inputs
+        ------
+        modellist : list of objects
+            List of warp_funcs objects, or objects that have the same methods/inputs.
+        r: ndarray of floats
+            Radius array, units of arcseconds.
+        params: ndarray of floats
+            Parameters to use in each model in the list.
+        Returns
+        -------
+        out : ndarray of floats
+            Output combined warp profile.
+        """
         indices=np.append(np.array([0]),np.cumsum([i.freeparams for i in modellist]))
         operations=[i.operation for i in modellist]
         out=np.zeros(r.size)
@@ -22,6 +41,24 @@ class warp_funcs:
         return out
 
     class linear:  
+        """
+        Creates a warp thats linear with radius (optionally: that also flattens after some radius).     
+        
+        Inputs
+        ------
+        guesses : ndarray of float
+            Initial guesses. Two or three elements [Gradient, Intercept, (optionally Cutoff_Radius)]. Units of deg/arcsec, deg, (arcsec). 
+        minimums  : ndarray of float
+            Minimums for the given parameters.
+        maximums  : ndarray of float
+            Maximums for the given parameters.
+        priors : ndarray of objects
+            Optional- Priors for the given parameters (see GAStimator priors).
+        precisions : ndarray of float
+            Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]
+        fixed: ndarray of bool
+            Optional - Fix this parameter to the input value in guesses. [Default = All False]
+        """
         def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None,labels_prefix='PA'):
             self.guess=np.array(guesses)
             if self.guess.size == 2:
@@ -60,13 +97,42 @@ class warp_funcs:
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
                     
         def __call__(self,x,args):
-                out=args[0]*x + args[1]
-                if self.freeparams==3:
-                    out[x>args[2]]=args[0]*args[2] + args[1]
-                return out
+            """
+            Returns the required warp profile.
+            
+            Inputs
+            ------
+            x : ndarray of float
+                Input radial array in arcseconds
+            args : ndarray of float
+                Input arguments to evalue the profile with
+            
+            """
+            out=args[0]*x + args[1]
+            if self.freeparams==3:
+                out[x>args[2]]=args[0]*args[2] + args[1]
+            return out
             
     
     class flat:  
+        """
+        No warp- inc/PA flat with radius.     
+        
+        Inputs
+        ------
+        guesses : ndarray of float
+            Initial guess. One element, units of degrees.
+        minimums  : ndarray of float
+            Minimums for the given parameters.
+        maximums  : ndarray of float
+            Maximums for the given parameters.
+        priors : ndarray of objects
+            Optional- Priors for the given parameters (see GAStimator priors).
+        precisions : ndarray of float
+            Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]
+        fixed: ndarray of bool
+            Optional - Fix this parameter to the input value in guesses. [Default = All False]
+        """
         def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None,labels=['PA'],units=['deg']):
             self.guess=np.array([guesses])
             if self.guess.size == 1:
@@ -99,9 +165,40 @@ class warp_funcs:
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
                     
         def __call__(self,x,args):
-                return args[0]
+            """
+            Returns the required warp profile.
+            
+            Inputs
+            ------
+            x : ndarray of float
+                Input radial array in arcseconds
+            args : ndarray of float
+                Input arguments to evalue the profile with
+            
+            """
+            return args[0]
 
     class tilted_rings:  
+        """
+        Arbitary warp using the tilted ring formalism. 
+        
+        Inputs
+        ------
+        bincentroids: ndarray of float
+            Radii at which to constrain the profile. Linearly interpolated between these points.
+        guesses : ndarray of float
+            Initial guesses. Size of bincentroids, units of degrees.
+        minimums  : ndarray of float
+            Minimums for the given parameters.
+        maximums  : ndarray of float
+            Maximums for the given parameters.
+        priors : ndarray of objects
+            Optional- Priors for the given parameters (see GAStimator priors).
+        precisions : ndarray of float
+            Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]
+        fixed: ndarray of bool
+            Optional - Fix this parameter to the input value in guesses. [Default = All False]
+        """
         def __init__(self,bincentroids,guesses,minimums,maximums,priors=None,precisions=None,fixed=None,labels_prefix='PA'):
             self.freeparams=bincentroids.size
             self.bincentroids=bincentroids
@@ -133,5 +230,15 @@ class warp_funcs:
             keys=['labels','min','max','fixed']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
         def __call__(self,x,args,**kwargs):
-            ## return the velocity 
+            """
+            Returns the required warp profile.
+            
+            Inputs
+            ------
+            x : ndarray of float
+                Input radial array in arcseconds
+            args : ndarray of float
+                Input arguments to evalue the profile with
+            
+            """
             return np.interp(x,self.bincentroids,args)            

@@ -4,6 +4,9 @@ import numpy as np
 from pprint import pformat
 
 class prior_funcs:
+    """
+    Priors for use in KinMS_fitter.
+    """
     def __init__():
         pass
     

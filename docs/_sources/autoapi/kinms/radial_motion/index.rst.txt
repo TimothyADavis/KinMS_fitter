@@ -1,0 +1,40 @@
+:py:mod:`kinms.radial_motion`
+=============================
+
+.. py:module:: kinms.radial_motion
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   kinms.radial_motion.radial_motion
+
+
+
+
+.. py:class:: radial_motion
+
+   .. py:class:: bisymmetric_flow(radius, v2t, v2r, phib)
+
+      .. py:method:: __call__(r_flatv, theta, inc_rad)
+
+
+
+   .. py:class:: lopsided_flow(radius, v1t, v1r, phib)
+
+      .. py:method:: __call__(r_flatv, theta, inc_rad)
+
+
+
+   .. py:class:: pure_radial(radius, vradial)
+
+      .. py:method:: __call__(r_flatv, theta, inc_rad)
+
+
+
+

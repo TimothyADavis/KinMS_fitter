@@ -1,0 +1,6 @@
+kinms\_fitter.transformClouds
+=============================
+
+.. currentmodule:: kinms_fitter
+
+.. autofunction:: transformClouds

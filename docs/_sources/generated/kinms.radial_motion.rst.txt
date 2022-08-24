@@ -1,0 +1,22 @@
+kinms.radial\_motion
+====================
+
+.. currentmodule:: kinms
+
+.. autoclass:: radial_motion
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~radial_motion.__init__
+   
+   
+
+   
+   
+   

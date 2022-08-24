@@ -1,0 +1,31 @@
+.. KinMS_fitter documentation master file, created by
+   sphinx-quickstart on Tue Aug  9 11:34:15 2022.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+KinMS API documentation
+========================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+KinMS_fitter is a wrapper for KinMSpy that automates most common galaxy fitting tasks, and has a flexible interface for defining surface brightness/velocity profile functions.
+
+
+Contents
+--------
+
+.. toctree::
+
+   install
+   tutorials
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
