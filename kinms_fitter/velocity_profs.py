@@ -641,8 +641,8 @@ class velocity_profs:
             self.freeparams=2
             self.hubbleparam=hubbleconst
             self.operation="quad"
-            self.labels=['M200','c']
-            self.units=['log_Msun','unitless']
+            self.labels=['M200','log_c']
+            self.units=['log_Msun','log unitless']
             self.distance=distance
             self.minimums=np.array(minimums)
             self.maximums=np.array(maximums)
@@ -681,7 +681,7 @@ class velocity_profs:
             
             """
             r=self.distance*4.84e-3*xs
-            c=theargs[1]
+            c=10**theargs[1]
             m200=10**theargs[0]
             r200=10*(((4.301e-3*m200)/(100*(self.hubbleparam**2)))**(1/3))
             v200=r200*(self.hubbleparam/100)

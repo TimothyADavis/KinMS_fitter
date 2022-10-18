@@ -194,7 +194,7 @@ class kinms_fitter:
         self.show_corner= True
         self.totflux_guess=np.nansum(self.cube)
         self.expscale_guess=self.maxextent/5.
-        self.inc_guess=45.
+        self.inc_guess=60.
         self.velDisp_guess=8.
         self.velDisp_range=np.array([0,50])
         self.inc_range=np.array([1,89])
@@ -489,9 +489,7 @@ class kinms_fitter:
             radmotion=self.radial_motion[0](self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_velvars+self.n_sbvars:])
         else:
             radmotion=None
-        
-        
-        new=self.kinms_instance.model_cube(inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self._xc_img,dec=(phasecen[1]/3600.)+self._yc_img,fileName=fileName,bunit=self.bunit,**myargs)
+        new=self.kinms_instance.model_cube(inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self._xc_img,dec=(phasecen[1]/3600.)+self._yc_img,fileName=fileName,bunit=self.bunit,**myargs,toplot=False)
         #old=KinMSold(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],inc,nSamps=self.nSamps,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self._xc_img,dec=(phasecen[1]/3600.)+self._yc_img,fileName=fileName,bunit=self.bunit,**myargs,verbose=True).model_cube(toplot=True)
 
         return new
@@ -558,6 +556,7 @@ class kinms_fitter:
         chi2=np.nansum((self.cube-model)**2)/(np.nansum((self.error*self.chi2_correct_fac))**2)
         if chi2==0:
             chi2=10000000
+            breakpoint()
         if not self.silent:     
             if info['Nfeval']%50 == 0:
                 print("Steps:",info['Nfeval'],"chi2:",chi2)
@@ -589,7 +588,7 @@ class kinms_fitter:
         maximums[fixed]=initial_guesses[fixed]
         
         self.bounds = Bounds(minimums, maximums,keep_feasible=True)
-
+        
         res = minimize(self.simple_chi2, initial_guesses, args={'Nfeval':0},method ='Powell' ,bounds=self.bounds, options={'disp': True,'adaptive':True,'maxfev':self.niters,'maxiter':self.niters,'ftol':self.tolerance}) 
         
         results=res.x
@@ -667,7 +666,10 @@ class kinms_fitter:
         self.yc_guess=(self.yc_guess-self._yc_img)*3600.
         self.xcent_range=(np.array(self.xcent_range)-self._xc_img)*3600.
         self.ycent_range=(np.array(self.ycent_range)-self._yc_img)*3600.
-        
+        if np.any(self.initial_guesses != None):
+            self.initial_guesses[0]=(self.initial_guesses[0]-self._xc_img)*3600.
+            self.initial_guesses[1]=(self.initial_guesses[1]-self._yc_img)*3600.
+
         if np.any(self.inc_profile) == None:
             self.inc_profile=[warp_funcs.flat(self.inc_guess,self.inc_range[0],self.inc_range[1],priors=self.inc_prior,fixed=[self.inc_range[1]==self.inc_range[0]],labels='inc',units='deg')]
         self.n_incvars = np.sum([i.freeparams for i in self.inc_profile])
@@ -682,6 +684,7 @@ class kinms_fitter:
         
         if len(self.skySampClouds) >0:
             self.n_sbvars = 0
+            self.nSamps=self.skySampClouds.shape[0]
         else:
             self.n_sbvars = np.sum([i.freeparams for i in self.sb_profile])
          
