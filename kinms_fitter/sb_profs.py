@@ -245,3 +245,77 @@ class sb_profs:
             
             """
             return ~((x>=args[0])&(x<args[1]))
+            
+    class mod_sersic:  
+        """
+        Creates an "modified sersic" surface brightness profile. This profile seemlessly morphs
+        between an exponential disc at n=1, a gaussian at n=2, and can be made to peak at any
+        given radius, falling off either side.      
+        
+        Inputs
+        ------
+        guesses : ndarray of float
+            Initial guesses. If a two elements, then the gaussian profile is normalised (peak=1). If three elements then elements should be ['PeakFlux_gauss','Mean_gauss','sigma_gauss']. Units of mean/sigma are arcsec.
+        minimums  : ndarray of float
+            Minimums for the given parameters.
+        maximums  : ndarray of float
+            Maximums for the given parameters.
+        priors : ndarray of objects
+            Optional- Priors for the given parameters (see GAStimator priors).
+        precisions : ndarray of float
+            Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]
+        fixed: ndarray of bool
+            Optional - Fix this parameter to the input value in guesses. [Default = All False]
+        """
+        def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
+            self.guess=np.array(guesses)
+            if self.guess.size == 3:
+                self.freeparams=3
+                self.labels=['mean_modsersic','sigma_modsersic','index_modsersic']
+                self.units=['arcsec','arcsec','arbitary']
+            else:
+                if self.guess.size == 4:
+                    self.freeparams=4
+                    self.labels=['peak_modsersic','mean_modsersic','sigma_modsersic','index_modsersic']
+                    self.units=['arbitary','arcsec','arcsec','arbitary']
+                else:
+                    raise('Wrong number of guesses, expected three or four [(optionally peak_modsersic),mean_modsersic,sigma_modsersic,index_modsersic]')
+                    
+            self.min=np.array(minimums)
+            self.max=np.array(maximums)
+            self.operation='add'
+        
+            if np.any(fixed) == None:
+                self.fixed=np.resize(False,self.freeparams)
+            else:
+                self.fixed=fixed
+        
+            if np.any(priors) == None:
+                self.priors=np.resize(None,self.freeparams)
+            else:
+                self.priors=priors
+                    
+            if np.any(precisions) == None:
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
+            else:
+                self.precisions=precisions
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
+                 
+        def __call__(self,x,args):
+            """
+            Returns the required profile.
+            
+            Inputs
+            ------
+            x : ndarray of float
+                Input radial array in arcseconds
+            args : ndarray of float
+                Input arguments to evalue the profile with
+            
+            """
+            if self.freeparams==3:
+                args=np.append(1,args)
+            #z = (x - args[1]) / args[2]
+            return args[0]*np.exp(-(np.abs(x-args[1])**args[3]/((args[2])**args[3])))            

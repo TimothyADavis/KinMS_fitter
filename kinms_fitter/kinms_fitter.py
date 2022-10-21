@@ -556,7 +556,7 @@ class kinms_fitter:
         chi2=np.nansum((self.cube-model)**2)/(np.nansum((self.error*self.chi2_correct_fac))**2)
         if chi2==0:
             chi2=10000000
-            breakpoint()
+            #breakpoint()
         if not self.silent:     
             if info['Nfeval']%50 == 0:
                 print("Steps:",info['Nfeval'],"chi2:",chi2)
