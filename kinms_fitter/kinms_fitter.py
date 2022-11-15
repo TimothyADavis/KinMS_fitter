@@ -529,7 +529,7 @@ class kinms_fitter:
     
         
         if self.chi2_var_correct & (self.chi2_correct_fac == None):
-           self.chi2_correct_fac=(2*(self.mask_sum**0.25))
+           self.chi2_correct_fac=((2*self.mask_sum)**0.25)
 
         if not self.chi2_var_correct:
             self.chi2_correct_fac=1
