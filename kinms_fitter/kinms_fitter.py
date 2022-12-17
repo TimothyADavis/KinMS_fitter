@@ -489,7 +489,7 @@ class kinms_fitter:
             radmotion=self.radial_motion[0](self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_velvars+self.n_sbvars:])
         else:
             radmotion=None
-        new=self.kinms_instance.model_cube(inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self._xc_img,dec=(phasecen[1]/3600.)+self._yc_img,fileName=fileName,bunit=self.bunit,**myargs,toplot=False)
+        new=self.kinms_instance.model_cube(inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=self._xc_img,dec=self._yc_img,fileName=fileName,bunit=self.bunit,**myargs,toplot=False)
         #old=KinMSold(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],inc,nSamps=self.nSamps,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self._xc_img,dec=(phasecen[1]/3600.)+self._yc_img,fileName=fileName,bunit=self.bunit,**myargs,verbose=True).model_cube(toplot=True)
 
         return new
