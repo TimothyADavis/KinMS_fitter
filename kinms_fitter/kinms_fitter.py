@@ -176,8 +176,8 @@ class kinms_fitter:
         self.cube =self.read_primary_cube(filename)
         self.spatial_trim=spatial_trim
         self.clip_cube()
-        self._xc_img=np.nanmedian(self.x1)
-        self._yc_img=np.nanmedian(self.y1)
+        self._xc_img=self.x1[self.x1.size//2]
+        self._yc_img=self.y1[self.y1.size//2]
         self.xc_guess=np.nanmedian(self.x1)
         self.yc_guess=np.nanmedian(self.y1)
         self.vsys_guess=np.nanmedian(self.v1)
@@ -775,9 +775,10 @@ class kinms_fitter:
             else:
                 fileName=''
             best_model=self.model_simple(bestvals,fileName=fileName)
-            
-            bestvals[0]=(bestvals[0]/3600.)+self._xc_img
-            bestvals[1]=(bestvals[1]/3600.)+self._yc_img
+            bestvals[0]=np.interp(self.x1.size//2 + (bestvals[0]/self.cellsize),np.arange(0,self.x1.size),self.x1)
+            bestvals[1]=np.interp(self.y1.size//2 + (bestvals[1]/self.cellsize),np.arange(0,self.y1.size),self.y1)
+            #(bestvals[1]/3600.)+self._yc_img
+            #(-bestvals[0]/3600.)+self._xc_img
             
             if (method=='mcmc'):
                 besterrs[0]=besterrs[0]/3600.
