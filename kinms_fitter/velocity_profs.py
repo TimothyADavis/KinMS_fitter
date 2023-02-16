@@ -261,6 +261,100 @@ class velocity_profs:
             else:
                 bhmass=args[1]    
             return mge_vcirc(self.surf*args[0], self.sigma, self.qobs, np.clip(kwargs['inc'],self.mininc,90), 10**bhmass, self.distance, x)               
+    class mge_vcirc_mlvar:  
+        """
+        Evaulate an MGE model of the potential, with or without a central point mass.  
+        
+        Inputs
+        ------
+        surf : ndarray of float
+            Luminosity of each gaussian component, units of Lsun.
+        sigma : ndarray of float
+            Width of each gaussian, units of arcsec.
+        qobs : ndarray of float
+            Axial ratio of each gaussian.
+        distance: ndarray of float
+            Distance to the object in Mpc.
+        guesses : ndarray of float
+            Initial guesses. One or two elements [M/L and optionally log10_CentralMass in Msun].
+        minimums  : ndarray of float
+            Minimums for the given parameter.
+        maximums  : ndarray of float
+            Maximums for the given parameter.
+        priors : ndarray of objects
+            Optional- Priors for the given parameter (see GAStimator priors).
+        precisions : ndarray of float
+            Optional - Precision you want to reach for the given parameter. [Default = 10 percent of range]
+        fixed: ndarray of bool
+            Optional - Fix this parameter to the input value in guesses. [Default = False]
+        """
+        def __init__(self,surf,sigma,qobs,distance,guesses,minimums,maximums,priors=None,precisions=None,fixed=None,mbh_included=False):
+            self.guess=np.array(guesses)
+            self.operation="quad"
+            self.freeparams=len(guesses)
+            self.labels=[]
+            if mbh_included:
+                for i in range(0,len(guesses)-1):
+                    self.labels.append('M/L'+str(i))
+                self.labels.append('logMBH')
+                self.units=(['Msun/Lsun']*(len(guesses)-1))+['log_Msun']
+                self.lastmlindex=len(guesses)-1
+            else:
+                for i in range(0,len(guesses)):
+                    self.labels.append('M/L'+str(i))
+                self.units=(['Msun/Lsun']*(len(guesses)))
+                self.lastmlindex=len(guesses)
+            #breakpoint()    
+            if (self.freeparams == len(surf))or (self.freeparams == len(surf)+1):
+                pass
+            else:
+                raise('Wrong number of guesses, expected an M/L per gaussian component (and optionally logBHmass)')    
+                
+            self.distance=distance
+            self.surf=surf
+            self.sigma=sigma
+            self.qobs=qobs
+            self.mininc=np.max(np.rad2deg(np.arccos(qobs-0.05)))
+            self.min=np.array(minimums)
+            self.max=np.array(maximums)
+            
+
+            if np.any(fixed) == None:
+                self.fixed=np.resize(False,self.freeparams)
+            else:
+                self.fixed=fixed
+            
+            if np.any(priors) == None:
+                self.priors=np.resize(None,self.freeparams)
+            else:
+                self.priors=priors
+                        
+            if np.any(precisions) == None:
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
+            else:
+                self.precisions=precisions
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
+        def __call__(self,x,args,**kwargs):
+            """
+            Returns the required profile.
+            
+            Inputs
+            ------
+            x : ndarray of float
+                Input radial array in arcseconds
+            args : ndarray of float
+                Input arguments to evalue the profile with
+            
+            """
+            if self.lastmlindex==len(args):
+                bhmass=0
+            else:
+                bhmass=args[-1]    
+                
+                
+            return mge_vcirc(self.surf*args[0:self.lastmlindex], self.sigma, self.qobs, np.clip(kwargs['inc'],self.mininc,90), 10**bhmass, self.distance, x)               
 
     # class mge_vcirc_innerml:
     #     def __init__(self,surf,sigma,qobs,distance,guesses,minimums,maximums,ninner=1,priors=None,precisions=None,fixed=None):
