@@ -184,7 +184,7 @@ class kinms_fitter:
         self.vsys_mid=np.nanmedian(self.v1)
         self.skySampClouds=np.array([])
         self.maxextent=np.max([np.max(np.abs(self.x1-self._xc_img)),np.max(np.abs(self.y1-self._yc_img))])*3600.
-        self.nrings=np.floor(self.maxextent/self.bmaj).astype(np.int)
+        self.nrings=np.floor(self.maxextent/self.bmaj).astype(int)
         self.vel_guess= np.nanstd(self.v1)
         self.cellsize=np.abs(self.hdr['CDELT1']*3600)
         self.nprocesses=None
@@ -207,7 +207,7 @@ class kinms_fitter:
         self.vel_range=np.array([0,(np.nanmax(self.v1)-np.nanmin(self.v1))/2.])
         self.sbRad=np.arange(0,self.maxextent*2,self.cellsize/3.)
         self.output_initial_model=False
-        self.nSamps=np.int(5e5)
+        self.nSamps=int(5e5)
         self.sb_profile=None
         self.radial_motion=None
         self.vel_profile=None
@@ -308,8 +308,8 @@ class kinms_fitter:
         """
         Estimate the RMS in the inner quarter of the datacube in a given channel range.
         """
-        quarterx=np.array(self.x1.size/4.).astype(np.int)
-        quartery=np.array(self.y1.size/4.).astype(np.int)
+        quarterx=np.array(self.x1.size/4.).astype(int)
+        quartery=np.array(self.y1.size/4.).astype(int)
         return np.nanstd(cube[quarterx*1:3*quarterx,1*quartery:3*quartery,chanstart:chanend])
         
     def from_fits_history(self, hdr):
@@ -516,7 +516,7 @@ class kinms_fitter:
             mcmc.lnlike_func=self.lnlike_func
         
         if self.nprocesses == None:
-            cpucount = np.int(cpu_count())-1
+            cpucount = int(cpu_count())-1
             mcmc.nprocesses = np.clip(np.floor(self.niters/1250),1,cpucount).astype(int)
         else:
             mcmc.nprocesses= int(self.nprocesses)
@@ -702,6 +702,7 @@ class kinms_fitter:
         
         
         initial_guesses,labels,minimums,maximums,fixed, priors,precision,units = self.setup_params()
+        
         central_inc_guess=warp_funcs.eval(self.inc_profile,np.array([0]),initial_guesses[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
         if central_inc_guess < 87: 
             inc_multfac= (1/np.cos(np.deg2rad(central_inc_guess)))
