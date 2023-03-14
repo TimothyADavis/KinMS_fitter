@@ -10,6 +10,7 @@ from scipy.optimize import Bounds
 from scipy.optimize import minimize
 import matplotlib
 import warnings
+from astropy.coordinates import SkyCoord
 from joblib import cpu_count 
 import matplotlib.gridspec as gridspec
 from matplotlib.offsetbox import AnchoredText
@@ -26,7 +27,7 @@ import time
 from spectral_cube import SpectralCube
 from spectral_cube.utils import SpectralCubeWarning
 warnings.filterwarnings(action='ignore', category=SpectralCubeWarning, append=True)
-         
+     
 class kinms_fitter:
     """
     Wrapper for easily kinematically modelling datacubes (typically from ALMA or VLA) using KinMS.
@@ -176,14 +177,15 @@ class kinms_fitter:
         self.cube =self.read_primary_cube(filename)
         self.spatial_trim=spatial_trim
         self.clip_cube()
-        self._xc_img=self.x1[self.x1.size//2]
-        self._yc_img=self.y1[self.y1.size//2]
-        self.xc_guess=np.nanmedian(self.x1)
-        self.yc_guess=np.nanmedian(self.y1)
+        _centskycoord=self.spectralcube_trimmed.wcs.celestial.pixel_to_world(self.x1.size//2,self.y1.size//2).transform_to('icrs')
+        self._xc_img=_centskycoord.ra.value
+        self._yc_img=_centskycoord.dec.value
+        self.xc_guess=_centskycoord.ra.value
+        self.yc_guess=_centskycoord.dec.value
         self.vsys_guess=np.nanmedian(self.v1)
         self.vsys_mid=np.nanmedian(self.v1)
         self.skySampClouds=np.array([])
-        self.maxextent=np.max([np.max(np.abs(self.x1-self._xc_img)),np.max(np.abs(self.y1-self._yc_img))])*3600.
+        self.maxextent=np.max([np.max(np.abs(self.x1)),np.max(np.abs(self.y1))])
         self.nrings=np.floor(self.maxextent/self.bmaj).astype(int)
         self.vel_guess= np.nanstd(self.v1)
         self.cellsize=np.abs(self.hdr['CDELT1']*3600)
@@ -200,8 +202,11 @@ class kinms_fitter:
         self.inc_range=np.array([1,89])
         self.expscale_range=np.array([0,self.maxextent])
         self.totflux_range=np.array([0,np.nansum(self.cube)*3.])
-        self.xcent_range=np.array([np.min(self.x1),np.max(self.x1)])
-        self.ycent_range=np.array([np.min(self.y1),np.max(self.y1)])
+        xcent_range=np.array([np.min(self.x1),np.max(self.x1)])
+        ycent_range=np.array([np.min(self.y1),np.max(self.y1)])
+        smallest_dim=np.min([np.diff(xcent_range)[0],np.diff(ycent_range)[0]])
+        self.xcent_range=(np.array([-smallest_dim/2,smallest_dim/2])/3600.)+self._xc_img
+        self.ycent_range=(np.array([-smallest_dim/2,smallest_dim/2])/3600.)+self._yc_img
         self.pa_range=np.array([0,360])
         self.vsys_range=np.array([np.nanmin(self.v1),np.nanmax(self.v1)])
         self.vel_range=np.array([0,(np.nanmax(self.v1)-np.nanmin(self.v1))/2.])
@@ -287,22 +292,72 @@ class kinms_fitter:
         """
         Get coordinate arrays from a FITS header
         """
-        y,x=self.spectralcube.spatial_coordinate_map
-
-        x1=np.median(x[0:hdr['NAXIS2'],0:hdr['NAXIS1']],0).value
-        y1=np.median(y[0:hdr['NAXIS2'],0:hdr['NAXIS1']],1).value
+        #y,x=self.spectralcube.spatial_coordinate_map
+        cd1=self.spectralcube.wcs.pixel_scale_matrix[0,0]*3600
+        cd2=self.spectralcube.wcs.pixel_scale_matrix[1,1]*3600
+        x1=((np.arange(0,hdr['NAXIS1'])-(hdr['NAXIS1']//2))*cd1)# + hdr['CRVAL1']
+        y1=((np.arange(0,hdr['NAXIS2'])-(hdr['NAXIS1']//2))*cd2)# + hdr['CRVAL2']
+        
+        #x1=np.median(x[0:hdr['NAXIS2'],0:hdr['NAXIS1']],0).value
+        #y1=np.median(y[0:hdr['NAXIS2'],0:hdr['NAXIS1']],1).value
         v1=self.spectralcube.spectral_axis.value
 
         cd3= np.median(np.diff(v1))
-        cd1= np.median(np.diff(x1))
-        
-        if np.any(np.diff(x1) > 359):
-            # we have RA=0 wrap issue
-            x1[x1 > 180]-=360
-            
-            
+        #cd1= np.median(np.diff(x1))
+        # if np.any(x1 < 0):
+        #     # we have RA=0 wrap issue
+        #     x1+=360
+        #
+        # if np.any(np.diff(x1) > 359):
+        #     # we have RA=0 wrap issue
+        #     x1[x1 > 180]-=360
+ 
+
+
         return x1,y1,v1,np.abs(cd1*3600),cd3
+    # def get_header_coord_arrays_simp(self,hdr):
+    #    try:
+    #        cd1=hdr['CDELT1']
+    #        cd2=hdr['CDELT2']
+    #
+    #    except:
+    #        cd1=hdr['CD1_1']
+    #        cd2=hdr['CD2_2']
+    #
+    #    #cd1=(cd1/np.cos(np.deg2rad(hdr['CRVAL2'])))
+    #
+    #    x1=((np.arange(0,hdr['NAXIS1'])-(hdr['CRPIX1']-1))*cd1) + hdr['CRVAL1']
+    #    y1=((np.arange(0,hdr['NAXIS2'])-(hdr['CRPIX2']-1))*cd2) + hdr['CRVAL2']
+    #
+    #    try:
+    #        cd3=hdr['CDELT3']
+    #    except:
+    #        cd3=hdr['CD3_3']
+    #
+    #
+    #    if (hdr['CTYPE3'] =='VRAD') or (hdr['CTYPE3'] =='VELO-LSR'):
+    #        v1=((np.arange(0,hdr['NAXIS3'])-(hdr['CRPIX3']-1))*cd3) + hdr['CRVAL3']
+    #        try:
+    #            if hdr['CUNIT3']=='m/s':
+    #                 v1/=1e3
+    #                 cd3/=1e3
+    #        except:
+    #             if np.max(v1) > 1e5:
+    #                 v1/=1e3
+    #                 cd3/=1e3
+    #    else:
+    #        f1=(((np.arange(0,hdr['NAXIS3'])-(hdr['CRPIX3']-1))*cd3) + hdr['CRVAL3'])*u.Hz
+    #        try:
+    #            restfreq = hdr['RESTFRQ']*u.Hz
+    #        except:
+    #            restfreq = hdr['RESTFREQ']*u.Hz
+    #        v1=f1.to(u.km/u.s, equivalencies=u.doppler_radio(restfreq))
+    #        v1=v1.value
+    #        cd3= v1[1]-v1[0]
+    #    return x1,y1,v1,np.abs(cd2*3600),cd3
             
+            
+        return x1,y1,v1,np.abs(cd1*3600),cd3        
            
     def rms_estimate(self,cube,chanstart,chanend):
         """
@@ -442,7 +497,7 @@ class kinms_fitter:
             units=np.append(units,np.concatenate([i.units for i in list_vars]))
             
         if np.any(self.initial_guesses != None):
-            initial_guesses= self.initial_guesses
+            initial_guesses= np.array(self.initial_guesses)
         
         return initial_guesses,labels,minimums,maximums,fixed, priors,precision,units
         
@@ -459,7 +514,7 @@ class kinms_fitter:
         self.x1=self.x1[self.spatial_trim[0]:self.spatial_trim[1]]
         self.y1=self.y1[self.spatial_trim[2]:self.spatial_trim[3]]
         self.v1=self.v1[self.chans2do[0]:self.chans2do[1]]
-        
+        self.spectralcube_trimmed=self.spectralcube[self.chans2do[0]:self.chans2do[1],self.spatial_trim[2]:self.spatial_trim[3],self.spatial_trim[0]:self.spatial_trim[1]]
 
     def model_simple(self,param,fileName=''):
         """
@@ -489,8 +544,9 @@ class kinms_fitter:
             radmotion=self.radial_motion[0](self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_velvars+self.n_sbvars:])
         else:
             radmotion=None
+            
         new=self.kinms_instance.model_cube(inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=self._xc_img,dec=self._yc_img,fileName=fileName,bunit=self.bunit,**myargs,toplot=False)
-        #old=KinMSold(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],inc,nSamps=self.nSamps,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=(phasecen[0]/3600.)+self._xc_img,dec=(phasecen[1]/3600.)+self._yc_img,fileName=fileName,bunit=self.bunit,**myargs,verbose=True).model_cube(toplot=True)
+    
 
         return new
 
@@ -540,7 +596,7 @@ class kinms_fitter:
             else:
                 print("Correction for chi-sqr variance not applied")    
         
-        
+
         outputvalue, outputll= mcmc.run(self.cube,self.error*self.chi2_correct_fac,self.niters,nchains=1,plot=False)
 
         bestvals=np.median(outputvalue,1)    
@@ -556,7 +612,6 @@ class kinms_fitter:
         chi2=np.nansum((self.cube-model)**2)/(np.nansum((self.error*self.chi2_correct_fac))**2)
         if chi2==0:
             chi2=10000000
-            #breakpoint()
         if not self.silent:     
             if info['Nfeval']%50 == 0:
                 print("Steps:",info['Nfeval'],"chi2:",chi2)
@@ -582,8 +637,8 @@ class kinms_fitter:
         Runs the simple fit.
         """
         if self.chi2_var_correct & (self.chi2_correct_fac == None):
-           self.chi2_correct_fac=(2*(self.mask_sum**0.25))
-        
+           self.chi2_correct_fac=(((2*self.mask_sum)**0.25))
+
         minimums[fixed]=initial_guesses[fixed]
         maximums[fixed]=initial_guesses[fixed]
         
@@ -662,14 +717,24 @@ class kinms_fitter:
         self.error=self.rms
         self.errors_warnings=[]
         ### set up offset coordinates
-        self.xc_guess=(self.xc_guess-self._xc_img)*3600.
-        self.yc_guess=(self.yc_guess-self._yc_img)*3600.
+        
         self.xcent_range=(np.array(self.xcent_range)-self._xc_img)*3600.
         self.ycent_range=(np.array(self.ycent_range)-self._yc_img)*3600.
         if np.any(self.initial_guesses != None):
-            self.initial_guesses[0]=(self.initial_guesses[0]-self._xc_img)*3600.
-            self.initial_guesses[1]=(self.initial_guesses[1]-self._yc_img)*3600.
-
+            self.xc_guess=self.initial_guesses[0]
+            self.yc_guess=self.initial_guesses[1]
+            
+        newcoord = SkyCoord(self.xc_guess,self.yc_guess, unit="deg")
+        centcoord = SkyCoord(self._xc_img,self._yc_img, unit="deg")
+        dra, ddec = centcoord.spherical_offsets_to(newcoord)
+        self.xc_guess=-dra.to(u.arcsec).value
+        self.yc_guess=ddec.to(u.arcsec).value
+        print(self.xc_guess,self.yc_guess)
+        if np.any(self.initial_guesses != None):
+            self.initial_guesses[0]=self.xc_guess
+            self.initial_guesses[1]=self.yc_guess
+        #breakpoint()   
+         
         if np.any(self.inc_profile) == None:
             self.inc_profile=[warp_funcs.flat(self.inc_guess,self.inc_range[0],self.inc_range[1],priors=self.inc_prior,fixed=[self.inc_range[1]==self.inc_range[0]],labels='inc',units='deg')]
         self.n_incvars = np.sum([i.freeparams for i in self.inc_profile])
@@ -702,7 +767,7 @@ class kinms_fitter:
         
         
         initial_guesses,labels,minimums,maximums,fixed, priors,precision,units = self.setup_params()
-        
+        #breakpoint()
         central_inc_guess=warp_funcs.eval(self.inc_profile,np.array([0]),initial_guesses[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
         if central_inc_guess < 87: 
             inc_multfac= (1/np.cos(np.deg2rad(central_inc_guess)))
@@ -776,10 +841,10 @@ class kinms_fitter:
             else:
                 fileName=''
             best_model=self.model_simple(bestvals,fileName=fileName)
-            bestvals[0]=np.interp(self.x1.size//2 + (bestvals[0]/self.cellsize),np.arange(0,self.x1.size),self.x1)
-            bestvals[1]=np.interp(self.y1.size//2 + (bestvals[1]/self.cellsize),np.arange(0,self.y1.size),self.y1)
-            #(bestvals[1]/3600.)+self._yc_img
-            #(-bestvals[0]/3600.)+self._xc_img
+            
+            cent=self.spectralcube_trimmed.wcs.celestial.pixel_to_world(self.x1.size//2 + (bestvals[0]/self.cellsize),self.y1.size//2 + (bestvals[1]/self.cellsize))
+            bestvals[0]=cent.ra.value
+            bestvals[1]=cent.dec.value
             
             if (method=='mcmc'):
                 besterrs[0]=besterrs[0]/3600.
