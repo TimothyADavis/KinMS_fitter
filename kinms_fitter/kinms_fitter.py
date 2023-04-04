@@ -729,7 +729,6 @@ class kinms_fitter:
         dra, ddec = centcoord.spherical_offsets_to(newcoord)
         self.xc_guess=-dra.to(u.arcsec).value
         self.yc_guess=ddec.to(u.arcsec).value
-        print(self.xc_guess,self.yc_guess)
         if np.any(self.initial_guesses != None):
             self.initial_guesses[0]=self.xc_guess
             self.initial_guesses[1]=self.yc_guess

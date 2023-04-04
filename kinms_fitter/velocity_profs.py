@@ -263,7 +263,7 @@ class velocity_profs:
             return mge_vcirc(self.surf*args[0], self.sigma, self.qobs, np.clip(kwargs['inc'],self.mininc,90), 10**bhmass, self.distance, x)               
     class mge_vcirc_mlvar:  
         """
-        Evaulate an MGE model of the potential, with or without a central point mass.  
+        Evaulate an MGE model of the potential with variable M/L for each gaussian, with or without a central point mass.  
         
         Inputs
         ------
