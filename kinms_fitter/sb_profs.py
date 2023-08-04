@@ -2,6 +2,21 @@
 # coding: utf-8
 import numpy as np
 from pprint import pformat
+import scipy.integrate
+
+def add_in_thickness(class1,thickness):
+    class1.labels=np.append(class1.labels,thickness.labels)
+    class1.units=np.append(class1.units,thickness.units)
+    class1.min=np.append(class1.min,thickness.min)
+    class1.max=np.append(class1.max,thickness.max)
+    class1.fixed=np.append(class1.fixed,thickness.fixed)
+    class1.guess=np.append(class1.guess,thickness.guess)
+    class1.priors=np.append(class1.priors,thickness.priors)
+    class1.precisions=np.append(class1.precisions,thickness.precisions)
+    class1.sbparams=class1.freeparams
+    class1.freeparams+=thickness.freeparams
+    class1.thickparams=thickness.freeparams
+    
 
 class sb_profs:
     """
@@ -39,7 +54,70 @@ class sb_profs:
             if operations[i]=='mult':
                 out= out * mod(r,params[indices[i]:indices[i+1]])    
         return out
+        
+    def model(modellist,r,params,nSamps,seeds=[54321,12345,34512]):
+        ilast=0
+        indices=np.append(np.array([0]),np.cumsum([i.freeparams for i in modellist]))
+        modellist=np.array(modellist)
+        totalflux=scipy.integrate.trapz(sb_profs.eval(modellist,r,params) * 2 * np.pi * abs(r), abs(r))
+        inClouds=[]
+        #find multiplicative components
+        wmult=np.array([i.operation=='mult' for i in modellist])
+        wmultinds,=np.where([i.operation=='mult' for i in modellist])
+        nmodels=len(modellist[wmult==False])
+                    
+        for i,model in enumerate(modellist):
+            if model.operation=='add':
+                ## generate sbProf
+                if np.sum(wmult)>0:
+                    themodel=np.append(np.array([model]),modellist[wmult])
+                    theparams=params[ilast:ilast+model.freeparams]
+                    for j,ind in enumerate(indices[np.where(wmult)]):
+                        theparams=np.append(theparams,params[ind:ind+modellist[wmultinds[j]].freeparams])
+                else:
+                    theparams=params[ilast:ilast+model.freeparams]
+                    themodel=np.array([model])
+                
+                    
+                sbProf = sb_profs.eval(themodel,r,theparams)
+                ##pick r and theta
+                px = scipy.integrate.cumtrapz(sbProf * 2 * np.pi * abs(r), abs(r), initial=0)
+                nsamps2do=int((px[-1]/totalflux)*nSamps)
+                px /= max(px) 
+                rng1 = np.random.RandomState(seeds[0])
+                rng2 = np.random.RandomState(seeds[1])
+                randompick_r = rng1.random_sample(nsamps2do)
+                phi = rng2.random_sample(nsamps2do) * 2 * np.pi 
+                r_flat = np.interp(randompick_r,px,r)
             
+                ## do disk thickness
+                if callable(model.thicknessfunc):
+                    diskThick_here = model.thicknessfunc(r_flat,params[ilast+model.sbparams:ilast+model.freeparams])
+                    rng3 = np.random.RandomState(seeds[2])
+                    z_pos = diskThick_here * rng3.exponential(1,nsamps2do)*rng3.choice([-1,1],size=nsamps2do)    
+                else:
+                    z_pos = 0
+        
+
+                # Calculate the x & y position of the clouds in the x-y plane of the disk.
+                r_3d = np.sqrt(r_flat ** 2 + z_pos ** 2)
+                sintheta=np.sqrt(1-(z_pos / r_3d)**2)
+                x_pos = r_3d * np.cos(phi) * sintheta
+                y_pos = r_3d * np.sin(phi) * sintheta
+
+                # Generates the output array
+                theseinClouds = np.empty((int(nsamps2do), 3))
+                theseinClouds[: ,0] = x_pos
+                theseinClouds[:, 1] = y_pos
+                theseinClouds[:, 2] = z_pos
+                if len(inClouds)==0:
+                    inClouds=theseinClouds.copy()
+                else:
+                    inClouds=np.concatenate((inClouds,theseinClouds))
+                
+            ilast+=model.freeparams
+            
+        return inClouds    
     
     class expdisk:  
         """
@@ -60,20 +138,23 @@ class sb_profs:
         fixed: ndarray of bool
             Optional - Fix this parameter to the input value in guesses. [Default = All False]
         """
-        def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
+        def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None,thickness=None):
             self.guess=np.array(guesses)
+            self.thicknessfunc=None
             if self.guess.size == 1:
                 self.freeparams=1
-                self.labels=['Rscale_exp']
-                self.units=['arcsec']
+                self.labels=np.array(['Rscale_exp'])
+                self.units=np.array(['arcsec'])
             else:
                 if self.guess.size == 2:
                     self.freeparams=2
                     self.labels=np.array(['PeakFlux_exp','Rscale_exp'])
-                    self.units=['arb','arcsec']
+                    self.units=np.array(['arb','arcsec'])
                 else:
                     raise('Wrong number of guesses, expected one or two [(optionally PeakFlux_exp), Rscale_exp]')
-
+            
+            
+            
             self.min=np.array(minimums)
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
@@ -92,6 +173,13 @@ class sb_profs:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
+                
+            if callable(thickness):
+                self.thicknessfunc=thickness
+                add_in_thickness(self,thickness)
+            else:
+                self.sbparams=self.freeparams
+                    
     
         def __repr__(self):
             keys=['labels','min','max','fixed']
@@ -109,7 +197,7 @@ class sb_profs:
                 Input arguments to evalue the profile with
             
             """
-            if self.freeparams==1:
+            if self.sbparams==1:
                 return np.exp(-x/args[0])
             else:
                 return args[0]*np.exp(-x/args[1])
@@ -133,8 +221,9 @@ class sb_profs:
         fixed: ndarray of bool
             Optional - Fix this parameter to the input value in guesses. [Default = All False]
         """
-        def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
+        def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None,thickness=None):
             self.guess=np.array(guesses)
+            self.thicknessfunc=None
             if self.guess.size == 2:
                 self.freeparams=2
                 self.labels=['Mean_gauss','sigma_gauss']
@@ -165,6 +254,12 @@ class sb_profs:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
+            if callable(thickness):
+                self.thicknessfunc=thickness
+                add_in_thickness(self,thickness)
+            else:
+                self.sbparams=self.freeparams    
+                    
         def __repr__(self):
             keys=['labels','min','max','fixed']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
@@ -207,8 +302,10 @@ class sb_profs:
         """
         def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
             self.freeparams=2
+            self.sbparams=self.freeparams
             self.labels=np.array(['Start_cutoff','End_cutoff'])
             self.units=['arcsec','arcsec']
+            self.thicknessfunc=None
             self.min=np.array(minimums)
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
@@ -267,8 +364,9 @@ class sb_profs:
         fixed: ndarray of bool
             Optional - Fix this parameter to the input value in guesses. [Default = All False]
         """
-        def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
+        def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None,thickness=None):
             self.guess=np.array(guesses)
+            self.thicknessfunc=None
             if self.guess.size == 3:
                 self.freeparams=3
                 self.labels=['mean_modsersic','sigma_modsersic','index_modsersic']
@@ -299,6 +397,11 @@ class sb_profs:
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
+            if callable(thickness):
+                self.thicknessfunc=thickness
+                add_in_thickness(self,thickness)
+            else:
+                self.sbparams=self.freeparams        
         def __repr__(self):
             keys=['labels','min','max','fixed']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)

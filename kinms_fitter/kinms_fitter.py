@@ -532,12 +532,19 @@ class kinms_fitter:
         inc=warp_funcs.eval(self.inc_profile,self.sbRad,param[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
 
         if len(self.skySampClouds) >0:
-            inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,cent = phasecen,sbRad=self.sbRad)
+            inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,sbRad=self.sbRad)
             sbprof=None
             myargs={'vPhaseCent': phasecen,'inClouds': inClouds, 'flux_clouds': self.skySampClouds[:,3]}
         else:
-            sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars:5+self.n_pavars+self.n_incvars+self.n_sbvars])
-            myargs={'phaseCent': phasecen}
+            if np.any([callable(i.thicknessfunc) for i in self.sb_profile]):
+                inClouds=sb_profs.model(self.sb_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars:5+self.n_pavars+self.n_incvars+self.n_sbvars],self.nSamps)
+                myargs={'vPhaseCent': phasecen,'inClouds': inClouds}
+                sbprof=None
+            else:
+                sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars:5+self.n_pavars+self.n_incvars+self.n_sbvars])
+                myargs={'phaseCent': phasecen}
+            
+            
         vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_sbvars:],inc=inc[0])
         
         if self.n_radmotionvars >0:
