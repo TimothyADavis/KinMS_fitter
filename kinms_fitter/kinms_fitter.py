@@ -27,7 +27,7 @@ import time
 from spectral_cube import SpectralCube
 from spectral_cube.utils import SpectralCubeWarning
 warnings.filterwarnings(action='ignore', category=SpectralCubeWarning, append=True)
-     
+
 class kinms_fitter:
     """
     Wrapper for easily kinematically modelling datacubes (typically from ALMA or VLA) using KinMS.
@@ -466,6 +466,7 @@ class kinms_fitter:
         priors=np.array([self.xc_prior,self.yc_prior,self.vsys_prior,self.totflux_prior,self.velDisp_prior])#np.resize(None,fixed.size)
         precision=(maximums-minimums)/10.    
         
+        
         if 'beam' in self.bunit:
             newunit=(self.spectralcube.unit*u.beam*u.km/u.s).to_string()
         else:
@@ -516,6 +517,7 @@ class kinms_fitter:
         self.v1=self.v1[self.chans2do[0]:self.chans2do[1]]
         self.spectralcube_trimmed=self.spectralcube[self.chans2do[0]:self.chans2do[1],self.spatial_trim[2]:self.spatial_trim[3],self.spatial_trim[0]:self.spatial_trim[1]]
 
+        
     def model_simple(self,param,fileName=''):
         """
         Function to create a model from the given input parameters.
@@ -604,7 +606,7 @@ class kinms_fitter:
                 print("Correction for chi-sqr variance not applied")    
         
 
-        outputvalue, outputll= mcmc.run(self.cube,self.error*self.chi2_correct_fac,self.niters,nchains=1,plot=False)
+        outputvalue, outputll= mcmc.run(self.cube,self.error*self.chi2_correct_fac,self.niters,plot=False)
 
         bestvals=np.median(outputvalue,1)    
         besterrs=np.std(outputvalue,1)
@@ -725,6 +727,13 @@ class kinms_fitter:
         self.errors_warnings=[]
         ### set up offset coordinates
         
+        if self.xcent_range[0]==self.xcent_range[1]:
+            self._xc_img=self.xcent_range[0]
+            self.xc_guess=self.xcent_range[0]
+        if self.ycent_range[0]==self.ycent_range[1]:
+            self._yc_img=self.ycent_range[0]
+            self.yc_guess=self.ycent_range[0]
+            
         self.xcent_range=(np.array(self.xcent_range)-self._xc_img)*3600.
         self.ycent_range=(np.array(self.ycent_range)-self._yc_img)*3600.
         if np.any(self.initial_guesses != None):
