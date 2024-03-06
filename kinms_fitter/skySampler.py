@@ -88,18 +88,19 @@ class skySampler:
             else: 
                 scheme = 'custom weighting'
                 weighting = weighting.flatten()
+            weighting[np.isfinite(weighting)==False]=0.0
             weighting=np.abs(weighting)
-            intWeight = weighting.sum()
+            intWeight = np.nansum(weighting)
             iCloud = intWeight/nSamps
             nClouds = np.floor(weighting/iCloud)
-        
+            breakpoint()
         else: 
             scheme = 'uniform'
             nClouds = np.full(sb[:,2].shape,sampFact)
-        if verbose: print('Using a ',scheme,' scheme to sample with ',nClouds.sum(),' clouds.')
+        if verbose: print('Using a ',scheme,' scheme to sample with ',np.nansum(nClouds),' clouds.')
     
         # Generate the final list of all clouds
-        clouds = np.zeros([int(nClouds.sum()),4])
+        clouds = np.zeros([int(np.nansum(nClouds)),4])
         k=0
     
         pixSmoothing = 0.5*self.cellsize              #Smooth cloud positions to within a cell, rather than gridded to the centre of that cell

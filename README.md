@@ -27,6 +27,9 @@ It requires the following modules:
 A simple iPython notebook tutorial on KinMS_fitter can be found here: [KinMS_fitter tutorial](https://github.com/TimothyADavis/KinMS_fitter/blob/main/kinms_fitter/docs/KinMS_fitter_tutorial.ipynb)
 
 Full API documentation is avaliable [here](https://timothyadavis.github.io/KinMS_fitter/index.html).
+
+New in KinMS_fitter v>0.5.2, is the ability to use the skySampler tool to deal with non-uniform flux distributions. See an example and some discussion [here](https://github.com/TimothyADavis/KinMS_fitter/blob/main/kinms_fitter/docs/KinMS+skySampler.ipynb)
+
 ### Commumication
 
 If you find any bugs, or wish to be kept up to date when new versions of this software are released, please raise an issue here on github, or email me at DavisT -at- cardiff.ac.uk
