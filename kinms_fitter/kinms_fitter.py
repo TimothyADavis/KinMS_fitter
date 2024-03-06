@@ -196,6 +196,7 @@ class kinms_fitter:
         self.show_corner= True
         self.totflux_guess=np.nansum(self.cube)
         self.expscale_guess=self.maxextent/5.
+        self.noplot=False
         self.inc_guess=60.
         self.velDisp_guess=8.
         self.velDisp_range=np.array([0,50])
@@ -292,7 +293,6 @@ class kinms_fitter:
         """
         Get coordinate arrays from a FITS header
         """
-        #y,x=self.spectralcube.spatial_coordinate_map
         cd1=self.spectralcube.wcs.pixel_scale_matrix[0,0]*3600
         cd2=self.spectralcube.wcs.pixel_scale_matrix[1,1]*3600
         x1=((np.arange(0,hdr['NAXIS1'])-(hdr['NAXIS1']//2))*cd1)# + hdr['CRVAL1']
@@ -456,7 +456,7 @@ class kinms_fitter:
         """
         nums=np.arange(0,self.nrings)
                 
-         
+
         # xcen, ycen, vsys, totflux, veldisp
         initial_guesses=np.array([self.xc_guess,self.yc_guess,self.vsys_guess,self.totflux_guess,self.velDisp_guess])
         minimums=np.array([self.xcent_range[0],self.ycent_range[0],self.vsys_range[0],self.totflux_range[0],self.velDisp_range[0]])
@@ -483,11 +483,10 @@ class kinms_fitter:
             vars2look.append(self.sb_profile)
         vars2look.append(self.vel_profile)
         if self.radial_motion != None:
-            vars2look.append(self.radial_motion)
-
-            
+            vars2look.append(self.radial_motion)  
             
         for list_vars in vars2look:
+            
             initial_guesses= np.append(initial_guesses,np.concatenate([i.guess for i in list_vars])) 
             minimums=np.append(minimums,np.concatenate([i.min for i in list_vars]))
             maximums=np.append(maximums,np.concatenate([i.max for i in list_vars]))
@@ -496,6 +495,7 @@ class kinms_fitter:
             precision=np.append(precision,np.concatenate([i.precisions for i in list_vars]))
             labels=np.append(labels,np.concatenate([i.labels for i in list_vars]))
             units=np.append(units,np.concatenate([i.units for i in list_vars]))
+        
             
         if np.any(self.initial_guesses != None):
             initial_guesses= np.array(self.initial_guesses)
@@ -529,7 +529,6 @@ class kinms_fitter:
         veldisp=param[4]
         phasecen=[xc,yc]
         
-        
         pa=warp_funcs.eval(self.pa_profile,self.sbRad,param[5:5+self.n_pavars])
         inc=warp_funcs.eval(self.inc_profile,self.sbRad,param[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
 
@@ -540,13 +539,12 @@ class kinms_fitter:
         else:
             if np.any([callable(i.thicknessfunc) for i in self.sb_profile]):
                 inClouds=sb_profs.model(self.sb_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars:5+self.n_pavars+self.n_incvars+self.n_sbvars],self.nSamps)
-                myargs={'vPhaseCent': phasecen,'inClouds': inClouds}
+                myargs={'phaseCent':[0,0],'vPhaseCent': phasecen,'inClouds': inClouds}
                 sbprof=None
             else:
                 sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars:5+self.n_pavars+self.n_incvars+self.n_sbvars])
                 myargs={'phaseCent': phasecen}
-            
-            
+                    
         vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_sbvars:],inc=inc[0])
         
         if self.n_radmotionvars >0:
@@ -728,8 +726,10 @@ class kinms_fitter:
         ### set up offset coordinates
         
         if self.xcent_range[0]==self.xcent_range[1]:
+            #if the range is fixed, better be within that range
             self._xc_img=self.xcent_range[0]
             self.xc_guess=self.xcent_range[0]
+            
         if self.ycent_range[0]==self.ycent_range[1]:
             self._yc_img=self.ycent_range[0]
             self.yc_guess=self.ycent_range[0]
@@ -780,9 +780,8 @@ class kinms_fitter:
         else:
             self.n_radmotionvars = np.sum([i.freeparams for i in self.radial_motion])
         
-        
-        initial_guesses,labels,minimums,maximums,fixed, priors,precision,units = self.setup_params()
         #breakpoint()
+        initial_guesses,labels,minimums,maximums,fixed, priors,precision,units = self.setup_params()
         central_inc_guess=warp_funcs.eval(self.inc_profile,np.array([0]),initial_guesses[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
         if central_inc_guess < 87: 
             inc_multfac= (1/np.cos(np.deg2rad(central_inc_guess)))
@@ -813,7 +812,8 @@ class kinms_fitter:
             print("==========================================================")
             print("One model evaluation takes {:.2f} seconds".format(self.timetaken))
         
-        self.figout=self.plot(overcube=init_model,savepath=savepath,block=self.interactive,**kwargs)
+        if not self.noplot:
+            self.figout=self.plot(overcube=init_model,savepath=savepath,block=self.interactive,**kwargs)
         
         if justplot:
             return initial_guesses,1,1,1,1
