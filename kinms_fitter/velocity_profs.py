@@ -530,7 +530,72 @@ class velocity_profs:
             v2r=np.heaviside(args[2]-x,1.0)*args[1]
             phib=args[3]
             return radial_motion.bisymmetric_flow(x,v2t,v2r,phib)     
+    class pure_radial:  
+        """
+        Pure Radial flow from e.g. Krajnovic Kinemetry
+        
+        Inputs
+        ------
+        bincentroids: ndarray of float
+            Radii at which to constrain the profile. Linearly interpolated between these points.
+        guesses : ndarray of float
+            Initial inflow/outflow guesses. Size of bincentroids, units of km/s.
+        minimums  : ndarray of float
+            Minimums for the given parameter.
+        maximums  : ndarray of float
+            Maximums for the given parameter.
+        priors : ndarray of objects
+            Optional- Priors for the given parameter (see GAStimator priors).
+        precisions : ndarray of float
+            Optional - Precision you want to reach for the given parameter. [Default = 10 percent of range]
+        fixed: ndarray of bool
+            Optional - Fix this parameter to the input value in guesses. [Default = False]
+        """
+        def __init__(self,bincentroids,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
+            self.freeparams=bincentroids.size
+            self.bincentroids=bincentroids
+            self.operation="quad"
+            self.labels=np.array([])
+            units=[]
+            for i in range(0,self.freeparams):
+                self.labels=np.append(self.labels,"Vr"+str(i))
+                units.append('km/s')
+            self.units=np.array(units)
+            self.min=np.array(minimums)
+            self.max=np.array(maximums)
+            self.guess=np.array(guesses)
 
+            if np.any(fixed) == None:
+                self.fixed=np.resize(False,self.freeparams)
+            else:
+                self.fixed=fixed
+            
+            if np.any(priors) == None:
+                self.priors=np.resize(None,self.freeparams)
+            else:
+                self.priors=priors
+                        
+            if np.any(precisions) == None:
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
+            else:
+                self.precisions=precisions
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
+        def __call__(self,x,args,**kwargs):
+            """
+            Returns the required profile.
+            
+            Inputs
+            ------
+            x : ndarray of float
+                Input radial array in arcseconds
+            args : ndarray of float
+                Input arguments to evalue the profile with
+            
+            """
+
+            return radial_motion.pure_radial(x,np.interp(x,self.bincentroids,args))
               
     class sersic:  
         """
@@ -783,7 +848,73 @@ class velocity_profs:
             top=np.log(1+(c*x)) - ((c*x)/(1+(c*x)))
             bottom=np.log(1+c) - ((c)/(1+(c)))     
             return v200*np.sqrt((1/x)*(top/bottom))
+    
+    class gasSelfGravity:  
+        """
+        Include gas self gravity. 
+        
+        Inputs
+        ------
+        distance: float
+            Distance to the object in Mpc.
+        guesses : ndarray of float
+            Initial guesses. Gas mass. Units of log10(Msun).
+        minimums  : ndarray of float
+            Minimums for the given parameter.
+        maximums  : ndarray of float
+            Maximums for the given parameter.
+        priors : ndarray of objects
+            Optional- Priors for the given parameter (see GAStimator priors).
+        precisions : ndarray of float
+            Optional - Precision you want to reach for the given parameter. [Default = 10 percent of range]
+        fixed: ndarray of bool
+            Optional - Fix this parameter to the input value in guesses. [Default = False]
+        """
+        def __init__(self,distance,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
+            self.guess=np.array(guesses)
+            self.guesses=np.array(guesses)
+            self.freeparams=1
+            self.operation="mult"
+            self.labels=['Mgas']
+            self.units=['log_Msun']
+            self.distance=distance
+            self.minimums=np.array(minimums)
+            self.maximums=np.array(maximums)
+            self.max=np.array(maximums)
+            self.min=np.array(minimums)
+
+            if np.any(fixed) == None:
+                self.fixed=np.resize(False,self.freeparams)
+            else:
+                self.fixed=fixed
             
+            if np.all(np.array(priors) == None):
+                self.priors=np.resize(None,self.freeparams)
+            else:
+                self.priors=priors
+          
+            if np.any(precisions) == None:
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
+            else:
+                self.precisions=precisions
+        
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)
+
+        def __call__(self,xs,theargs,**kwargs):
+            """
+            Returns the required profile.
+            
+            Inputs
+            ------
+            x : ndarray of float
+                Input radial array in arcseconds
+            args : ndarray of float
+                Input arguments to evalue the profile with
+            
+            """
+            return 1            
     # class mlgrad_linear:
     #     def __init__(self,guesses,minimums,maximums,priors=None,precisions=None,fixed=None):
     #         self.freeparams=3

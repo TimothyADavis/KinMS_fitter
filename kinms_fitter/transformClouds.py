@@ -45,7 +45,7 @@ def transformClouds(inclouds, posAng = 90., inc = 0., cent = [0.,0.],sbRad=None)
             inc2use=inc[0]
                     
     if inc_interp or posang_interp:
-        rflat_sqr=np.sqrt((clouds[:,0] - cent[0])**2 + (clouds[:,1] - cent[1])**2)
+        rflat=np.sqrt((clouds[:,0] - cent[0])**2 + (clouds[:,1] - cent[1])**2)
         if posang_interp:
             posang2use=np.interp(rflat,sbRad,posAng)
         if inc_interp:

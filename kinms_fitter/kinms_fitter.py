@@ -219,6 +219,7 @@ class kinms_fitter:
         self.vel_profile=None
         self.inc_profile=None
         self.pa_profile=None
+        self.vpa_profile=None
         self.timetaken=0
         self.initial_guesses=None
         self.chi2_var_correct=True
@@ -478,12 +479,16 @@ class kinms_fitter:
         
         vars2look=[self.pa_profile,self.inc_profile]
         
-    
+        if self.vpa_profile != None:    
+            vars2look.append(self.vpa_profile)
         if len(self.skySampClouds) == 0:
             vars2look.append(self.sb_profile)
         vars2look.append(self.vel_profile)
         if self.radial_motion != None:
             vars2look.append(self.radial_motion)  
+
+            
+            
             
         for list_vars in vars2look:
             
@@ -531,27 +536,39 @@ class kinms_fitter:
         
         pa=warp_funcs.eval(self.pa_profile,self.sbRad,param[5:5+self.n_pavars])
         inc=warp_funcs.eval(self.inc_profile,self.sbRad,param[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
-
+        myargs={}
+        
+        if self.vpa_profile != None:
+            vpa=warp_funcs.eval(self.vpa_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars:5+self.n_pavars+self.n_incvars+self.n_vpavars])
+            myargs['vPosAng']= vpa
         if len(self.skySampClouds) >0:
-            inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,sbRad=self.sbRad)
+            inClouds=transformClouds(self.skySampClouds[:,0:3],posAng = pa,inc = inc,sbRad=self.sbRad,cent=phasecen)
             sbprof=None
-            myargs={'vPhaseCent': phasecen,'inClouds': inClouds, 'flux_clouds': self.skySampClouds[:,3]}
+            myargs['vPhaseCent']= phasecen
+            myargs['inClouds']= inClouds
+            myargs['flux_clouds']= self.skySampClouds[:,3]
         else:
             if np.any([callable(i.thicknessfunc) for i in self.sb_profile]):
-                inClouds=sb_profs.model(self.sb_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars:5+self.n_pavars+self.n_incvars+self.n_sbvars],self.nSamps)
-                myargs={'phaseCent':[0,0],'vPhaseCent': phasecen,'inClouds': inClouds}
+                inClouds=sb_profs.model(self.sb_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_vpavars:5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars],self.nSamps)
+                myargs['phaseCent']=[0,0]
+                myargs['vPhaseCent']= phasecen
+                myargs['inClouds']=inClouds
                 sbprof=None
             else:
-                sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars:5+self.n_pavars+self.n_incvars+self.n_sbvars])
-                myargs={'phaseCent': phasecen}
-                    
-        vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_sbvars:],inc=inc[0])
+                sbprof=sb_profs.eval(self.sb_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_vpavars:5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars])
+                myargs['phaseCent']= phasecen
+                
+        
+        if self.selfGrav_mass_index!=None:
+            myargs['massDist']=[10**param[self.selfGrav_mass_index],self.selfGrav_dist]     
+
+        vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars:],inc=inc[0])        
         
         if self.n_radmotionvars >0:
-            radmotion=self.radial_motion[0](self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_velvars+self.n_sbvars:])
+            radmotion=self.radial_motion[0](self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_velvars+self.n_sbvars:])
         else:
             radmotion=None
-            
+          
         new=self.kinms_instance.model_cube(inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=self._xc_img,dec=self._yc_img,fileName=fileName,bunit=self.bunit,**myargs,toplot=False)
     
 
@@ -780,6 +797,12 @@ class kinms_fitter:
         else:
             self.n_radmotionvars = np.sum([i.freeparams for i in self.radial_motion])
         
+        if np.any(self.vpa_profile) == None:
+            self.n_vpavars=0
+        else:
+            self.n_vpavars = np.sum([i.freeparams for i in self.vpa_profile])
+        
+        
         #breakpoint()
         initial_guesses,labels,minimums,maximums,fixed, priors,precision,units = self.setup_params()
         central_inc_guess=warp_funcs.eval(self.inc_profile,np.array([0]),initial_guesses[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
@@ -801,6 +824,18 @@ class kinms_fitter:
         self.kinms_instance=KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],nSamps=self.nSamps)
         
         self.pa_guess=warp_funcs.eval(self.pa_profile,np.array([0]),initial_guesses[5:5+self.n_pavars])[0]
+        
+        usegasself,=np.where(np.array([i.__class__.__name__ for i in self.vel_profile])== 'gasSelfGravity')
+        ### include gas self gravity?
+        
+        self.selfGrav_mass_index=None
+        if len(usegasself)>0:
+            indices=np.append(np.array([0]),np.cumsum([i.freeparams for i in self.vel_profile]))
+            self.selfGrav_dist=self.vel_profile[usegasself[0]].distance
+            self.selfGrav_mass_index = 5+self.n_pavars+self.n_incvars+self.n_sbvars+indices[usegasself[0]]
+            
+        
+        
         t=time.time()
         init_model=self.model_simple(initial_guesses,fileName=fileName)
         self.timetaken=(time.time()-t)

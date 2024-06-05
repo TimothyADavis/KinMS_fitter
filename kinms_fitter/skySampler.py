@@ -16,6 +16,7 @@ from astropy.io import fits
 class skySampler:
     def __init__(self,filename,cellsize=None):
         hdu=fits.open(filename)
+        self.filename=filename
         self.sb=hdu[0].data.T
         if cellsize == None:
             try:
@@ -27,7 +28,7 @@ class skySampler:
         
         
             
-    def sample(self,nSamps = 0, sampFact = 20, weighting = None, allow_undersample = False, verbose = True):
+    def sample(self,nSamps = 0, sampFact = 20, weighting = None, allow_undersample = False, verbose = True,save=True):
         """
         Given a 2d image or 3d cube, will generate coordinates for a point-source model of that image
     
@@ -53,13 +54,20 @@ class skySampler:
         clouds: An array of [x,y,I] values corresponding to particle positions relative to the cube centre
     
         """
+        if save:
+            try:
+                savedclouds=np.load(self.filename+"_clouds.npz")
+                return savedclouds['arr_0']
+            except:
+                pass
+                
         sb=self.sb
         
     
         assert len(sb.shape) == 2 or len(sb.shape) == 3, "The input array must be 2 or 3 dimensions"
     
-        if len(sb.shape) == 3: sb = sb.sum(axis=2)
-        assert sb.shape[0] == sb.shape[1], "Currently, correct gridding is only handled for square matrices"
+        # if len(sb.shape) == 3: sb = sb.sum(axis=2)
+        # assert sb.shape[0] == sb.shape[1], "Currently, correct gridding is only handled for square matrices"
 
         if not nSamps == 0 and allow_undersample == False: assert nSamps > sb.size, "There are insufficiently many clouds to sample the distribution. If this is a sparse array, use allow_undersample = True"
     
@@ -93,7 +101,6 @@ class skySampler:
             intWeight = np.nansum(weighting)
             iCloud = intWeight/nSamps
             nClouds = np.floor(weighting/iCloud)
-            breakpoint()
         else: 
             scheme = 'uniform'
             nClouds = np.full(sb[:,2].shape,sampFact)
@@ -114,6 +121,9 @@ class skySampler:
         #Sanity checking:
         if not (clouds[:,3].sum() - inFlux) < 1e-3: print('Flux not conserved: '+str(100*(clouds[:,3].sum()-inFlux)/inFlux)+'%')
         #print(clouds)
+        if save:
+            np.savez(self.filename+"_clouds.npz",clouds)
+            
         return clouds
 
 
