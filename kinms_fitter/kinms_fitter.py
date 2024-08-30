@@ -153,7 +153,7 @@ class kinms_fitter:
         Label for each fitted quantity
      
     """
-    def __init__(self,filename,spatial_trim=None,spectral_trim=None,linefree_chans=[1,5]):
+    def __init__(self,filename,spatial_trim=None,spectral_trim=None,linefree_chans=[1,5],restfreq=None):
         """
         Initalise the KinMS_fitter instance, reading in the observed datacube and trimming it as needed.
 
@@ -167,6 +167,7 @@ class kinms_fitter:
         :type linefree_chans: list[int] or None
         
         """
+        self.restfreq=restfreq
         self.pa_guess=0
         self.linefree_chans_start = linefree_chans[0]
         self.linefree_chans_end = linefree_chans[1]
@@ -196,7 +197,6 @@ class kinms_fitter:
         self.show_corner= True
         self.totflux_guess=np.nansum(self.cube)
         self.expscale_guess=self.maxextent/5.
-        self.noplot=False
         self.inc_guess=60.
         self.velDisp_guess=8.
         self.velDisp_range=np.array([0,50])
@@ -216,6 +216,7 @@ class kinms_fitter:
         self.nSamps=int(5e5)
         self.sb_profile=None
         self.radial_motion=None
+        self.nchains=1
         self.vel_profile=None
         self.inc_profile=None
         self.pa_profile=None
@@ -236,7 +237,6 @@ class kinms_fitter:
         self.output_cube_fileroot=False
         self.lnlike_func=None # dont override default    
         self.tolerance=0.1 ## tolerance for simple fit. Smaller numbers are more stringent (longer runtime)
-
         
     
     def colorbar(self,mappable,ticks=None):
@@ -262,7 +262,7 @@ class kinms_fitter:
         """
         Reads in the datacube.
         """
-        self.spectralcube=SpectralCube.read(path).with_spectral_unit(u.km/u.s, velocity_convention='radio')#, rest_value=self.restfreq)
+        self.spectralcube=SpectralCube.read(path).with_spectral_unit(u.km/u.s, velocity_convention='radio', rest_value=self.restfreq)
         self.bunit=self.spectralcube.unit.to_string()
         hdr=self.spectralcube.header
         cube = np.squeeze(self.spectralcube.filled_data[:,:,:].T).value #squeeze to remove singular stokes axis if present
@@ -561,11 +561,11 @@ class kinms_fitter:
         
         if self.selfGrav_mass_index!=None:
             myargs['massDist']=[10**param[self.selfGrav_mass_index],self.selfGrav_dist]     
-
-        vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars:],inc=inc[0])        
+        
+        vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars:5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars+self.n_velvars],inc=inc[0])        
         
         if self.n_radmotionvars >0:
-            radmotion=self.radial_motion[0](self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_velvars+self.n_sbvars:])
+            radmotion=self.radial_motion[0](self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars+self.n_velvars:])
         else:
             radmotion=None
           
@@ -590,6 +590,7 @@ class kinms_fitter:
         mcmc.prior_func=priors
         mcmc.silent=self.silent
         mcmc.precision= precision
+        mcmc.nchains=self.nchains
         self.fixed=fixed
         
         if callable(self.lnlike_func): #lnlike func overridden
@@ -678,7 +679,8 @@ class kinms_fitter:
         """
         Makes the plots.
         """
-        pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=self.rms,savepath=savepath,savename=self.pdf_rootname,**kwargs)
+ 
+        pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=np.nanmin(self.rms),savepath=savepath,savename=self.pdf_rootname,**kwargs)
         pl.makeplots(block=block,plot2screen=self.show_plots)
         self.mask_sum=pl.mask.sum()
         return pl
@@ -803,7 +805,7 @@ class kinms_fitter:
             self.n_vpavars = np.sum([i.freeparams for i in self.vpa_profile])
         
         
-        #breakpoint()
+
         initial_guesses,labels,minimums,maximums,fixed, priors,precision,units = self.setup_params()
         central_inc_guess=warp_funcs.eval(self.inc_profile,np.array([0]),initial_guesses[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
         if central_inc_guess < 87: 
@@ -847,8 +849,8 @@ class kinms_fitter:
             print("==========================================================")
             print("One model evaluation takes {:.2f} seconds".format(self.timetaken))
         
-        if not self.noplot:
-            self.figout=self.plot(overcube=init_model,savepath=savepath,block=self.interactive,**kwargs)
+        
+        self.figout=self.plot(overcube=init_model,savepath=savepath,block=self.interactive,**kwargs)
         
         if justplot:
             return initial_guesses,1,1,1,1
@@ -901,14 +903,14 @@ class kinms_fitter:
                 besterrs[1]=besterrs[1]/3600.
             
             if (method=='mcmc')&(self.save_all_accepted):
-                np.savez(self.pdf_rootname+".npz",bestvals=bestvals, besterrs=besterrs, outputvalue=outputvalue, outputll=outputll,fixed=fixed,labels=self.labels)
+                np.savez(savepath+self.pdf_rootname+".npz",bestvals=bestvals, besterrs=besterrs, outputvalue=outputvalue, outputll=outputll,fixed=fixed,labels=self.labels)
 
                                         
             if self.text_output:
                 if self.pdf_rootname != "KinMS_fitter":
-                    fname=self.pdf_rootname+"_KinMS_fitter_output.txt"
+                    fname=savepath+self.pdf_rootname+"_KinMS_fitter_output.txt"
                 else:
-                    fname="KinMS_fitter_output.txt"
+                    fname=savepath+"KinMS_fitter_output.txt"
                 if ((method=='mcmc') or (method=='both')):    
                     perc = np.percentile(outputvalue, [15.86, 50, 84.14], axis=1)
                     sig_bestfit_up = (perc[2][:] - perc[1][:])
@@ -928,7 +930,7 @@ class kinms_fitter:
                 fig=corner_plot.corner_plot(outputvalue[~fixed,:].T,like=outputll,\
                                     quantiles=[0.16, 0.5, 0.84],labels=self.labels[~fixed],verbose=False)
                 if self.pdf:
-                    plt.savefig(self.pdf_rootname+"_MCMCcornerplot.pdf")
+                    plt.savefig(savepath+self.pdf_rootname+"_MCMCcornerplot.pdf")
                 if self.show_plots:    
                     if self.interactive==False:
                         plt.draw()
