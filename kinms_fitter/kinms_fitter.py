@@ -16,7 +16,7 @@ import matplotlib.gridspec as gridspec
 from matplotlib.offsetbox import AnchoredText
 import astropy.units as u
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from kinms import KinMS
+from kinms import KinMS#_jax as KinMS
 from kinms.utils.KinMS_figures import KinMS_plotter
 from kinms_fitter.sb_profs import sb_profs
 from kinms_fitter.warp_funcs import warp_funcs
@@ -581,7 +581,7 @@ class kinms_fitter:
         Function to run the MCMC fit.
         """
         mcmc = gastimator(self.model_simple)
-        
+        #breakpoint()
         mcmc.labels=labels
         mcmc.guesses=initial_guesses
         mcmc.min=minimums
@@ -769,15 +769,15 @@ class kinms_fitter:
             self.initial_guesses[1]=self.yc_guess
         #breakpoint()   
          
-        if np.any(self.inc_profile) == None:
+        if np.any(self.inc_profile == None):
             self.inc_profile=[warp_funcs.flat(self.inc_guess,self.inc_range[0],self.inc_range[1],priors=self.inc_prior,fixed=[self.inc_range[1]==self.inc_range[0]],labels='inc',units='deg')]
         self.n_incvars = np.sum([i.freeparams for i in self.inc_profile])
             
-        if np.any(self.pa_profile) == None:
+        if np.any(self.pa_profile == None):
             self.pa_profile=[warp_funcs.flat(self.pa_guess,self.pa_range[0],self.pa_range[1],priors=self.pa_prior,fixed=[self.pa_range[1]==self.pa_range[0]],labels='PA',units='deg')]
         self.n_pavars = np.sum([i.freeparams for i in self.pa_profile])    
         
-        if np.any(self.sb_profile) == None:
+        if np.any(self.sb_profile == None):
             # default SB profile is a single exponential disc
             self.sb_profile=[sb_profs.expdisk(guesses=[self.expscale_guess],minimums=[self.expscale_range[0]],maximums=[self.expscale_range[1]],fixed=[False])]
         
@@ -788,18 +788,18 @@ class kinms_fitter:
             self.n_sbvars = np.sum([i.freeparams for i in self.sb_profile])
          
             
-        if np.any(self.vel_profile) == None:
+        if np.any(self.vel_profile == None):
             # default vel profile is tilted rings
             self.vel_profile=[velocity_profs.tilted_rings(self.bincentroids,guesses=np.resize(self.vel_guess,self.nrings),minimums=np.resize(self.vel_range[0],self.nrings),maximums=np.resize(self.vel_range[1],self.nrings),priors=np.resize(prior_funcs.physical_velocity_prior(self.bincentroids,5+self.n_pavars+self.n_incvars+self.n_sbvars).eval,self.nrings))]
         self.n_velvars = np.sum([i.freeparams for i in self.vel_profile])
         
         
-        if np.any(self.radial_motion) == None:
+        if np.any(self.radial_motion == None):
             self.n_radmotionvars=0
         else:
             self.n_radmotionvars = np.sum([i.freeparams for i in self.radial_motion])
         
-        if np.any(self.vpa_profile) == None:
+        if np.any(self.vpa_profile == None):
             self.n_vpavars=0
         else:
             self.n_vpavars = np.sum([i.freeparams for i in self.vpa_profile])
@@ -850,7 +850,7 @@ class kinms_fitter:
             print("One model evaluation takes {:.2f} seconds".format(self.timetaken))
         
         
-        self.figout=self.plot(overcube=init_model,savepath=savepath,block=self.interactive,**kwargs)
+        self.figout=self.plot(overcube=np.array(init_model),savepath=savepath,block=self.interactive,**kwargs)
         
         if justplot:
             return initial_guesses,1,1,1,1
@@ -923,7 +923,7 @@ class kinms_fitter:
             
             
                 
-            self.figout=self.plot(overcube=best_model,savepath=savepath,block=self.interactive,**kwargs)
+            self.figout=self.plot(overcube=np.array(best_model),savepath=savepath,block=self.interactive,**kwargs)
             
             
             if ((method=='mcmc') or (method=='both')) and self.show_corner:

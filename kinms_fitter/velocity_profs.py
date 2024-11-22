@@ -1,11 +1,32 @@
 #!/usr/bin/env python3
 # coding: utf-8
 import numpy as np
-from jampy.mge_vcirc import mge_vcirc
+try:
+    from jampy.mge_vcirc import mge_vcirc
+except:
+    from jampy.mge import vcirc as mge_vcirc
 from kinms.radial_motion import radial_motion
 import scipy.integrate as integrate 
 from pprint import pformat
 from scipy import special
+
+def set_nones(self,fixed,priors,precisions):
+    if np.any(fixed == None):
+        self.fixed=np.resize(False,self.freeparams)
+    else:
+        self.fixed=fixed
+    
+    if np.any(priors == None):
+        self.priors=np.resize(None,self.freeparams)
+    else:
+        self.priors=priors
+                
+    if np.any(precisions == None):
+        self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
+    else:
+        self.precisions=precisions
+    return self
+        
 class velocity_profs:
     """
     Circular velocity curves from physical and arbitary models that can be combined together.
@@ -81,20 +102,8 @@ class velocity_profs:
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
             self.units=np.array(self.units)
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
+            self=set_nones(self,fixed,priors,precisions)
             
-            if np.any(priors) == None:
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-                        
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
         def __repr__(self):
             keys=['labels','min','max','fixed']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
@@ -145,20 +154,7 @@ class velocity_profs:
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
 
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
-            
-            if np.any(priors) == None:
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-                        
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
+            self=set_nones(self,fixed,priors,precisions)
         def __repr__(self):
             keys=['labels','min','max','fixed']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
@@ -227,20 +223,7 @@ class velocity_profs:
             self.max=np.array(maximums)
             
 
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
-            
-            if np.any(priors) == None:
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-                        
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
+            self=set_nones(self,fixed,priors,precisions)
         def __repr__(self):
             keys=['labels','min','max','fixed']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
@@ -319,20 +302,7 @@ class velocity_profs:
             self.max=np.array(maximums)
             
 
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
-            
-            if np.any(priors) == None:
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-                        
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
+            self=set_nones(self,fixed,priors,precisions)
         def __repr__(self):
             keys=['labels','min','max','fixed']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
@@ -438,20 +408,8 @@ class velocity_profs:
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
 
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
+            self=set_nones(self,fixed,priors,precisions)
             
-            if np.any(priors) == None:
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-                        
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
         def __repr__(self):
             keys=['labels','min','max','fixed']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
@@ -496,21 +454,8 @@ class velocity_profs:
             self.min=np.array(minimums)
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
+            self=set_nones(self,fixed,priors,precisions)
 
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
-            
-            if np.any(priors) == None:
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-                        
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
         def __repr__(self):
             keys=['labels','min','max','fixed']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
@@ -564,21 +509,8 @@ class velocity_profs:
             self.min=np.array(minimums)
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
-
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
+            self=set_nones(self,fixed,priors,precisions)
             
-            if np.any(priors) == None:
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-                        
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
         def __repr__(self):
             keys=['labels','min','max','fixed']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
@@ -627,22 +559,8 @@ class velocity_profs:
             self.distance=distance
             self.min=np.array(minimums)
             self.max=np.array(maximums)
+            self=set_nones(self,fixed,priors,precisions)
 
-
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
-            
-            if np.any(priors) == None:
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-                        
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
         
         def mass(self,r,theargs,norm=1):
             if not hasattr(r, "__len__") and r == 0:
@@ -734,21 +652,7 @@ class velocity_profs:
             self.operation="quad"
             self.max=np.array(maximums)
             self.min=np.array(minimums)
-
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
-            
-            if np.all(np.array(priors) == None):
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-                        
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
+            self=set_nones(self,fixed,priors,precisions)
             
             self.mymodel = [velocity_profs.sersic(self.distance,guesses=[self.guesses[0]+np.log10(1-self.guesses[3]),self.guesses[1],1],minimums=[self.minimums[0]+np.log10(1-self.maximums[3]),self.minimums[1],1],maximums=[self.maximums[0]+np.log10(1-self.minimums[3]),self.maximums[1],1],fixed=[self.fixed[0]&self.fixed[3],self.fixed[1],True]),\
                        velocity_profs.sersic(self.distance,guesses=[self.guesses[0]+np.log10(self.guesses[3]),self.guesses[2],4],minimums=[self.minimums[0]+np.log10(self.maximums[3]),self.minimums[2],4],maximums=[self.maximums[0]+np.log10(self.minimums[3]),self.maximums[2],4],fixed=[self.fixed[0]&self.fixed[3],self.fixed[2],True])]
@@ -808,20 +712,7 @@ class velocity_profs:
             self.max=np.array(maximums)
             self.min=np.array(minimums)
 
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
-            
-            if np.all(np.array(priors) == None):
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-          
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
+            self=set_nones(self,fixed,priors,precisions)
         
         def __repr__(self):
             keys=['labels','min','max','fixed']
@@ -883,20 +774,7 @@ class velocity_profs:
             self.max=np.array(maximums)
             self.min=np.array(minimums)
 
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
-            
-            if np.all(np.array(priors) == None):
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-          
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
+            self=set_nones(self,fixed,priors,precisions)
         
         def __repr__(self):
             keys=['labels','min','max','fixed']
@@ -1003,20 +881,7 @@ class velocity_profs:
             self.max=np.array(maximums)
             self.min=np.array(minimums)
 
-            if np.any(fixed) == None:
-                self.fixed=np.resize(False,self.freeparams)
-            else:
-                self.fixed=fixed
-            
-            if np.all(np.array(priors) == None):
-                self.priors=np.resize(None,self.freeparams)
-            else:
-                self.priors=priors
-          
-            if np.any(precisions) == None:
-                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
-            else:
-                self.precisions=precisions
+            self=set_nones(self,fixed,priors,precisions)
         
         def __repr__(self):
             keys=['labels','min','max','fixed']

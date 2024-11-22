@@ -71,7 +71,7 @@ class skySampler:
 
         if not nSamps == 0 and allow_undersample == False: assert nSamps > sb.size, "There are insufficiently many clouds to sample the distribution. If this is a sparse array, use allow_undersample = True"
     
-        inFlux = sb.sum()
+        inFlux = np.nansum(sb)
     
         #Convert to a list of pixel values
         cent = [sb.shape[0]/2, sb.shape[1]/2]
@@ -104,6 +104,8 @@ class skySampler:
         else: 
             scheme = 'uniform'
             nClouds = np.full(sb[:,2].shape,sampFact)
+            nClouds[sb[:,2]==0]=0
+            nClouds[np.isfinite(sb[:,2])==False]=0
         if verbose: print('Using a ',scheme,' scheme to sample with ',np.nansum(nClouds),' clouds.')
     
         # Generate the final list of all clouds

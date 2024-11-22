@@ -159,20 +159,20 @@ class sb_profs:
             self.max=np.array(maximums)
             self.guess=np.array(guesses)
             self.operation='add'
-            if np.any(fixed) == None:
+            if np.any(fixed == None):
                 self.fixed=np.resize(False,self.freeparams)
             else:
                 self.fixed=fixed
             
-            if np.any(priors) == None:
+            if np.any(priors == None):
                 self.priors=np.resize(None,self.freeparams)
             else:
                 self.priors=priors
                         
-            if np.any(precisions) == None:
+            if np.any(precisions == None):
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
-                self.precisions=precisions
+                self.precisions=precisions	
                 
             if callable(thickness):
                 self.thicknessfunc=thickness
@@ -240,17 +240,17 @@ class sb_profs:
             self.max=np.array(maximums)
             self.operation='add'
         
-            if np.any(fixed) == None:
+            if np.any(fixed == None):
                 self.fixed=np.resize(False,self.freeparams)
             else:
                 self.fixed=fixed
         
-            if np.any(priors) == None:
+            if np.any(priors == None):
                 self.priors=np.resize(None,self.freeparams)
             else:
                 self.priors=priors
                     
-            if np.any(precisions) == None:
+            if np.any(precisions == None):
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
@@ -311,17 +311,17 @@ class sb_profs:
             self.guess=np.array(guesses)
             self.operation='mult'
         
-            if np.any(fixed) == None:
+            if np.any(fixed == None):
                 self.fixed=np.resize(False,self.freeparams)
             else:
                 self.fixed=fixed
         
-            if np.any(priors) == None:
+            if np.any(priors == None):
                 self.priors=np.resize(None,self.freeparams)
             else:
                 self.priors=priors
                     
-            if np.any(precisions) == None:
+            if np.any(precisions == None):
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
@@ -383,17 +383,17 @@ class sb_profs:
             self.max=np.array(maximums)
             self.operation='add'
         
-            if np.any(fixed) == None:
+            if np.any(fixed == None):
                 self.fixed=np.resize(False,self.freeparams)
             else:
                 self.fixed=fixed
         
-            if np.any(priors) == None:
+            if np.any(priors == None):
                 self.priors=np.resize(None,self.freeparams)
             else:
                 self.priors=priors
                     
-            if np.any(precisions) == None:
+            if np.any(precisions == None):
                 self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
             else:
                 self.precisions=precisions
