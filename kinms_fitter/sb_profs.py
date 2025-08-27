@@ -59,7 +59,7 @@ class sb_profs:
         ilast=0
         indices=np.append(np.array([0]),np.cumsum([i.freeparams for i in modellist]))
         modellist=np.array(modellist)
-        totalflux=scipy.integrate.trapz(sb_profs.eval(modellist,r,params) * 2 * np.pi * abs(r), abs(r))
+        totalflux=scipy.integrate.trapezoid(sb_profs.eval(modellist,r,params) * 2 * np.pi * abs(r), abs(r))
         inClouds=[]
         #find multiplicative components
         wmult=np.array([i.operation=='mult' for i in modellist])
@@ -81,7 +81,7 @@ class sb_profs:
                     
                 sbProf = sb_profs.eval(themodel,r,theparams)
                 ##pick r and theta
-                px = scipy.integrate.cumtrapz(sbProf * 2 * np.pi * abs(r), abs(r), initial=0)
+                px = scipy.integrate.cumulative_trapezoid(sbProf * 2 * np.pi * abs(r), abs(r), initial=0)
                 nsamps2do=int((px[-1]/totalflux)*nSamps)
                 px /= max(px) 
                 rng1 = np.random.RandomState(seeds[0])
@@ -342,7 +342,77 @@ class sb_profs:
             
             """
             return ~((x>=args[0])&(x<args[1]))
+    class tilted_rings:  
+        """
+        Arbitary velocity profile using the tilted ring formalism. 
+        
+        Inputs
+        ------
+        bincentroids: ndarray of float
+            Radii at which to constrain the profile. Linearly interpolated between these points.
+        guesses : ndarray of float
+            Initial guesses. Size of bincentroids, units of km/s.
+        minimums  : ndarray of float
+            Minimums for the given parameters.
+        maximums  : ndarray of float
+            Maximums for the given parameters.
+        priors : ndarray of objects
+            Optional- Priors for the given parameters (see GAStimator priors).
+        precisions : ndarray of float
+            Optional - Precision you want to reach for the given parameters. [Default = 10 percent of range]
+        fixed: ndarray of bool
+            Optional - Fix this parameter to the input value in guesses. [Default = All False]
+        """
+        def __init__(self,bincentroids,guesses,minimums,maximums,priors=None,precisions=None,fixed=None,thickness=None):
+            self.freeparams=bincentroids.size
+            self.bincentroids=bincentroids
+            self.thicknessfunc=None
+            self.labels=np.array([])
+            self.units=[]
+            for i in range(0,self.freeparams):
+                self.labels=np.append(self.labels,"Sigma_"+str(i))
+                self.units.append('Arb')
+
+            self.min=np.array(minimums)
+            self.max=np.array(maximums)
+            self.guess=np.array(guesses)
+            self.units=np.array(self.units)
+            self.operation='add'
             
+            if np.any(fixed == None):
+                self.fixed=np.resize(False,self.freeparams)
+            else:
+                self.fixed=fixed
+        
+            if np.any(priors == None):
+                self.priors=np.resize(None,self.freeparams)
+            else:
+                self.priors=priors
+                    
+            if np.any(precisions == None):
+                self.precisions=np.resize(((self.max-self.min)/10.),self.freeparams)
+            else:
+                self.precisions=precisions
+            
+            
+        def __repr__(self):
+            keys=['labels','min','max','fixed']
+            return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
+        def __call__(self,x,args,**kwargs):
+            ## return the velocity 
+            """
+            Returns the required profile.
+            
+            Inputs
+            ------
+            x : ndarray of float
+                Input radial array in arcseconds
+            args : ndarray of float
+                Input arguments to evalue the profile with
+            
+            """
+            return np.interp(x,self.bincentroids,args)
+                    
     class mod_sersic:  
         """
         Creates an "modified sersic" surface brightness profile. This profile seemlessly morphs

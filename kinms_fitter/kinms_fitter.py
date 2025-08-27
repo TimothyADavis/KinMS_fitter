@@ -17,6 +17,7 @@ from matplotlib.offsetbox import AnchoredText
 import astropy.units as u
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from kinms import KinMS#_jax as KinMS
+from kinms.KinMS_jax import KinMS as KinMS_jax
 from kinms.utils.KinMS_figures import KinMS_plotter
 from kinms_fitter.sb_profs import sb_profs
 from kinms_fitter.warp_funcs import warp_funcs
@@ -153,7 +154,7 @@ class kinms_fitter:
         Label for each fitted quantity
      
     """
-    def __init__(self,filename,spatial_trim=None,spectral_trim=None,linefree_chans=[1,5],restfreq=None):
+    def __init__(self,filename,spatial_trim=None,spectral_trim=None,linefree_chans=[1,5],restfreq=None,hdu=0,velocity_convention='radio'):
         """
         Initalise the KinMS_fitter instance, reading in the observed datacube and trimming it as needed.
 
@@ -175,7 +176,8 @@ class kinms_fitter:
         self.spectralcube=None
         self.bunit=None
         self.filename=filename
-        self.cube =self.read_primary_cube(filename)
+        self.velocity_convention=velocity_convention
+        self.cube =self.read_primary_cube(filename,hdu=hdu)
         self.spatial_trim=spatial_trim
         self.clip_cube()
         _centskycoord=self.spectralcube_trimmed.wcs.celestial.pixel_to_world(self.x1.size//2,self.y1.size//2).transform_to('icrs')
@@ -210,7 +212,7 @@ class kinms_fitter:
         self.ycent_range=(np.array([-smallest_dim/2,smallest_dim/2])/3600.)+self._yc_img
         self.pa_range=np.array([0,360])
         self.vsys_range=np.array([np.nanmin(self.v1),np.nanmax(self.v1)])
-        self.vel_range=np.array([0,(np.nanmax(self.v1)-np.nanmin(self.v1))/2.])
+        self.vel_range=np.array([0,(np.nanmax(self.v1)-np.nanmin(self.v1))])
         self.sbRad=np.arange(0,self.maxextent*2,self.cellsize/3.)
         self.output_initial_model=False
         self.nSamps=int(5e5)
@@ -237,7 +239,9 @@ class kinms_fitter:
         self.output_cube_fileroot=False
         self.lnlike_func=None # dont override default    
         self.tolerance=0.1 ## tolerance for simple fit. Smaller numbers are more stringent (longer runtime)
-        
+        self.useJAX=True
+        self.spectral_resolution=0.0
+        self.asymmetric_drift=False 
     
     def colorbar(self,mappable,ticks=None):
         """
@@ -258,16 +262,15 @@ class kinms_fitter:
         return cb
             
 
-    def read_in_a_cube(self,path):
+    def read_in_a_cube(self,path,hdu=0):
         """
         Reads in the datacube.
         """
-        self.spectralcube=SpectralCube.read(path).with_spectral_unit(u.km/u.s, velocity_convention='radio', rest_value=self.restfreq)
+        self.spectralcube=SpectralCube.read(path,hdu=hdu).with_spectral_unit(u.km/u.s, velocity_convention=self.velocity_convention, rest_value=self.restfreq)
         self.bunit=self.spectralcube.unit.to_string()
         hdr=self.spectralcube.header
         cube = np.squeeze(self.spectralcube.filled_data[:,:,:].T).value #squeeze to remove singular stokes axis if present
         cube[np.isfinite(cube) == False] = 0.0
-        
         try:
             self.objname=self.hdr['OBJECT']
             self.pdf_rootname=hdr['OBJECT']+"_KinMS_fitter"
@@ -412,12 +415,12 @@ class kinms_fitter:
         else:
             return None,None,None
                         
-    def read_primary_cube(self,cube):
+    def read_primary_cube(self,cube,hdu=0):
         """
         Wrapper method for reading in datacube.
         """
         ### read in cube ###
-        datacube,hdr,beamtab = self.read_in_a_cube(cube)
+        datacube,hdr,beamtab = self.read_in_a_cube(cube,hdu=hdu)
         
         try:
            self.bmaj= beamtab.major.to(u.arcsec).value
@@ -568,8 +571,8 @@ class kinms_fitter:
             radmotion=self.radial_motion[0](self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars+self.n_velvars:])
         else:
             radmotion=None
-          
-        new=self.kinms_instance.model_cube(inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=self._xc_img,dec=self._yc_img,fileName=fileName,bunit=self.bunit,**myargs,toplot=False)
+        
+        new=self.kinms_instance.model_cube(inc,sbProf=sbprof,sbRad=self.sbRad,velRad=self.sbRad,velProf=vrad,gasSigma=veldisp,intFlux=totflux,posAng=pa,vOffset=vsys - self.vsys_mid,vSys=vsys,radial_motion_func=radmotion,ra=self._xc_img,dec=self._yc_img,fileName=fileName,bunit=self.bunit,**myargs,toplot=False,asymmetric_drift=self.asymmetric_drift)
     
 
         return new
@@ -581,7 +584,6 @@ class kinms_fitter:
         Function to run the MCMC fit.
         """
         mcmc = gastimator(self.model_simple)
-        #breakpoint()
         mcmc.labels=labels
         mcmc.guesses=initial_guesses
         mcmc.min=minimums
@@ -675,12 +677,11 @@ class kinms_fitter:
             
         return results 
 
-    def plot(self,block=True,overcube=None,savepath=None,**kwargs):
+    def plot(self,block=True,overcube=None,savepath=None,initial='',**kwargs):
         """
         Makes the plots.
         """
- 
-        pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=np.nanmin(self.rms),savepath=savepath,savename=self.pdf_rootname,**kwargs)
+        pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=np.nanmean(self.rms),savepath=savepath,savename=self.pdf_rootname+initial,**kwargs)
         pl.makeplots(block=block,plot2screen=self.show_plots)
         self.mask_sum=pl.mask.sum()
         return pl
@@ -767,7 +768,7 @@ class kinms_fitter:
         if np.any(self.initial_guesses != None):
             self.initial_guesses[0]=self.xc_guess
             self.initial_guesses[1]=self.yc_guess
-        #breakpoint()   
+           
          
         if np.any(self.inc_profile == None):
             self.inc_profile=[warp_funcs.flat(self.inc_guess,self.inc_range[0],self.inc_range[1],priors=self.inc_prior,fixed=[self.inc_range[1]==self.inc_range[0]],labels='inc',units='deg')]
@@ -823,7 +824,12 @@ class kinms_fitter:
             fileName=''
             
         ### setup the KinMS instance
-        self.kinms_instance=KinMS(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],nSamps=self.nSamps)
+        if self.useJAX:
+            func=KinMS_jax
+        else:
+            func=KinMS
+            
+        self.kinms_instance=func(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],nSamps=self.nSamps,spectral_resolution=self.spectral_resolution)
         
         self.pa_guess=warp_funcs.eval(self.pa_profile,np.array([0]),initial_guesses[5:5+self.n_pavars])[0]
         
@@ -837,7 +843,8 @@ class kinms_fitter:
             self.selfGrav_mass_index = 5+self.n_pavars+self.n_incvars+self.n_sbvars+indices[usegasself[0]]
             
         
-        
+        if self.useJAX:
+            init_model=self.model_simple(initial_guesses,fileName=fileName)
         t=time.time()
         init_model=self.model_simple(initial_guesses,fileName=fileName)
         self.timetaken=(time.time()-t)
@@ -849,8 +856,7 @@ class kinms_fitter:
             print("==========================================================")
             print("One model evaluation takes {:.2f} seconds".format(self.timetaken))
         
-        
-        self.figout=self.plot(overcube=np.array(init_model),savepath=savepath,block=self.interactive,**kwargs)
+        self.figout=self.plot(overcube=np.array(init_model),savepath=savepath,block=self.interactive,initial="_initial",**kwargs)
         
         if justplot:
             return initial_guesses,1,1,1,1

@@ -607,13 +607,12 @@ class velocity_profs:
             totmass,err=integrate.quad(self.mass,0,np.inf,args=(myargs))
             
             
-            
             norm=((10**myargs[0])/totmass)
             
                 
             smallestmass,errs=integrate.quad(self.mass,0,r[0],args=(myargs,norm))
             
-            mass=integrate.cumtrapz(self.mass(r,myargs,norm), r,initial=smallestmass)
+            mass=integrate.cumulative_trapezoid(self.mass(r,myargs,norm), r,initial=smallestmass)
             
             vsqr = (4.301e-3*mass)/r
             vsqr[r==0]=0
