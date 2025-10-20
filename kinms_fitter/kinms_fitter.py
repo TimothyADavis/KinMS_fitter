@@ -17,7 +17,10 @@ from matplotlib.offsetbox import AnchoredText
 import astropy.units as u
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from kinms import KinMS#_jax as KinMS
-from kinms.KinMS_jax import KinMS as KinMS_jax
+try:
+    from kinms.KinMS_jax import KinMS as KinMS_jax
+except:
+    pass
 from kinms.utils.KinMS_figures import KinMS_plotter
 from kinms_fitter.sb_profs import sb_profs
 from kinms_fitter.warp_funcs import warp_funcs
@@ -187,6 +190,7 @@ class kinms_fitter:
         self.yc_guess=_centskycoord.dec.value
         self.vsys_guess=np.nanmedian(self.v1)
         self.vsys_mid=np.nanmedian(self.v1)
+        self.bincentroids=None
         self.skySampClouds=np.array([])
         self.maxextent=np.max([np.max(np.abs(self.x1)),np.max(np.abs(self.y1))])
         self.nrings=np.floor(self.maxextent/self.bmaj).astype(int)
@@ -227,6 +231,7 @@ class kinms_fitter:
         self.initial_guesses=None
         self.chi2_var_correct=True
         self.chi2_correct_fac=None
+        self.model_function=self.model_simple
         self.n_pavars=1
         self.n_incvars=1
         self.mask_sum=0
@@ -239,9 +244,11 @@ class kinms_fitter:
         self.output_cube_fileroot=False
         self.lnlike_func=None # dont override default    
         self.tolerance=0.1 ## tolerance for simple fit. Smaller numbers are more stringent (longer runtime)
-        self.useJAX=True
+        self.useJAX=False
         self.spectral_resolution=0.0
         self.asymmetric_drift=False 
+        self.extra_fit_data=False
+        self.extra_fit_error=False
     
     def colorbar(self,mappable,ticks=None):
         """
@@ -458,7 +465,7 @@ class kinms_fitter:
         """
         Setup the fit guesses, minima, maxima etc from the inputs.
         """
-        nums=np.arange(0,self.nrings)
+        #nums=np.arange(0,self.nrings)
                 
 
         # xcen, ycen, vsys, totflux, veldisp
@@ -583,7 +590,7 @@ class kinms_fitter:
         """
         Function to run the MCMC fit.
         """
-        mcmc = gastimator(self.model_simple)
+        mcmc = gastimator(self.model_function)
         mcmc.labels=labels
         mcmc.guesses=initial_guesses
         mcmc.min=minimums
@@ -623,8 +630,15 @@ class kinms_fitter:
             else:
                 print("Correction for chi-sqr variance not applied")    
         
+        if np.all(self.extra_fit_data==False):
+            fitdata=self.cube
+            fiterr=self.error*self.chi2_correct_fac
+        else:
+            fitdata=np.array([self.cube,self.extra_fit_data])
+            fiterr=np.array([np.full_like(self.cube, self.error*self.chi2_correct_fac),self.extra_fit_error])
+        
 
-        outputvalue, outputll= mcmc.run(self.cube,self.error*self.chi2_correct_fac,self.niters,plot=False)
+        outputvalue, outputll= mcmc.run(fitdata,fiterr,self.niters,plot=False)
 
         bestvals=np.median(outputvalue,1)    
         besterrs=np.std(outputvalue,1)
@@ -635,7 +649,7 @@ class kinms_fitter:
         """
         Likelihood function for the simple fit mode.
         """
-        model=self.model_simple(theargs)
+        model=self.model_function(theargs)
         chi2=np.nansum((self.cube-model)**2)/(np.nansum((self.error*self.chi2_correct_fac))**2)
         if chi2==0:
             chi2=10000000
@@ -677,12 +691,12 @@ class kinms_fitter:
             
         return results 
 
-    def plot(self,block=True,overcube=None,savepath=None,initial='',**kwargs):
+    def plot(self,block=True,overcube=None,savepath=None,initial='',overrad=None,overvrad=None,**kwargs):
         """
         Makes the plots.
         """
         pl=KinMS_plotter(self.cube.copy(), self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa], posang=self.pa_guess,overcube=overcube,rms=np.nanmean(self.rms),savepath=savepath,savename=self.pdf_rootname+initial,**kwargs)
-        pl.makeplots(block=block,plot2screen=self.show_plots)
+        pl.makeplots(block=block,plot2screen=self.show_plots,overrad=overrad,overvrad=overvrad)
         self.mask_sum=pl.mask.sum()
         return pl
     
@@ -740,7 +754,6 @@ class kinms_fitter:
         method=method.lower()
         if (method!='mcmc')&(method!='both')&(method!='simple'):
             raise Exception('Method must be one of "mcmc", "simple", or "both"')
-        self.bincentroids=np.arange(0,self.nrings)*self.bmaj
         self.error=self.rms
         self.errors_warnings=[]
         ### set up offset coordinates
@@ -791,7 +804,8 @@ class kinms_fitter:
             
         if np.any(self.vel_profile == None):
             # default vel profile is tilted rings
-            self.vel_profile=[velocity_profs.tilted_rings(self.bincentroids,guesses=np.resize(self.vel_guess,self.nrings),minimums=np.resize(self.vel_range[0],self.nrings),maximums=np.resize(self.vel_range[1],self.nrings),priors=np.resize(prior_funcs.physical_velocity_prior(self.bincentroids,5+self.n_pavars+self.n_incvars+self.n_sbvars).eval,self.nrings))]
+            self.bincentroids=np.arange(0,self.nrings)*self.bmaj
+            self.vel_profile=[velocity_profs.tilted_rings(self.bincentroids,guesses=np.resize(self.vel_guess,self.nrings),minimums=np.resize(self.vel_range[0],self.nrings),maximums=np.resize(self.vel_range[1],self.nrings),priors=np.resize(prior_funcs.physical_velocity_prior(self.bincentroids,5+self.n_pavars+self.n_incvars+self.n_sbvars).eval,self.nrings))] 
         self.n_velvars = np.sum([i.freeparams for i in self.vel_profile])
         
         
@@ -844,9 +858,9 @@ class kinms_fitter:
             
         
         if self.useJAX:
-            init_model=self.model_simple(initial_guesses,fileName=fileName)
+            init_model=self.model_function(initial_guesses,fileName=fileName)
         t=time.time()
-        init_model=self.model_simple(initial_guesses,fileName=fileName)
+        init_model=self.model_function(initial_guesses,fileName=fileName)
         self.timetaken=(time.time()-t)
 
         
@@ -856,7 +870,16 @@ class kinms_fitter:
             print("==========================================================")
             print("One model evaluation takes {:.2f} seconds".format(self.timetaken))
         
-        self.figout=self.plot(overcube=np.array(init_model),savepath=savepath,block=self.interactive,initial="_initial",**kwargs)
+        showtilted,=np.where('tilted_rings' in np.array([i.__class__.__name__ for i in self.vel_profile]))
+        if len(showtilted)>0:
+            overrad=self.vel_profile[showtilted[0]].bincentroids
+            overinc=warp_funcs.eval(self.inc_profile,overrad,initial_guesses[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
+            overvrad=velocity_profs.eval(self.vel_profile,overrad,initial_guesses[5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars:5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars+self.n_velvars],inc=central_inc_guess)*np.sin(np.deg2rad(overinc))
+        else:
+            overrad=None
+            overvrad=None
+        
+        self.figout=self.plot(overcube=np.array(init_model),savepath=savepath,block=self.interactive,initial="_initial",overrad=overrad,overvrad=overvrad,**kwargs)
         
         if justplot:
             return initial_guesses,1,1,1,1
@@ -898,7 +921,7 @@ class kinms_fitter:
                 fileName=self.output_cube_fileroot
             else:
                 fileName=''
-            best_model=self.model_simple(bestvals,fileName=fileName)
+            best_model=self.model_function(bestvals,fileName=fileName)
             
             cent=self.spectralcube_trimmed.wcs.celestial.pixel_to_world(self.x1.size//2 + (bestvals[0]/self.cellsize),self.y1.size//2 + (bestvals[1]/self.cellsize))
             bestvals[0]=cent.ra.value
@@ -908,8 +931,18 @@ class kinms_fitter:
                 besterrs[0]=besterrs[0]/3600.
                 besterrs[1]=besterrs[1]/3600.
             
+            
+            showtilted,=np.where('tilted_rings' in np.array([i.__class__.__name__ for i in self.vel_profile]))
+            if len(showtilted)>0:
+                overrad=self.vel_profile[showtilted[0]].bincentroids
+                overinc=warp_funcs.eval(self.inc_profile,overrad,bestvals[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
+                overvrad=velocity_profs.eval(self.vel_profile,overrad,bestvals[5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars:5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars+self.n_velvars],inc=central_inc_guess)*np.sin(np.deg2rad(overinc))
+            else:
+                overrad=None
+                overvrad=None
+            
             if (method=='mcmc')&(self.save_all_accepted):
-                np.savez(savepath+self.pdf_rootname+".npz",bestvals=bestvals, besterrs=besterrs, outputvalue=outputvalue, outputll=outputll,fixed=fixed,labels=self.labels)
+                np.savez(savepath+self.pdf_rootname+".npz",bestvals=bestvals, besterrs=besterrs, outputvalue=outputvalue, outputll=outputll,fixed=fixed,labels=self.labels,bincentroids=overrad)
 
                                         
             if self.text_output:
@@ -927,9 +960,10 @@ class kinms_fitter:
                     sig_bestfit_up=sig_bestfit_down=np.zeros(bestvals.size)
                 self.write_text(bestvals, sig_bestfit_up, sig_bestfit_down, units, fixed,runtime,method,errors_warnings=self.errors_warnings,fname=fname)
             
-            
-                
-            self.figout=self.plot(overcube=np.array(best_model),savepath=savepath,block=self.interactive,**kwargs)
+    
+
+                    
+            self.figout=self.plot(overcube=np.array(best_model),savepath=savepath,block=self.interactive,overrad=overrad,overvrad=overvrad,**kwargs)
             
             
             if ((method=='mcmc') or (method=='both')) and self.show_corner:

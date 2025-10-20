@@ -105,7 +105,7 @@ class velocity_profs:
             self=set_nones(self,fixed,priors,precisions)
             
         def __repr__(self):
-            keys=['labels','min','max','fixed']
+            keys=['labels','min','max','fixed','bincentroids']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
         def __call__(self,x,args,**kwargs):
             ## return the velocity 
@@ -227,6 +227,10 @@ class velocity_profs:
         def __repr__(self):
             keys=['labels','min','max','fixed']
             return self.__class__.__name__+":\n"+pformat({key: vars(self)[key] for key in keys}, indent=4, width=1)        
+        
+        def total_lum(self):
+            return np.sum(2*np.pi*self.surf*((self.sigma*4.84*self.distance)**2)*self.qobs)
+            
         def __call__(self,x,args,**kwargs):
             """
             Returns the required profile.
@@ -243,7 +247,13 @@ class velocity_profs:
                 bhmass=0
             else:
                 bhmass=args[1]    
-            return mge_vcirc(self.surf*args[0], self.sigma, self.qobs, np.clip(kwargs['inc'],self.mininc,90), 10**bhmass, self.distance, x)               
+            inc=(np.clip(kwargs['inc'],self.mininc,90))
+            try:
+                inc=inc[0]
+            except:
+                pass
+                
+            return mge_vcirc(self.surf*args[0], self.sigma, self.qobs, inc, 10**bhmass, self.distance, x)               
     class mge_vcirc_mlvar:  
         """
         Evaulate an MGE model of the potential with variable M/L for each gaussian, with or without a central point mass.  
