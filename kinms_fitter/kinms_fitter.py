@@ -289,10 +289,16 @@ class kinms_fitter:
             self.objname="Object"
         try:
             self.specsys=hdr['SPECSYS']
+        except:
+            pass
         try:    
             self.radesys=hdr['RADESYS']
+        except:
+            pass
         try:    
             self.equinox=hdr['EQUINOX']   
+        except:
+            pass
         try:
             beamtab=self.spectralcube.beam
         except:
