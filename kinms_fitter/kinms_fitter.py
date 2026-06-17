@@ -249,9 +249,7 @@ class kinms_fitter:
         self.asymmetric_drift=False 
         self.extra_fit_data=False
         self.extra_fit_error=False
-        self.specsys='BARYCENT'
-        self.radesys='FK5'
-        self.equinox=2000.
+
         
     def colorbar(self,mappable,ticks=None):
         """
@@ -290,15 +288,16 @@ class kinms_fitter:
         try:
             self.specsys=hdr['SPECSYS']
         except:
-            pass
+            self.specsys='BARYCENT'
+
         try:    
             self.radesys=hdr['RADESYS']
         except:
-            pass
+            self.radesys='FK5'
         try:    
             self.equinox=hdr['EQUINOX']   
         except:
-            pass
+            self.equinox=2000.
         try:
             beamtab=self.spectralcube.beam
         except:
@@ -311,7 +310,7 @@ class kinms_fitter:
                     beamtab=Beam(major=np.max(beamvals)*u.deg,minor=np.min(beamvals)*u.deg,pa=self.spectralcube.header['bpa']*u.deg)
                 except:
                     beamtab=False
- 
+
         return cube, hdr, beamtab
         
     def get_header_coord_arrays(self,hdr):
@@ -859,9 +858,10 @@ class kinms_fitter:
             
         self.kinms_instance=func(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],nSamps=self.nSamps,spectral_resolution=self.spectral_resolution)
         self.kinms_instance.specsys=self.specsys
+        breakpoint()
         self.kinms_instance.radesys=self.radesys
         self.kinms_instance.equinox=self.equinox
-        
+
         self.pa_guess=warp_funcs.eval(self.pa_profile,np.array([0]),initial_guesses[5:5+self.n_pavars])[0]
         
         usegasself,=np.where(np.array([i.__class__.__name__ for i in self.vel_profile])== 'gasSelfGravity')
