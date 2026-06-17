@@ -249,7 +249,10 @@ class kinms_fitter:
         self.asymmetric_drift=False 
         self.extra_fit_data=False
         self.extra_fit_error=False
-    
+        self.specsys='BARYCENT'
+        self.radesys='FK5'
+        self.equinox=2000.
+        
     def colorbar(self,mappable,ticks=None):
         """
         Add a colorbar to a given plot
@@ -279,12 +282,17 @@ class kinms_fitter:
         cube = np.squeeze(self.spectralcube.filled_data[:,:,:].T).value #squeeze to remove singular stokes axis if present
         cube[np.isfinite(cube) == False] = 0.0
         try:
-            self.objname=self.hdr['OBJECT']
+            self.objname=hdr['OBJECT']
             self.pdf_rootname=hdr['OBJECT']+"_KinMS_fitter"
         except:
             self.pdf_rootname="KinMS_fitter"
             self.objname="Object"
-            
+        try:
+            self.specsys=hdr['SPECSYS']
+        try:    
+            self.radesys=hdr['RADESYS']
+        try:    
+            self.equinox=hdr['EQUINOX']   
         try:
             beamtab=self.spectralcube.beam
         except:
@@ -784,11 +792,11 @@ class kinms_fitter:
            
          
         if np.any(self.inc_profile == None):
-            self.inc_profile=[warp_funcs.flat(self.inc_guess,self.inc_range[0],self.inc_range[1],priors=self.inc_prior,fixed=[self.inc_range[1]==self.inc_range[0]],labels='inc',units='deg')]
+            self.inc_profile=[warp_funcs.flat(self.inc_guess,self.inc_range[0],self.inc_range[1],priors=[self.inc_prior],fixed=[self.inc_range[1]==self.inc_range[0]],labels='inc',units='deg')]
         self.n_incvars = np.sum([i.freeparams for i in self.inc_profile])
             
         if np.any(self.pa_profile == None):
-            self.pa_profile=[warp_funcs.flat(self.pa_guess,self.pa_range[0],self.pa_range[1],priors=self.pa_prior,fixed=[self.pa_range[1]==self.pa_range[0]],labels='PA',units='deg')]
+            self.pa_profile=[warp_funcs.flat(self.pa_guess,self.pa_range[0],self.pa_range[1],priors=[self.pa_prior],fixed=[self.pa_range[1]==self.pa_range[0]],labels='PA',units='deg')]
         self.n_pavars = np.sum([i.freeparams for i in self.pa_profile])    
         
         if np.any(self.sb_profile == None):
@@ -844,6 +852,9 @@ class kinms_fitter:
             func=KinMS
             
         self.kinms_instance=func(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],nSamps=self.nSamps,spectral_resolution=self.spectral_resolution)
+        self.kinms_instance.specsys=self.specsys
+        self.kinms_instance.radesys=self.radesys
+        self.kinms_instance.equinox=self.equinox
         
         self.pa_guess=warp_funcs.eval(self.pa_profile,np.array([0]),initial_guesses[5:5+self.n_pavars])[0]
         
@@ -870,7 +881,7 @@ class kinms_fitter:
             print("==========================================================")
             print("One model evaluation takes {:.2f} seconds".format(self.timetaken))
         
-        showtilted,=np.where('tilted_rings' in np.array([i.__class__.__name__ for i in self.vel_profile]))
+        showtilted,=np.where(np.array([i.__class__.__name__ for i in self.vel_profile])=='tilted_rings')
         if len(showtilted)>0:
             overrad=self.vel_profile[showtilted[0]].bincentroids
             overinc=warp_funcs.eval(self.inc_profile,overrad,initial_guesses[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
@@ -932,7 +943,7 @@ class kinms_fitter:
                 besterrs[1]=besterrs[1]/3600.
             
             
-            showtilted,=np.where('tilted_rings' in np.array([i.__class__.__name__ for i in self.vel_profile]))
+            showtilted,=np.where(np.array([i.__class__.__name__ for i in self.vel_profile])=='tilted_rings')
             if len(showtilted)>0:
                 overrad=self.vel_profile[showtilted[0]].bincentroids
                 overinc=warp_funcs.eval(self.inc_profile,overrad,bestvals[5+self.n_pavars:5+self.n_pavars+self.n_incvars])

@@ -19,7 +19,8 @@ class prior_funcs:
         def eval(self,x,**kwargs):
             xs = (x - self.mu) / self.sigma
             return (-(xs*xs)/2.0) - np.log(2.5066282746310002*self.sigma)
-            
+        def __call__(self, x,**kwargs):    
+            return self.eval(x,**kwargs)
     
     class physical_velocity_prior:  
         def __init__(self,rads,vel_zero_index):
@@ -35,6 +36,9 @@ class prior_funcs:
                     return 0
                 else:
                     return -1e50
+        def __call__(self, x,**kwargs):    
+            return self.eval(x,**kwargs)            
+                        
     class gaussian_rolling:  
         def __init__(self,sigma,index_to_start):
             self.sigma=sigma
@@ -48,3 +52,5 @@ class prior_funcs:
                 mu=allvalues[ival-1]
                 xs = (x - mu) / self.sigma
                 return (-(xs*xs)/2.0) - np.log(2.5066282746310002*self.sigma)
+        def __call__(self, x,**kwargs):    
+            return self.eval(x,**kwargs)        
