@@ -524,7 +524,7 @@ class kinms_fitter:
             labels=np.append(labels,np.concatenate([i.labels for i in list_vars]))
             units=np.append(units,np.concatenate([i.units for i in list_vars]))
         
-            
+   
         if np.any(self.initial_guesses != None):
             initial_guesses= np.array(self.initial_guesses)
         
@@ -584,7 +584,6 @@ class kinms_fitter:
         
         if self.selfGrav_mass_index!=None:
             myargs['massDist']=[10**param[self.selfGrav_mass_index],self.selfGrav_dist]     
-        
         vrad=velocity_profs.eval(self.vel_profile,self.sbRad,param[5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars:5+self.n_pavars+self.n_incvars+self.n_vpavars+self.n_sbvars+self.n_velvars],inc=inc[0])        
         
         if self.n_radmotionvars >0:
@@ -835,6 +834,8 @@ class kinms_fitter:
         
 
         initial_guesses,labels,minimums,maximums,fixed, priors,precision,units = self.setup_params()
+        
+
         central_inc_guess=warp_funcs.eval(self.inc_profile,np.array([0]),initial_guesses[5+self.n_pavars:5+self.n_pavars+self.n_incvars])
         if central_inc_guess < 87: 
             inc_multfac= (1/np.cos(np.deg2rad(central_inc_guess)))
@@ -857,8 +858,7 @@ class kinms_fitter:
             func=KinMS
             
         self.kinms_instance=func(self.x1.size*self.cellsize,self.y1.size*self.cellsize,self.v1.size*self.dv,self.cellsize,self.dv,[self.bmaj,self.bmin,self.bpa],nSamps=self.nSamps,spectral_resolution=self.spectral_resolution)
-        self.kinms_instance.specsys=self.specsys
-        breakpoint()
+        self.kinms_instance.specsys=self.specsys 
         self.kinms_instance.radesys=self.radesys
         self.kinms_instance.equinox=self.equinox
 

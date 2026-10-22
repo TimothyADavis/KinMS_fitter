@@ -923,4 +923,46 @@ class velocity_profs:
                 zd=theargs[2]*4.84*self.distance
                 vcsqr=vcsqr- ((((4.301e-3*(10**theargs[0]))/(rd**2))*zd)*x*np.exp(-x))
 
-            return np.sqrt(vcsqr)    
+            return np.sqrt(vcsqr)
+    class constant_surfacedensity_gasdisk:
+            """
+            A flat HI disk with constant surface density.
+
+            Assumes Sigma_HI = constant and evaluates the enclosed HI mass
+            at each radius x.
+            """
+
+            def __init__(self, distance, guesses=[10],minimums=[0],maximums=[10],priors=None,precisions=None,fixed=[True]):
+                self.guess=np.array(guesses)
+                self.freeparams=1
+                self.operation="quad"
+                self.labels=['Sigma_gas']
+                self.units=['Msun/pc^2',]
+                self.distance=distance
+                self.minimums=np.array(minimums)
+                self.maximums=np.array(maximums)
+                self.max=np.array(maximums)
+                self.min=np.array(minimums)
+                self=set_nones(self,fixed,priors,precisions)
+
+            def __repr__(self):
+                return self.__class__.__name__
+
+            def __call__(self, xs, theargs=None, **kwargs):
+                """
+                xs : ndarray
+                    Radius array in arcsec.
+
+                returns : ndarray
+                    HI circular velocity contribution in km/s.
+                """
+
+                # arcsec -> kpc
+                r = self.distance * 4.84e-3 * xs
+
+                # G in kpc (km/s)^2 / Msun
+                G = 4.301e-6
+
+                v2 = np.pi * G * (self.guess[0]*1e6) * r
+
+                return np.sqrt(v2)            

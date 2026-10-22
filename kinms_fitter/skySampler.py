@@ -15,6 +15,7 @@ from astropy.io import fits
 
 class skySampler:
     def __init__(self,filename,cellsize=None):
+
         hdu=fits.open(filename)
         self.filename=filename
         self.sb=hdu[0].data.T
@@ -56,7 +57,9 @@ class skySampler:
         """
         if save:
             try:
+                
                 savedclouds=np.load(self.filename+"_clouds.npz")
+                if verbose: print('Reading in the previously generated clouds from '+self.filename+"_clouds.npz for speed. Delete this file or set save=False to rerun sampling each time.")
                 return savedclouds['arr_0']
             except:
                 pass
@@ -106,6 +109,7 @@ class skySampler:
             nClouds = np.full(sb[:,2].shape,sampFact)
             nClouds[sb[:,2]==0]=0
             nClouds[np.isfinite(sb[:,2])==False]=0
+        
         if verbose: print('Using a ',scheme,' scheme to sample with ',np.nansum(nClouds),' clouds.')
     
         # Generate the final list of all clouds
@@ -125,7 +129,7 @@ class skySampler:
         #print(clouds)
         if save:
             np.savez(self.filename+"_clouds.npz",clouds)
-            
+ 
         return clouds
 
 
